@@ -1,0 +1,31 @@
+{
+  "id": "PROPERTY_AREA_RESIDUE",
+  "name": "Property Area Physical Residue",
+  "description": "Inspects Bionic property area memory structures for prop_info serial anomalies, value-length mismatches, and dirty trailing bytes left by in-place property tampering tools such as resetprop.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "system-property-residue.serial-anomaly",
+      "title": "Property serial and length consistency",
+      "domainId": "system-state",
+      "observedObject": "Bionic prop_info serial word encoding value length and update counter",
+      "proposition": "A system property exhibits an update counter on an immutable read-only property or a mismatch between the serial length field and the string value",
+      "observationChannel": "Direct parsing of process-mapped /dev/__properties__/* areas via /proc/self/maps",
+      "availability": "Available when Bionic property areas are mapped into process memory and format matches PROP_AREA_MAGIC",
+      "trustBoundary": "Reads property-area memory directly in our address space, bypassing libc property accessors that may be hooked",
+      "inferenceLimit": "Dynamic non-ro properties legitimately increment serial counters; only ro.* properties and strict length mismatches are considered anomalies"
+    },
+    {
+      "id": "system-property-residue.trailing-bytes",
+      "title": "Property value trailing buffer residue",
+      "domainId": "system-state",
+      "observedObject": "Unused bytes in prop_info value buffer past the initial NUL terminator",
+      "proposition": "A property value buffer contains non-zero bytes after its terminating NUL byte, indicating an in-place string overwrite without buffer zeroing",
+      "observationChannel": "Direct byte inspection of mapped prop_info structures in memory",
+      "availability": "Requires read access to process memory maps containing property area files",
+      "trustBoundary": "Operates directly on mapped physical buffer bytes in process address space",
+      "inferenceLimit": "Non-zero trailing bytes occur when an existing property is replaced with a shorter string (e.g. userdebug replaced with user); an overwrite with equal or longer string does not leave trailing bytes"
+    }
+  ]
+}

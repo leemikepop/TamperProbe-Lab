@@ -1,0 +1,31 @@
+{
+  "id": "SYSTEM_PROPERTIES_TAMPER",
+  "name": "System Property Source Integrity",
+  "description": "Cross-checks equivalent Android property sources and parses property areas with explicit failure states.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "system-properties.source-consistency",
+      "title": "Equivalent property-source consistency",
+      "domainId": "system-state",
+      "observedObject": "Equivalent Android property values read through multiple sources",
+      "proposition": "Available sources either agree or satisfy an explicit mismatch rule for the same property",
+      "observationChannel": "Comparison across the bionic callback accessor, the bionic legacy accessor, android.os.SystemProperties, a forked getprop, the parsed property-area bytes, android.os.Build, and /proc/cmdline boot parameters",
+      "availability": "A comparison is possible only when enough equivalent sources return usable values",
+      "trustBoundary": "All user-space sources can share mediation; agreement is not proof of kernel-level integrity. Only /proc/cmdline sits below user space, and only the property-area source bypasses the bionic accessor",
+      "inferenceLimit": "Strength is graded by which source is the outlier rather than by how many sources disagree: a kernel-versus-userspace or property-area-versus-accessor contradiction is STRONG, a Java-API or separate-process outlier is MODERATE, and an android.os.Build outlier is WEAK because the property may simply have changed after process start. Values are trimmed, lowercased and boolean-aliased before comparison, so a case-only or formatting-only spoof is not detected. Missing or failed sources remain collection state rather than negative evidence"
+    },
+    {
+      "id": "system-properties.area-layout",
+      "title": "Property-area allocation integrity",
+      "domainId": "system-state",
+      "observedObject": "Parsed property-area allocation and unreferenced byte ranges",
+      "proposition": "Visible property areas exhibit structural Trie integrity without orphaned unreferenced allocations",
+      "observationChannel": "Direct read-only parsing of visible property-area files",
+      "availability": "Depends on path visibility, permissions, and compatible property-area format",
+      "trustBoundary": "The app-visible files and parser remain below the kernel or privileged service trust boundary",
+      "inferenceLimit": "Unreferenced allocation indicates modified or deleted Trie nodes (e.g. via resetprop), though atypical OEM layouts remain possible"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "MEMORY_FD_ANOMALY",
+  "name": "Memory FD Anomaly",
+  "description": "Correlates executable memfd, ashmem, deleted mappings, and file descriptors while retaining generic anonymous-memory artifacts as telemetry.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "process-memory",
+  "evidenceUnits": [
+    {
+      "id": "memory-fd.executable-artifact",
+      "title": "Executable memory and FD artifact",
+      "domainId": "process-memory",
+      "observedObject": "Executable memfd, ashmem, deleted mappings, and correlated file-descriptor targets",
+      "proposition": "An executable memory or FD artifact satisfies either a detector signal rule or a non-attributing research candidate rule",
+      "observationChannel": "/proc/self/maps and /proc/self/fd correlation",
+      "availability": "Depends on maps and fd-directory readability and parseable targets",
+      "trustBoundary": "Both procfs sources are app-local and can be filtered by concealment",
+      "inferenceLimit": "Direct markers may support assessment; generic executable or deleted artifacts remain research data and do not establish instrumentation or privilege"
+    }
+  ]
+}

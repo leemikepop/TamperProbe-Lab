@@ -1,0 +1,20 @@
+{
+  "id": "TEE_OVERSIZED_CHALLENGE",
+  "name": "TEE Oversized Challenge",
+  "description": "Checks whether Android Keystore enforces the documented attestation challenge-size limit without attributing the result to a specific root tool.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "hardware-attestation",
+  "evidenceUnits": [
+    {
+      "id": "tee-oversized-challenge.limit-enforcement",
+      "title": "Attestation challenge-size enforcement",
+      "domainId": "hardware-attestation",
+      "observedObject": "Keystore behavior for a challenge exceeding the documented size limit",
+      "proposition": "The tested Keystore path accepted or rejected the oversized challenge at the recorded stage",
+      "observationChannel": "Android Keystore attestation key-generation request",
+      "availability": "Depends on Keystore availability and successful setup and cleanup of the test alias",
+      "trustBoundary": "The result reflects the public Keystore stack exposed to the application",
+      "inferenceLimit": "Unexpected behavior is a bounded consistency anomaly and is not attributed to a particular root tool"
+    }
+  ]
+}

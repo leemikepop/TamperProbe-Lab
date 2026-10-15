@@ -1,0 +1,42 @@
+# Gradle / Android Studio
+.gradle/
+build/
+/local.properties
+.idea/
+*.iml
+.cxx/
+.externalNativeBuild/
+captures/
+.navigation/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Generated during the build (the catalog is generated into tamperprobe/scripts/generated/)
+/tamperprobe/src/main/assets/tamperprobe/
+
+# Native tooling
+.clangd
+compile_commands.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Injector tools are downloaded locally, not redistributed
+/injector/tools/
+
+# Signing material and tokens must never be committed
+*.jks
+*.keystore
+*.p12
+*.pem
+*.token
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/

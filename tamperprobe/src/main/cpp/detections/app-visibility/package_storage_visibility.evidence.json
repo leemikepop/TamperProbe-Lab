@@ -1,0 +1,31 @@
+{
+  "id": "PACKAGE_STORAGE_VISIBILITY",
+  "name": "Package Storage Visibility",
+  "description": "Probes Android data and OBB package paths for canonical and Unicode alias visibility.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "app-visibility",
+  "evidenceUnits": [
+    {
+      "id": "package-storage.path-visibility",
+      "title": "Package storage path visibility",
+      "domainId": "app-visibility",
+      "observedObject": "Canonical or Unicode-aliased package data and OBB paths",
+      "proposition": "A storage path associated with an indicator package is visible through at least one tested representation",
+      "observationChannel": "stat, access, open, and directory-list probes over canonical and transformed paths",
+      "availability": "Depends on external-storage layout, target presence, package isolation, FUSE or BPF behavior, and permissions",
+      "trustBoundary": "The app observes a platform- and namespace-mediated storage view",
+      "inferenceLimit": "Path visibility does not prove package execution, root activation, or a universal Unicode bypass"
+    },
+    {
+      "id": "package-storage.path-representation-differential",
+      "title": "Path representation differential",
+      "domainId": "app-visibility",
+      "observedObject": "Different results returned for canonical and transformed package-storage paths",
+      "proposition": "The tested path representations produced a platform-level visibility differential",
+      "observationChannel": "Paired canonical and Unicode path probes",
+      "availability": "Requires a comparable probe pair and sufficient platform response data",
+      "trustBoundary": "The differential reflects the app-visible storage stack rather than an unmediated filesystem ground truth",
+      "inferenceLimit": "The differential is telemetry and is not attributed to a root or concealment framework"
+    }
+  ]
+}

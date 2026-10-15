@@ -1,0 +1,982 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "1.0",
+  "evidenceContractVersion": 1,
+  "evidenceDomains": [
+    {
+      "id": "binary-artifact",
+      "title": "Binary and Executable Artifacts",
+      "shortTitle": "Binary Artifacts",
+      "description": "Visible binary and executable filesystem objects inspected as bounded artifacts."
+    },
+    {
+      "id": "filesystem-state",
+      "title": "Filesystem and Mount State",
+      "shortTitle": "Filesystem State",
+      "description": "Filesystem paths, permissions, mounts, filesystems, and namespace-visible state."
+    },
+    {
+      "id": "kernel-interface",
+      "title": "Kernel and Privilege Interfaces",
+      "shortTitle": "Kernel Interfaces",
+      "description": "Kernel protocols, privilege interfaces, policy queries, and kernel-mediated side channels."
+    },
+    {
+      "id": "process-memory",
+      "title": "Process and Memory State",
+      "shortTitle": "Process & Memory",
+      "description": "Procfs, process context, file descriptors, linker visibility, mappings, and memory state."
+    },
+    {
+      "id": "runtime-integrity",
+      "title": "Runtime Injection and Code Integrity",
+      "shortTitle": "Runtime Integrity",
+      "description": "Runtime instrumentation, injected components, hooks, and executable code integrity."
+    },
+    {
+      "id": "system-state",
+      "title": "System Configuration and Security State",
+      "shortTitle": "System State",
+      "description": "Properties, build identity, SELinux state, and other system security posture."
+    },
+    {
+      "id": "app-visibility",
+      "title": "Package and Application Visibility",
+      "shortTitle": "App Visibility",
+      "description": "Package identities, application data paths, and package-associated storage visibility."
+    },
+    {
+      "id": "hardware-attestation",
+      "title": "Hardware-backed Attestation and Trusted Execution",
+      "shortTitle": "Hardware Attestation",
+      "description": "Android Keystore, attestation chains, RootOfTrust, and trusted execution state."
+    }
+  ],
+  "detections": [
+    {
+      "id": "BUILD_PATCH_COHERENCE",
+      "name": "Security Patch and Build Timestamp Coherence",
+      "description": "Compares each partition's declared Android security-patch level against the compile timestamp of that same partition, because a stock image declares a patch at most a few weeks after it was built. The comparison stays inside the property set and therefore survives a forged key attestation.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "build-patch.security-patch-plausibility",
+          "title": "Declared patch level versus own build timestamp",
+          "domainId": "system-state",
+          "observedObject": "Per-partition pairs of security-patch level and build timestamp properties, such as ro.build.version.security_patch with ro.build.date.utc",
+          "proposition": "A partition declares a security-patch level dated substantially later than the compile timestamp of that same partition, which no genuine build can produce",
+          "observationChannel": "Bionic system property reads through __system_property_get",
+          "availability": "Available when at least one partition publishes both a YYYY-MM-DD patch level and an epoch build timestamp; partitions publishing only one half are reported as not comparable",
+          "trustBoundary": "Both values are read from the same property set, so this compares two values an attacker could control; it holds only because spoofing tools rewrite the patch level while leaving build timestamps intact",
+          "inferenceLimit": "Proves the patch level was set after the image was produced but does not name the tool that set it; stock images legitimately declare a patch up to about two months after their build, so only skew far beyond that is graded, and an attacker who also rewrites build timestamps defeats the check entirely"
+        }
+      ]
+    },
+    {
+      "id": "BUSYBOX",
+      "name": "BusyBox Checking",
+      "description": "Classifies visible BusyBox paths by object type, resolved metadata, and bounded ELF-magic evidence without treating presence as proof of privilege.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "binary-artifact",
+      "evidenceUnits": [
+        {
+          "id": "busybox.visible-artifact",
+          "title": "Visible BusyBox artifact",
+          "domainId": "binary-artifact",
+          "observedObject": "A resolved filesystem object at a BusyBox candidate path",
+          "proposition": "A BusyBox-compatible artifact is visible through the app process filesystem view",
+          "observationChannel": "Fixed-path access, lstat, O_PATH open, fstat, and bounded header inspection",
+          "availability": "Available only for candidate paths visible and inspectable from the application sandbox",
+          "trustBoundary": "App-local VFS view and user-space parsing can be filtered or hooked",
+          "inferenceLimit": "Presence does not establish that the artifact grants privilege or was installed by a root framework"
+        }
+      ]
+    },
+    {
+      "id": "CUSTOM_ROM",
+      "name": "Custom ROM Detection",
+      "description": "Checks build properties (test-keys, ro.debuggable, ro.secure) and known custom ROM identifiers (LineageOS, PixelExperience, etc.).",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "custom-rom.build-fingerprint",
+          "title": "Custom or debug build fingerprint",
+          "domainId": "system-state",
+          "observedObject": "Build tags, debugging and security properties, and maintained ROM identifiers",
+          "proposition": "An app-visible build value matches a maintained custom-ROM or debug-build rule",
+          "observationChannel": "Android build and system-property observations",
+          "availability": "Depends on property availability and the maintained identifier set",
+          "trustBoundary": "Build and property values are user-space observations that can be spoofed",
+          "inferenceLimit": "A custom or debug build is not equivalent to root or malicious tampering"
+        }
+      ]
+    },
+    {
+      "id": "DANGEROUS_PACKAGES",
+      "name": "Dangerous Package Indicators",
+      "description": "Probes dangerous packages through PackageManager and visible native path indicators.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "app-visibility",
+      "evidenceUnits": [
+        {
+          "id": "dangerous-packages.package-identity-visibility",
+          "title": "Package identity visibility",
+          "domainId": "app-visibility",
+          "observedObject": "An installed package identity queried through Android PackageManager",
+          "proposition": "A package on the maintained dangerous-package indicator list is visible to the app",
+          "observationChannel": "PackageManager queries subject to package visibility rules",
+          "availability": "Depends on generated queries, installed package state, and platform visibility filtering",
+          "trustBoundary": "PackageManager is a framework-mediated app-local view",
+          "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state"
+        },
+        {
+          "id": "dangerous-packages.app-data-path-visibility",
+          "title": "Application data path visibility",
+          "domainId": "app-visibility",
+          "observedObject": "A canonical application data path derived from a maintained package identity",
+          "proposition": "A package-derived private-data path is visible through the application filesystem view",
+          "observationChannel": "Native access probes over canonical package-data paths",
+          "availability": "Depends on package-data layout, namespace, permissions, and concealment affecting the app-local VFS view; under the app data isolation current Android enables, other applications' data directories are not visible and the unit reports itself unavailable",
+          "trustBoundary": "Path resolution is mediated by the process mount namespace and kernel VFS",
+          "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege"
+        }
+      ]
+    },
+    {
+      "id": "DANGEROUS_PROPS",
+      "name": "Security-Relevant System Properties",
+      "description": "Reports explicit insecure property values and a non-standard adb_enabled setting, with non-assessment emulator and ADB posture telemetry.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "dangerous-props.security-posture",
+          "title": "Security-relevant property posture",
+          "domainId": "system-state",
+          "observedObject": "Selected Android security and debugging property values",
+          "proposition": "An available property value matches an explicitly defined insecure rule",
+          "observationChannel": "Bionic system-property API",
+          "availability": "Depends on property presence and successful property-service access",
+          "trustBoundary": "User-space property APIs may be spoofed or hooked",
+          "inferenceLimit": "An insecure value is contextual evidence and does not identify a root provider"
+        },
+        {
+          "id": "dangerous-props.environment-posture",
+          "title": "Environment property posture",
+          "domainId": "system-state",
+          "observedObject": "Emulator and USB or ADB-related property values, and the Settings.Global adb_enabled value",
+          "proposition": "adb_enabled holds a value outside {0, 1}, which neither the Settings UI nor AdbService writes; emulator and ADB-on posture is only described",
+          "observationChannel": "Bionic system-property API and Settings.Global through the app ContentResolver",
+          "availability": "Depends on property presence, successful property-service access, and a readable Settings.Global provider; from API 37 (Android 17 QPR1) the platform returns adb_enabled = 0 to third-party apps, so a 0 read there is recorded as redacted_by_platform and the rule is not evaluated",
+          "trustBoundary": "User-space property APIs and in-process Settings reads may be spoofed or hooked, and the platform itself redacts adb_enabled for third-party apps from Android 17 QPR1",
+          "inferenceLimit": "A non-standard adb_enabled value shows deliberate setting manipulation, not a root provider; a redacted_by_platform read is an unanswered channel, not ADB off, so the rule can fire only below API 37 or where the platform does not redact; emulator and ADB-on posture remain telemetry"
+        }
+      ]
+    },
+    {
+      "id": "DRM_CREDENTIAL_COHERENCE",
+      "name": "DRM Credential and Boot State Coherence",
+      "description": "Compares the boot state the device claims through its own properties against its Widevine credential. L1 key material is erased when a bootloader is unlocked and cannot be re-provisioned from userspace, so a device claiming a locked, verified boot state while advertising L1 with no provisioned credential is stating two things that cannot both be true.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "hardware-attestation",
+      "evidenceUnits": [
+        {
+          "id": "drm-credential.boot-state-coherence",
+          "title": "Claimed boot state versus Widevine credential",
+          "domainId": "hardware-attestation",
+          "observedObject": "Widevine plugin securityLevel and systemId read through MediaDrm, and a session open attempt, compared against ro.boot.verifiedbootstate, ro.boot.flash.locked and ro.boot.vbmeta.device_state",
+          "proposition": "A device claiming a locked and verified boot state advertises Widevine L1 while its plugin reports the unprovisioned-system-ID placeholder, which a genuinely locked device would not do",
+          "observationChannel": "android.media.MediaDrm for the Widevine UUID via a JNI collector, and Bionic system property reads for the claimed boot state",
+          "availability": "Comparable only when Widevine is supported, the plugin advertises L1, and the boot properties claim a locked verified state; devices advertising only L3 or honestly reporting an unlocked bootloader are reported as not comparable",
+          "trustBoundary": "Crosses from values a userspace module can rewrite to key material held by the DRM trustlet, which a module can neither forge nor re-provision, so the comparison survives property spoofing and a forged attestation keybox",
+          "inferenceLimit": "Proves the two statements are inconsistent, not which one is false or which tool caused it: an erased DRM credential can also follow a mainboard replacement or a device that never carried L1 provisioning, and no locked unmodified device has been measured, so the rate at which legitimate devices present this way is unknown"
+        }
+      ]
+    },
+    {
+      "id": "ELF_TEXT_INTEGRITY",
+      "name": "ELF Text Integrity",
+      "description": "Compares selected libc, ART, and input-library non-writable executable PT_LOAD bytes with their file-backed ELF without changing page protections.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "elf-text.mapped-file-mismatch",
+          "title": "Mapped ELF text mismatch",
+          "domainId": "runtime-integrity",
+          "observedObject": "Selected non-writable executable PT_LOAD bytes and their backing ELF bytes",
+          "proposition": "A compared executable segment differs from the corresponding file-backed ELF range",
+          "observationChannel": "Public linker enumeration, process maps, memory reads, and backing-file reads",
+          "availability": "Depends on module presence, resolved backing files, readable mappings, and supported ELF layout",
+          "trustBoundary": "Both in-memory and file-backed observations are made from the potentially mediated process",
+          "inferenceLimit": "A mismatch indicates code divergence but does not identify the modifier or prove malicious behavior"
+        }
+      ]
+    },
+    {
+      "id": "EMULATOR_HARDWARE_INDICATORS",
+      "name": "Emulator Hardware Indicators",
+      "description": "Detects virtualized and emulated hardware environments using offscreen OpenGL ES renderers, ARM64 hardware timer registers, and scheduler jitter analysis.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "emulator-hardware.egl-renderer",
+          "title": "Offscreen OpenGL ES renderer",
+          "domainId": "system-state",
+          "observedObject": "EGL display and OpenGL ES GL_RENDERER and GL_VENDOR strings",
+          "proposition": "The offscreen OpenGL ES renderer identifies a software rasterizer or virtual machine graphics driver",
+          "observationChannel": "EGL 1.4 and OpenGL ES 2.0 API",
+          "availability": "Requires EGL display initialization and pbuffer surface support",
+          "trustBoundary": "Vendor strings can be spoofed in modified emulator builds",
+          "inferenceLimit": "Identifies known emulator rendering drivers; does not classify physical GPU variants"
+        },
+        {
+          "id": "emulator-hardware.timer-register-deviation",
+          "title": "ARM64 hardware timer register deviation",
+          "domainId": "system-state",
+          "observedObject": "ARM64 cntvct_el0 and cntfrq_el0 virtual counter registers",
+          "proposition": "The ARM64 virtual counter frequency or drift deviates significantly from CLOCK_MONOTONIC",
+          "observationChannel": "ARM64 inline assembly instructions and POSIX monotonic clock",
+          "availability": "Supported exclusively on 64-bit ARM (aarch64) platforms",
+          "trustBoundary": "Hypervisors may trap or emulate timer register reads with overhead",
+          "inferenceLimit": "Indicates virtualized counter timing characteristics; does not pinpoint hypervisor vendor"
+        },
+        {
+          "id": "emulator-hardware.sched-jitter",
+          "title": "Scheduler yield jitter distribution",
+          "domainId": "system-state",
+          "observedObject": "POSIX sched_yield latency distribution across 32 iterations",
+          "proposition": "The thread yield latency exhibits abnormally low coefficient of variation characteristic of deterministic virtualization",
+          "observationChannel": "POSIX sched_yield and clock_gettime syscalls",
+          "availability": "Requires monotonic clock access and thread scheduling privileges",
+          "trustBoundary": "Physical system quiescence may occasionally reduce scheduling jitter",
+          "inferenceLimit": "Statistical heuristic indicating virtualization; requires correlation with hardware signals"
+        }
+      ]
+    },
+    {
+      "id": "EMULATOR_SYSTEM_PROFILE",
+      "name": "Emulator System Profile",
+      "description": "Detects emulator environments through QEMU system properties, virtual hardware identifiers, build fingerprints, and emulator boot characteristics.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "emulator-profile.qemu-properties",
+          "title": "QEMU and virtual hardware system properties",
+          "domainId": "system-state",
+          "observedObject": "Bionic system properties associated with QEMU and Android emulator platforms",
+          "proposition": "System properties explicitly declare QEMU or virtual hardware drivers",
+          "observationChannel": "Bionic system-property API via direct syscall or __system_property_get",
+          "availability": "Requires readable system property areas in /dev/__properties__",
+          "trustBoundary": "Root processes may modify or unset properties using tools like resetprop",
+          "inferenceLimit": "Identifies standard emulator platform property configurations"
+        },
+        {
+          "id": "emulator-profile.build-fingerprint",
+          "title": "Emulator build fingerprint and model characteristics",
+          "domainId": "system-state",
+          "observedObject": "ro.build.fingerprint and device model properties",
+          "proposition": "The system build fingerprint or product model matches generic emulator patterns",
+          "observationChannel": "Bionic system-property API",
+          "availability": "Requires access to Android build properties",
+          "trustBoundary": "Fingerprints can be spoofed by custom ROMs or Magisk modules",
+          "inferenceLimit": "Indicates build configuration origin; does not detect hardened hypervisor instances"
+        }
+      ]
+    },
+    {
+      "id": "KERNEL_CHECK",
+      "name": "Kernel Integrity Check",
+      "description": "Checks kernel compilation signatures in /proc/version and uname, bootloader lock state from /proc/cmdline, and kptr_restrict address visibility in /proc/kallsyms.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "kernel-check.integrity-posture",
+          "title": "Kernel and boot integrity posture",
+          "domainId": "kernel-interface",
+          "observedObject": "Kernel build strings, version signatures, bootloader parameters, and kallsyms address visibility",
+          "proposition": "An available kernel or boot observation matches a maintained integrity-posture rule",
+          "observationChannel": "uname, /proc/version, /proc/cmdline, and /proc/kallsyms",
+          "availability": "Each observation depends on kernel configuration, procfs permissions, and platform exposure",
+          "trustBoundary": "The running kernel owns all returned sources and can conceal or rewrite them",
+          "inferenceLimit": "A marker or visibility state is bounded evidence and does not prove a malicious custom kernel"
+        }
+      ]
+    },
+    {
+      "id": "KEYSTORE_GRANT_SPLIT",
+      "name": "Keystore Grant Chain Consistency",
+      "description": "Reads one Keystore key's attestation certificate chain twice, once by alias and once through a grant the application issues to its own uid, and compares them; a grant read-back that denies the key exists is graded separately, after a non-attested control key shows the grant path works. A stored chain is identical to every reader, so a difference proves the chain is being produced per lookup rather than returned from storage.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "hardware-attestation",
+      "evidenceUnits": [
+        {
+          "id": "keystore-grant.chain-consistency",
+          "title": "Alias-path and grant-path certificate chains",
+          "domainId": "hardware-attestation",
+          "observedObject": "The certificate chain of a freshly generated attested EC key, read through KeyStore.getCertificateChain and through KeyStoreManager.getGrantedCertificateChainFromId for the same key",
+          "proposition": "The two readings of one key's certificate chain disagree in length or in a certificate digest, or the grant path denies that the key exists while a non-attested control key reads back through its grant, none of which storage can produce",
+          "observationChannel": "AndroidKeyStore provider and the public android.security.keystore.KeyStoreManager grant API through a JNI collector",
+          "availability": "Requires API 36 or later, where KeyStoreManager first ships; below that the check reports unavailable rather than clean, and attestation key generation must succeed",
+          "trustBoundary": "Self-referential and carries no reference data, so it holds against an attestation chain that verifies to a genuine root: an interception layer must answer both lookup paths identically to stay consistent",
+          "inferenceLimit": "Proves the chain is synthesised per lookup, not which layer synthesises it or whether the attestation content is false; a layer that answers both paths identically is invisible to this check, and an isolated-process reader, which would be a stronger second path, cannot reach the Keystore service on any device"
+        }
+      ]
+    },
+    {
+      "id": "LSPOSED_MAPS",
+      "name": "LSPosed/Xposed Maps Scan",
+      "description": "Scans /proc/self/maps for LSPosed, Xposed, EdXposed, and Riru framework libraries loaded into the process memory.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "lsposed-maps.framework-marker",
+          "title": "LSPosed or Xposed process-map marker",
+          "domainId": "runtime-integrity",
+          "observedObject": "Mapped paths and names in the current process",
+          "proposition": "A process mapping matches a maintained LSPosed, Xposed, EdXposed, or Riru marker",
+          "observationChannel": "/proc/self/maps parsing",
+          "availability": "Depends on maps readability and marker visibility in the target process",
+          "trustBoundary": "The process map view and parser can be filtered or hooked",
+          "inferenceLimit": "A marker supports framework presence in this process but not module scope or system-wide activation"
+        }
+      ]
+    },
+    {
+      "id": "LSPOSED_SEPOLICY",
+      "name": "LSPosed SELinux Policy Oracle",
+      "description": "Uses a controlled app-zygote SELinux policy snapshot to observe LSPosed and Xposed-specific allow rules.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "lsposed-sepolicy.policy-oracle",
+          "title": "LSPosed-related SELinux policy oracle",
+          "domainId": "kernel-interface",
+          "observedObject": "Controlled app-zygote SELinux allow-rule decisions and validation controls",
+          "proposition": "A validated policy query permits a maintained LSPosed or Xposed-specific rule",
+          "observationChannel": "Native and hidden-framework SELinux policy queries in an app-zygote carrier",
+          "availability": "Requires carrier setup, stable controls, valid contexts, and available query sources",
+          "trustBoundary": "The oracle reports source agreement and trust rather than assuming every query path is independent",
+          "inferenceLimit": "An allowed rule is policy evidence and does not prove that LSPosed is injected into this process"
+        }
+      ]
+    },
+    {
+      "id": "MEMORY_FD_ANOMALY",
+      "name": "Memory FD Anomaly",
+      "description": "Correlates executable memfd, ashmem, deleted mappings, and file descriptors while retaining generic anonymous-memory artifacts as telemetry.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "process-memory",
+      "evidenceUnits": [
+        {
+          "id": "memory-fd.executable-artifact",
+          "title": "Executable memory and FD artifact",
+          "domainId": "process-memory",
+          "observedObject": "Executable memfd, ashmem, deleted mappings, and correlated file-descriptor targets",
+          "proposition": "An executable memory or FD artifact satisfies either a detector signal rule or a non-attributing research candidate rule",
+          "observationChannel": "/proc/self/maps and /proc/self/fd correlation",
+          "availability": "Depends on maps and fd-directory readability and parseable targets",
+          "trustBoundary": "Both procfs sources are app-local and can be filtered by concealment",
+          "inferenceLimit": "Direct markers may support assessment; generic executable or deleted artifacts remain research data and do not establish instrumentation or privilege"
+        }
+      ]
+    },
+    {
+      "id": "MEMORY_LINKER_VISIBILITY",
+      "name": "Memory Linker Visibility",
+      "description": "Cross-checks public dl_iterate_phdr load ranges with /proc/self/maps and verifies standard library symbol resolution boundaries (GOT/PLT integrity) without private linker symbols.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "process-memory",
+      "evidenceUnits": [
+        {
+          "id": "memory-linker.module-view-consistency",
+          "title": "Linker and process-map view consistency",
+          "domainId": "process-memory",
+          "observedObject": "Normalized module visibility relationships between dl_iterate_phdr objects, executable process mappings, and resolved symbol addresses",
+          "proposition": "The linker and process-map views agree or expose a directional module-visibility mismatch or symbol resolution escape",
+          "observationChannel": "dl_iterate_phdr, dlsym, and /proc/self/maps range comparison",
+          "availability": "Requires public linker enumeration, dlsym symbol resolution, and readable process maps",
+          "trustBoundary": "The user-visible linker tables and process maps can both be mediated and are not independent kernel attestation",
+          "inferenceLimit": "Linker-only mismatches, maps-only hidden modules, or symbol resolution escapes outside valid load ranges indicate memory tampering or hooking"
+        }
+      ]
+    },
+    {
+      "id": "MEMORY_MAPS_ANOMALY",
+      "name": "Memory Maps Anomaly",
+      "description": "Reports non-ART writable, anonymous, or deleted executable mappings, smaps dirty-page code modifications, and suspicious signal handler registrations.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "process-memory",
+      "evidenceUnits": [
+        {
+          "id": "memory-maps.executable-mapping-anomaly",
+          "title": "Executable mapping anomaly",
+          "domainId": "process-memory",
+          "observedObject": "Non-ART writable, anonymous, deleted executable mappings, smaps dirty code pages, and signal handler targets",
+          "proposition": "A normalized process-map entry, smaps dirty page, or signal handler target satisfies an anomaly rule",
+          "observationChannel": "/proc/self/maps parsing, /proc/self/smaps dirty page audit, and sigaction query",
+          "availability": "Depends on maps/smaps readability and sigaction accessibility",
+          "trustBoundary": "The process map and smaps views can be filtered or rewritten",
+          "inferenceLimit": "Generic mapping anomalies have legitimate producers. Anonymous or instrumentation-owned signal handlers and writable executable mappings drive the assessment; dirty system code pages are collected as context only, because relocation and copy-on-write dirty executable pages on ordinary devices and the size thresholds are not yet calibrated against a clean baseline."
+        }
+      ]
+    },
+    {
+      "id": "MOUNT_INTEGRITY",
+      "name": "Mount Table Integrity",
+      "description": "Detects framework-specific mount markers and cross-checks mountinfo against statx and statfs kernel observations; mount ID sequence gaps are recorded as telemetry.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "filesystem-state",
+      "evidenceUnits": [
+        {
+          "id": "mount-integrity.table-marker",
+          "title": "Mount-table marker",
+          "domainId": "filesystem-state",
+          "observedObject": "Mount-table rows and normalized mount relationships",
+          "proposition": "An app-visible mount row satisfies a framework-specific or bounded generic mount rule",
+          "observationChannel": "/proc/self/mountinfo parsing",
+          "availability": "Requires at least one required mount source to be readable and parseable",
+          "trustBoundary": "The process mount namespace can differ from init and can be filtered by concealment",
+          "inferenceLimit": "Generic rules are not framework attribution, and absence is limited to the visible namespace"
+        },
+        {
+          "id": "mount-integrity.kernel-view-consistency",
+          "title": "Kernel and mount-table view consistency",
+          "domainId": "filesystem-state",
+          "observedObject": "Mount IDs and filesystem types returned for selected paths",
+          "proposition": "statx or statfs observations agree or disagree with the parsed mount-table view",
+          "observationChannel": "statx mount ID, statfs type, and mount-table comparison",
+          "availability": "Depends on syscall support, selected path visibility, and readable mount sources",
+          "trustBoundary": "Syscalls and procfs are separate app-visible channels but can share kernel mediation",
+          "inferenceLimit": "Agreement does not prove global mount integrity; unavailable sources must remain explicit"
+        },
+        {
+          "id": "mount-integrity.namespace-observation",
+          "title": "Mount namespace observation",
+          "domainId": "filesystem-state",
+          "observedObject": "Mount ID sequences, mount namespace identifiers, and root mount propagation",
+          "proposition": "The app-visible mount environment has the recorded structural properties, or the process shares the init mount namespace",
+          "observationChannel": "Parsed /proc/self/mountinfo plus the /proc/self/ns/mnt and /proc/1/ns/mnt namespace links",
+          "availability": "Varies by the individual source and is retained even when no finding is produced",
+          "trustBoundary": "Telemetry describes the observed process view rather than a privileged global view",
+          "inferenceLimit": "Telemetry fields do not prove global mount configuration. Mount ID sequence gaps occur on unmodified phones and are not evidence of mount hiding; only a shared init namespace contributes a signal."
+        }
+      ]
+    },
+    {
+      "id": "NATIVE_ROOT_DEVPTS",
+      "name": "Devpts Permission Anomaly",
+      "description": "Checks /dev/pts/ pseudo-terminal permissions and SELinux contexts. KernelSU hooks may stamp PTYs with root ownership or ksu_file context.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "native-root-devpts.pty-metadata",
+          "title": "Devpts ownership and context anomaly",
+          "domainId": "kernel-interface",
+          "observedObject": "Visible pseudo-terminal ownership, permissions, freshness, and SELinux context",
+          "proposition": "A tested pseudo-terminal satisfies an explicit root-related metadata or context rule",
+          "observationChannel": "devpts enumeration, stat metadata, and SELinux file context",
+          "availability": "Depends on devpts visibility, an available PTY, and readable metadata or contexts",
+          "trustBoundary": "The process-visible devpts mount and context view may be mediated",
+          "inferenceLimit": "PTY metadata can have non-root producers and does not prove application privilege"
+        }
+      ]
+    },
+    {
+      "id": "NATIVE_ROOT_PATHS",
+      "name": "Native Root Paths",
+      "description": "Probes filesystem paths associated with KernelSU, APatch, and Magisk using multi-confirmation (stat/lstat/open) to detect root management artifacts.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "filesystem-state",
+      "evidenceUnits": [
+        {
+          "id": "native-root-paths.framework-artifact",
+          "title": "Native root-framework path artifact",
+          "domainId": "filesystem-state",
+          "observedObject": "Filesystem paths associated with KernelSU, APatch, or Magisk",
+          "proposition": "A maintained framework path was confirmed by the recorded native path operations",
+          "observationChannel": "Native stat, lstat, and open confirmations",
+          "availability": "Depends on path visibility, permissions, and process mount namespace",
+          "trustBoundary": "The app-local VFS can be filtered by concealment or kernel changes",
+          "inferenceLimit": "A path artifact does not prove that the associated provider is active for this process"
+        }
+      ]
+    },
+    {
+      "id": "NATIVE_ROOT_PRCTL",
+      "name": "Native Root Interface Probe",
+      "description": "Detects KernelSU, APatch, and native root frameworks by probing kernel prctl, supercall latency, cgroups, and driver file descriptors.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "native-root-prctl.kernelsu-protocol",
+          "title": "KernelSU and native root protocol response",
+          "domainId": "kernel-interface",
+          "observedObject": "Kernel responses to root prctl commands, supercall latency, cgroup allocations, and driver file descriptors",
+          "proposition": "The kernel interface or process environment returned a response satisfying a native root framework indicator",
+          "observationChannel": "Direct native prctl, syscall latency benchmarking, /proc/self/cgroup, and /proc/self/fd",
+          "availability": "Requires kernel interfaces and procfs nodes to execute without interception that suppresses or emulates responses",
+          "trustBoundary": "The kernel syscall boundary is below ordinary Java mediation but can be modified by the kernel",
+          "inferenceLimit": "The response identifies protocol compatibility or anomaly, not the full privilege granted to the app. The supercall latency deviation is a timing measurement taken without CPU pinning or frequency control, so it is treated as moderate corroboration rather than a direct marker."
+        }
+      ]
+    },
+    {
+      "id": "NATIVE_ROOT_SEPOLICY",
+      "name": "Native Root SELinux Policy Oracle",
+      "description": "Uses a controlled app-zygote SELinux policy snapshot to observe Magisk, KernelSU, ADB-root, and su-specific allow rules.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "native-root-sepolicy.policy-oracle",
+          "title": "Root-related SELinux policy oracle",
+          "domainId": "kernel-interface",
+          "observedObject": "Controlled app-zygote SELinux allow-rule decisions and validation controls",
+          "proposition": "A validated policy query permits a maintained Magisk, KernelSU, ADB-root, or su-related rule",
+          "observationChannel": "Native and hidden-framework SELinux policy queries in an app-zygote carrier",
+          "availability": "Requires carrier setup, stable positive and negative controls, and at least one trusted query source",
+          "trustBoundary": "Java-controlled query sources are weaker than native sources and their trust tier remains explicit",
+          "inferenceLimit": "An allowed rule is policy evidence and does not prove current process injection or granted root"
+        }
+      ]
+    },
+    {
+      "id": "NATIVE_ROOT_SUSFS",
+      "name": "SUSFS Side-Channel Probe",
+      "description": "Detects SUSFS (KernelSU filesystem hiding module) via a side-channel: a child process attempts setresuid and SUSFS kills it with SIGKILL instead of returning EPERM.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "kernel-interface",
+      "evidenceUnits": [
+        {
+          "id": "native-root-susfs.child-signal",
+          "title": "SUSFS syscall side-channel",
+          "domainId": "kernel-interface",
+          "observedObject": "Child-process termination behavior during a controlled setresuid probe",
+          "proposition": "The child was terminated with the detector-defined signal pattern instead of returning the expected permission error",
+          "observationChannel": "Forked child, setresuid syscall, and parent wait status",
+          "availability": "Requires process creation, syscall execution, and reliable wait-status collection",
+          "trustBoundary": "The kernel controls syscall and signal behavior and can intentionally imitate or hide the pattern",
+          "inferenceLimit": "The side-channel is associated with tested SUSFS behavior but is not a universal or version-independent proof"
+        }
+      ]
+    },
+    {
+      "id": "PACKAGE_STORAGE_VISIBILITY",
+      "name": "Package Storage Visibility",
+      "description": "Probes Android data and OBB package paths for canonical and Unicode alias visibility.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "app-visibility",
+      "evidenceUnits": [
+        {
+          "id": "package-storage.path-visibility",
+          "title": "Package storage path visibility",
+          "domainId": "app-visibility",
+          "observedObject": "Canonical or Unicode-aliased package data and OBB paths",
+          "proposition": "A storage path associated with an indicator package is visible through at least one tested representation",
+          "observationChannel": "stat, access, open, and directory-list probes over canonical and transformed paths",
+          "availability": "Depends on external-storage layout, target presence, package isolation, FUSE or BPF behavior, and permissions",
+          "trustBoundary": "The app observes a platform- and namespace-mediated storage view",
+          "inferenceLimit": "Path visibility does not prove package execution, root activation, or a universal Unicode bypass"
+        },
+        {
+          "id": "package-storage.path-representation-differential",
+          "title": "Path representation differential",
+          "domainId": "app-visibility",
+          "observedObject": "Different results returned for canonical and transformed package-storage paths",
+          "proposition": "The tested path representations produced a platform-level visibility differential",
+          "observationChannel": "Paired canonical and Unicode path probes",
+          "availability": "Requires a comparable probe pair and sufficient platform response data",
+          "trustBoundary": "The differential reflects the app-visible storage stack rather than an unmediated filesystem ground truth",
+          "inferenceLimit": "The differential is telemetry and is not attributed to a root or concealment framework"
+        }
+      ]
+    },
+    {
+      "id": "PROLOGUE_SCANNER",
+      "name": "Prologue Scanner",
+      "description": "Compares resolved libc and dynamic-linker function entries with their backing ELF bytes to identify runtime code redirection or modification.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "prologue-scanner.entry-integrity",
+          "title": "Resolved function-entry integrity",
+          "domainId": "runtime-integrity",
+          "observedObject": "Resolved libc or linker function entry bytes and their backing ELF bytes",
+          "proposition": "A resolved function entry is redirected outside its expected module or differs from backing bytes",
+          "observationChannel": "dlsym, dladdr, in-memory bytes, and backing ELF comparison",
+          "availability": "Depends on symbol resolution, expected module availability, and readable backing ELF data",
+          "trustBoundary": "Dynamic linker APIs and process memory are observable within the potentially instrumented process",
+          "inferenceLimit": "Modification supports code-redirection evidence but does not attribute a framework or intent"
+        },
+        {
+          "id": "prologue-scanner.entry-pattern",
+          "title": "Function-entry pattern",
+          "domainId": "runtime-integrity",
+          "observedObject": "Architecture-specific branch and trampoline-like entry-byte patterns",
+          "proposition": "The resolved entry bytes match the recorded descriptive pattern",
+          "observationChannel": "Bounded architecture-specific byte classification",
+          "availability": "Requires a supported architecture and readable function-entry bytes",
+          "trustBoundary": "The pattern is derived from the same process-visible bytes as the integrity comparison",
+          "inferenceLimit": "Pattern telemetry is diagnostic-only and does not independently affect assessment"
+        }
+      ]
+    },
+    {
+      "id": "PROPERTY_AREA_RESIDUE",
+      "name": "Property Area Physical Residue",
+      "description": "Inspects Bionic property area memory structures for prop_info serial anomalies, value-length mismatches, and dirty trailing bytes left by in-place property tampering tools such as resetprop.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "system-property-residue.serial-anomaly",
+          "title": "Property serial and length consistency",
+          "domainId": "system-state",
+          "observedObject": "Bionic prop_info serial word encoding value length and update counter",
+          "proposition": "A system property exhibits an update counter on an immutable read-only property or a mismatch between the serial length field and the string value",
+          "observationChannel": "Direct parsing of process-mapped /dev/__properties__/* areas via /proc/self/maps",
+          "availability": "Available when Bionic property areas are mapped into process memory and format matches PROP_AREA_MAGIC",
+          "trustBoundary": "Reads property-area memory directly in our address space, bypassing libc property accessors that may be hooked",
+          "inferenceLimit": "Dynamic non-ro properties legitimately increment serial counters; only ro.* properties and strict length mismatches are considered anomalies"
+        },
+        {
+          "id": "system-property-residue.trailing-bytes",
+          "title": "Property value trailing buffer residue",
+          "domainId": "system-state",
+          "observedObject": "Unused bytes in prop_info value buffer past the initial NUL terminator",
+          "proposition": "A property value buffer contains non-zero bytes after its terminating NUL byte, indicating an in-place string overwrite without buffer zeroing",
+          "observationChannel": "Direct byte inspection of mapped prop_info structures in memory",
+          "availability": "Requires read access to process memory maps containing property area files",
+          "trustBoundary": "Operates directly on mapped physical buffer bytes in process address space",
+          "inferenceLimit": "Non-zero trailing bytes occur when an existing property is replaced with a shorter string (e.g. userdebug replaced with user); an overwrite with equal or longer string does not leave trailing bytes"
+        }
+      ]
+    },
+    {
+      "id": "RUNTIME_INSTRUMENTATION",
+      "name": "Runtime Instrumentation",
+      "description": "Correlates portable process maps, FD, thread, and public linker markers while keeping generic runtime artifacts as telemetry.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "runtime-instrumentation.direct-marker",
+          "title": "Direct runtime instrumentation marker",
+          "domainId": "runtime-integrity",
+          "observedObject": "Process mappings, file descriptors, threads, or linker objects containing maintained direct markers",
+          "proposition": "A portable process observation matches a maintained runtime instrumentation marker",
+          "observationChannel": "procfs maps, fd and task directories, plus public linker enumeration",
+          "availability": "Depends on procfs readability and linker enumeration within the target process",
+          "trustBoundary": "All channels are app-local and can be altered by in-process or kernel mediation",
+          "inferenceLimit": "Marker attribution is bounded to the matched string and does not establish device-level compromise"
+        },
+        {
+          "id": "runtime-instrumentation.generic-anomaly",
+          "title": "Generic runtime anomaly telemetry",
+          "domainId": "process-memory",
+          "observedObject": "Portable process artifacts that are non-unique to instrumentation frameworks",
+          "proposition": "A generic runtime artifact matching a telemetry rule is present",
+          "observationChannel": "procfs and public linker observations",
+          "availability": "Depends on the underlying process sources being readable",
+          "trustBoundary": "The observations are app-local and may be mediated",
+          "inferenceLimit": "Generic anomalies are telemetry-only and must not be promoted to findings without a new validated rule"
+        }
+      ]
+    },
+    {
+      "id": "RW_PATHS",
+      "name": "Read-Write Paths Checking",
+      "description": "Checks for the presence of critical system paths that are writable, which can indicate a compromised environment.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "filesystem-state",
+      "evidenceUnits": [
+        {
+          "id": "rw-paths.system-path-writability",
+          "title": "Critical system path writability",
+          "domainId": "filesystem-state",
+          "observedObject": "Selected critical system filesystem paths",
+          "proposition": "The app-local permission probe reports a critical path as writable",
+          "observationChannel": "Filesystem access permission checks",
+          "availability": "Depends on path visibility and the semantics of the tested access operation",
+          "trustBoundary": "The result is scoped to the app mount namespace, credentials, and mediated VFS view",
+          "inferenceLimit": "Writability can have legitimate causes and does not identify a modification mechanism"
+        }
+      ]
+    },
+    {
+      "id": "SELINUX_CHECK",
+      "name": "SELinux Global Enforcement",
+      "description": "Cross-checks global SELinux enforcement observations, infers enforcement from a refused read of the DAC-readable enforce node, and probes enforce-node permissions without writing.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "selinux.enforcement-state",
+          "title": "SELinux enforcement state",
+          "domainId": "system-state",
+          "observedObject": "Enforcement state reported by available SELinux sources, or inferred from an EACCES refusal to read the enforce node",
+          "proposition": "One or more available sources report the current SELinux enforcement mode",
+          "observationChannel": "selinuxfs and libselinux read-only queries, plus stat() of the enforce node when its read is refused with EACCES",
+          "availability": "Depends on selinuxfs visibility and library availability; the read-denial inference needs selinuxfs confirmed by statfs and a DAC mode that permits the read, measured by stat() or taken from the kernel constant 0644 when stat() is refused",
+          "trustBoundary": "Each source is independently mediated and source disagreement remains explicit",
+          "inferenceLimit": "A reported enforcing state does not establish policy integrity; an inferred enforcing state shows only that the app's own domain is enforced, says nothing about other domains, and is defeated by a hook that makes open() return EACCES; unavailable sources are not negative evidence"
+        },
+        {
+          "id": "selinux.enforce-node-access",
+          "title": "SELinux enforce-node access",
+          "domainId": "filesystem-state",
+          "observedObject": "The app process permission result for the SELinux enforce node",
+          "proposition": "The enforce node returned the recorded writable or denied result without performing a write, and its DAC mode is recorded when a read is refused",
+          "observationChannel": "Write-mode open without writing, and stat(), against /sys/fs/selinux/enforce",
+          "availability": "Requires the enforce node to be visible enough to attempt the permission check",
+          "trustBoundary": "The VFS and SELinux permission path can be mediated",
+          "inferenceLimit": "A permission result is contextual and does not alone prove policy tampering"
+        },
+        {
+          "id": "selinux.cross-source-consistency",
+          "title": "SELinux cross-source consistency",
+          "domainId": "system-state",
+          "observedObject": "A contradictory combination of enforcement and filesystem permission observations",
+          "proposition": "Available SELinux observations satisfy a detector-defined contradiction rule; a disagreement that depends on an inferred answer is graded below one between two read sources",
+          "observationChannel": "Cross-check of enforcement sources, selinuxfs state, and permission probes",
+          "availability": "Requires the specific sources needed by a contradiction rule",
+          "trustBoundary": "The rule compares mediated sources and does not create an external ground truth",
+          "inferenceLimit": "The contradiction supports an anomaly claim but not attribution to a particular root framework"
+        }
+      ]
+    },
+    {
+      "id": "SU_BINARY",
+      "name": "SU Binary Checking",
+      "description": "Classifies visible su-related paths by object type, resolved metadata, executable mode, and bounded ELF-magic evidence.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "binary-artifact",
+      "evidenceUnits": [
+        {
+          "id": "su-binary.visible-artifact",
+          "title": "Visible su-related artifact",
+          "domainId": "binary-artifact",
+          "observedObject": "A resolved filesystem object at an su candidate path",
+          "proposition": "An su-related artifact with recorded object and executable-format properties is visible",
+          "observationChannel": "Fixed-path access, lstat, O_PATH open, fstat, mode, and bounded ELF-magic inspection",
+          "availability": "Available only for candidate paths visible and inspectable from the application sandbox",
+          "trustBoundary": "App-local VFS view and user-space parsing can be filtered or hooked",
+          "inferenceLimit": "Visibility does not prove successful privilege escalation or identify the current root provider"
+        }
+      ]
+    },
+    {
+      "id": "SU_CONTEXT",
+      "name": "SU Context Checking",
+      "description": "Checks /proc/self/attr/current and per-process SELinux contexts for root-related anomalies.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "process-memory",
+      "evidenceUnits": [
+        {
+          "id": "su-context.process-domain",
+          "title": "Process SELinux context anomaly",
+          "domainId": "process-memory",
+          "observedObject": "SELinux contexts exposed for the current and visible processes",
+          "proposition": "A visible process context matches a root-related or otherwise abnormal context rule",
+          "observationChannel": "/proc process attribute files",
+          "availability": "Depends on procfs visibility and permission to read process attributes",
+          "trustBoundary": "The process-visible procfs and SELinux views may be mediated",
+          "inferenceLimit": "A context match is an indicator and does not prove that this application can obtain root"
+        }
+      ]
+    },
+    {
+      "id": "SYSTEM_PROPERTIES_TAMPER",
+      "name": "System Property Source Integrity",
+      "description": "Cross-checks equivalent Android property sources and parses property areas with explicit failure states.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "system-state",
+      "evidenceUnits": [
+        {
+          "id": "system-properties.source-consistency",
+          "title": "Equivalent property-source consistency",
+          "domainId": "system-state",
+          "observedObject": "Equivalent Android property values read through multiple sources",
+          "proposition": "Available sources either agree or satisfy an explicit mismatch rule for the same property",
+          "observationChannel": "Comparison across the bionic callback accessor, the bionic legacy accessor, android.os.SystemProperties, a forked getprop, the parsed property-area bytes, android.os.Build, and /proc/cmdline boot parameters",
+          "availability": "A comparison is possible only when enough equivalent sources return usable values",
+          "trustBoundary": "All user-space sources can share mediation; agreement is not proof of kernel-level integrity. Only /proc/cmdline sits below user space, and only the property-area source bypasses the bionic accessor",
+          "inferenceLimit": "Strength is graded by which source is the outlier rather than by how many sources disagree: a kernel-versus-userspace or property-area-versus-accessor contradiction is STRONG, a Java-API or separate-process outlier is MODERATE, and an android.os.Build outlier is WEAK because the property may simply have changed after process start. Values are trimmed, lowercased and boolean-aliased before comparison, so a case-only or formatting-only spoof is not detected. Missing or failed sources remain collection state rather than negative evidence"
+        },
+        {
+          "id": "system-properties.area-layout",
+          "title": "Property-area allocation integrity",
+          "domainId": "system-state",
+          "observedObject": "Parsed property-area allocation and unreferenced byte ranges",
+          "proposition": "Visible property areas exhibit structural Trie integrity without orphaned unreferenced allocations",
+          "observationChannel": "Direct read-only parsing of visible property-area files",
+          "availability": "Depends on path visibility, permissions, and compatible property-area format",
+          "trustBoundary": "The app-visible files and parser remain below the kernel or privileged service trust boundary",
+          "inferenceLimit": "Unreferenced allocation indicates modified or deleted Trie nodes (e.g. via resetprop), though atypical OEM layouts remain possible"
+        }
+      ]
+    },
+    {
+      "id": "TEE_ATTESTATION",
+      "name": "TEE Attestation Validation",
+      "description": "Validates a fresh Android Keystore attestation challenge, certificate chain, trust anchor, revocation status, and RootOfTrust consistency.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "hardware-attestation",
+      "evidenceUnits": [
+        {
+          "id": "tee-attestation.chain-and-root-of-trust",
+          "title": "Keystore attestation chain and RootOfTrust",
+          "domainId": "hardware-attestation",
+          "observedObject": "A fresh Android Keystore attestation response, certificate chain, revocation snapshot, challenge, and RootOfTrust fields",
+          "proposition": "The returned attestation artifacts satisfy or violate the recorded cryptographic and structural validation rules",
+          "observationChannel": "Android Keystore key generation and offline certificate or extension validation",
+          "availability": "Depends on Keystore support, certificate availability, parseable extensions, and bundled trust data",
+          "trustBoundary": "Hardware-backed claims originate below the app, while local validation and revocation freshness remain app-managed",
+          "inferenceLimit": "Local attestation is not equivalent to server-side nonce policy or Play Integrity and may be unavailable on supported devices"
+        }
+      ]
+    },
+    {
+      "id": "TEE_KEYSTORE_CONSISTENCY",
+      "name": "TEE Keystore Consistency",
+      "description": "Checks public Android Keystore signature, lifecycle, and certificate-entry invariants while retaining AES and StrongBox observations as diagnostics.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "hardware-attestation",
+      "evidenceUnits": [
+        {
+          "id": "tee-keystore.public-api-consistency",
+          "title": "Android Keystore public-API consistency",
+          "domainId": "hardware-attestation",
+          "observedObject": "Required signature, key lifecycle, and certificate-entry invariants plus optional capability diagnostics",
+          "proposition": "A required public Keystore invariant completed consistently or returned a recorded contradiction",
+          "observationChannel": "Android Keystore public APIs",
+          "availability": "Depends on algorithm, provider, and optional StrongBox capabilities",
+          "trustBoundary": "The app observes framework API behavior and does not directly inspect TEE implementation state",
+          "inferenceLimit": "Optional AES and StrongBox observations are diagnostic; a contradiction is not root-provider attribution"
+        }
+      ]
+    },
+    {
+      "id": "TEE_OVERSIZED_CHALLENGE",
+      "name": "TEE Oversized Challenge",
+      "description": "Checks whether Android Keystore enforces the documented attestation challenge-size limit without attributing the result to a specific root tool.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "hardware-attestation",
+      "evidenceUnits": [
+        {
+          "id": "tee-oversized-challenge.limit-enforcement",
+          "title": "Attestation challenge-size enforcement",
+          "domainId": "hardware-attestation",
+          "observedObject": "Keystore behavior for a challenge exceeding the documented size limit",
+          "proposition": "The tested Keystore path accepted or rejected the oversized challenge at the recorded stage",
+          "observationChannel": "Android Keystore attestation key-generation request",
+          "availability": "Depends on Keystore availability and successful setup and cleanup of the test alias",
+          "trustBoundary": "The result reflects the public Keystore stack exposed to the application",
+          "inferenceLimit": "Unexpected behavior is a bounded consistency anomaly and is not attributed to a particular root tool"
+        }
+      ]
+    },
+    {
+      "id": "VDSO_INTEGRITY",
+      "name": "VDSO Integrity",
+      "description": "Cross-checks the VDSO mapping, AT_SYSINFO_EHDR, ELF load ranges, public linker ownership, and available kernel-helper symbol ownership.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "vdso.mapping-ownership-consistency",
+          "title": "VDSO mapping and ownership consistency",
+          "domainId": "runtime-integrity",
+          "observedObject": "The VDSO mapping, AT_SYSINFO_EHDR, ELF load ranges, linker owner, and available helper symbol",
+          "proposition": "Available VDSO observations satisfy or violate explicit mapping and ownership consistency rules",
+          "observationChannel": "procfs maps, auxv, ELF parsing, public linker enumeration, and symbol resolution",
+          "availability": "Individual checks depend on readable maps and auxv plus available linker and symbol data",
+          "trustBoundary": "The app-local channels may be mediated and are not independent kernel attestation",
+          "inferenceLimit": "A consistency violation is an anomaly and does not identify the modification mechanism"
+        }
+      ]
+    },
+    {
+      "id": "ZYGISK_FD_FORENSICS",
+      "name": "Cross-Process Descriptor Forensics",
+      "description": "Cross-checks three independent kernel views of the process descriptor table in the host process and in a helper process forked fresh from Zygote, and carries a cross-process trap descriptor as telemetry.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "zygisk-fd-forensics.descriptor-view-differential",
+          "title": "Descriptor table view differential",
+          "domainId": "runtime-integrity",
+          "observedObject": "The open file descriptors of the host process and of a dedicated helper process, as reported by three independent kernel interfaces",
+          "proposition": "The descriptor table, the /proc/self/fd lookup path and the /proc/self/fd iteration path disagree about the same descriptor across repeated sweeps",
+          "observationChannel": "fcntl(F_GETFD) against readlink(/proc/self/fd/<n>) against readdir(/proc/self/fd), repeated in the host process and in an android:process helper",
+          "availability": "Requires a readable /proc/self/fd; the comparison is skipped when procfs resolves no descriptors at all",
+          "trustBoundary": "A kernel-resident hook that filters both the lookup and the iteration path consistently would defeat the comparison, as would one that also intercepts fcntl",
+          "inferenceLimit": "A stable disagreement is a contradiction in the kernel's own descriptor accounting and needs no device threshold, but it identifies procfs filtering in general rather than any specific tool. Reported at MODERATE while the detector is EXPERIMENTAL because no clean-device baseline exists for the residual race rate."
+        },
+        {
+          "id": "zygisk-fd-forensics.cross-process-trap",
+          "title": "Cross-process trap descriptor",
+          "domainId": "runtime-integrity",
+          "observedObject": "An unlinked, app-private trap descriptor transferred to the helper process over Binder",
+          "proposition": "The trap descriptor did not survive transfer to a separately specialized process intact",
+          "observationChannel": "ParcelFileDescriptor transfer, then fstat, pread of the signature payload and readlink of /proc/self/fd in the receiving process",
+          "availability": "Requires the helper process to bind and the host cache directory to be writable",
+          "trustBoundary": "The descriptor is app-private and unlinked, so only a process already holding it could alter it",
+          "inferenceLimit": "Telemetry only; this channel can never move the detector outcome. The descriptor is installed into the helper process by the binder driver after that process has finished specializing, so Zygisk-style specialization-time descriptor sanitization cannot reach it and no result here supports a tamper claim."
+        }
+      ]
+    },
+    {
+      "id": "ZYGISK_NAMESPACE",
+      "name": "Dynamic Linker Namespace Audit",
+      "description": "Audits loaded shared libraries via dl_iterate_phdr, inspects thread comm names, and verifies file descriptor isolation traps.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "zygisk-namespace.loaded-library-path",
+          "title": "Suspicious loaded-library path",
+          "domainId": "runtime-integrity",
+          "observedObject": "Shared objects enumerated by the process dynamic linker, task comm names, and anonymous trap file descriptors",
+          "proposition": "A loaded object path matches an injection-related rule, or a task comm name / FD trap reveals an active runtime framework",
+          "observationChannel": "dl_iterate_phdr public linker enumeration, /proc/self/task/*/comm, and anonymous FD verification",
+          "availability": "Limited to objects and task directories exposed in the target process",
+          "trustBoundary": "In-process hooks can alter linker enumeration, task comm strings, or file descriptors",
+          "inferenceLimit": "A suspicious library path, thread name, or FD anomaly supports injection evidence but may not uniquely identify Zygisk"
+        }
+      ]
+    },
+    {
+      "id": "ZYGISK_SMAPS",
+      "name": "Zygisk Dirty Pages Scan",
+      "description": "Scans /proc/self/smaps for executable system-library code split into one-page dirty regions, the footprint of in-place code patching, and records per-region dirt and heap allocation entropy as context.",
+      "payloadSchemaVersion": 1,
+      "primaryEvidenceDomainId": "runtime-integrity",
+      "evidenceUnits": [
+        {
+          "id": "zygisk-smaps.dirty-executable-page",
+          "title": "Dirty executable system-library page",
+          "domainId": "runtime-integrity",
+          "observedObject": "Private or shared dirty counts for executable system-library mappings and mallinfo2 heap allocation ratios",
+          "proposition": "An executable system-library mapping has been split into one-page regions carrying dirty pages",
+          "observationChannel": "/proc/self/smaps parsing and mallinfo2 allocator queries",
+          "availability": "Depends on smaps readability, recognized system-library paths, and mallinfo2 support (API >= 30)",
+          "trustBoundary": "The process-visible procfs view and allocator state can be filtered by in-process or kernel concealment",
+          "inferenceLimit": "One-page dirty regions show that code was patched in place, not who patched it: an inline-hooking SDK in the host app leaves the same shape as an injected framework, and neither implies root. Per-region dirt and heap fragmentation are context only and do not affect the assessment."
+        }
+      ]
+    }
+  ]
+}

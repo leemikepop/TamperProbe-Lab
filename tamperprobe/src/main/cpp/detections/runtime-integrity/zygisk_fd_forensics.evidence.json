@@ -1,0 +1,31 @@
+{
+  "id": "ZYGISK_FD_FORENSICS",
+  "name": "Cross-Process Descriptor Forensics",
+  "description": "Cross-checks three independent kernel views of the process descriptor table in the host process and in a helper process forked fresh from Zygote, and carries a cross-process trap descriptor as telemetry.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "zygisk-fd-forensics.descriptor-view-differential",
+      "title": "Descriptor table view differential",
+      "domainId": "runtime-integrity",
+      "observedObject": "The open file descriptors of the host process and of a dedicated helper process, as reported by three independent kernel interfaces",
+      "proposition": "The descriptor table, the /proc/self/fd lookup path and the /proc/self/fd iteration path disagree about the same descriptor across repeated sweeps",
+      "observationChannel": "fcntl(F_GETFD) against readlink(/proc/self/fd/<n>) against readdir(/proc/self/fd), repeated in the host process and in an android:process helper",
+      "availability": "Requires a readable /proc/self/fd; the comparison is skipped when procfs resolves no descriptors at all",
+      "trustBoundary": "A kernel-resident hook that filters both the lookup and the iteration path consistently would defeat the comparison, as would one that also intercepts fcntl",
+      "inferenceLimit": "A stable disagreement is a contradiction in the kernel's own descriptor accounting and needs no device threshold, but it identifies procfs filtering in general rather than any specific tool. Reported at MODERATE while the detector is EXPERIMENTAL because no clean-device baseline exists for the residual race rate."
+    },
+    {
+      "id": "zygisk-fd-forensics.cross-process-trap",
+      "title": "Cross-process trap descriptor",
+      "domainId": "runtime-integrity",
+      "observedObject": "An unlinked, app-private trap descriptor transferred to the helper process over Binder",
+      "proposition": "The trap descriptor did not survive transfer to a separately specialized process intact",
+      "observationChannel": "ParcelFileDescriptor transfer, then fstat, pread of the signature payload and readlink of /proc/self/fd in the receiving process",
+      "availability": "Requires the helper process to bind and the host cache directory to be writable",
+      "trustBoundary": "The descriptor is app-private and unlinked, so only a process already holding it could alter it",
+      "inferenceLimit": "Telemetry only; this channel can never move the detector outcome. The descriptor is installed into the helper process by the binder driver after that process has finished specializing, so Zygisk-style specialization-time descriptor sanitization cannot reach it and no result here supports a tamper claim."
+    }
+  ]
+}

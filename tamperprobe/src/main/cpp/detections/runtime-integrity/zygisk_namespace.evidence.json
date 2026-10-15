@@ -1,0 +1,20 @@
+{
+  "id": "ZYGISK_NAMESPACE",
+  "name": "Dynamic Linker Namespace Audit",
+  "description": "Audits loaded shared libraries via dl_iterate_phdr, inspects thread comm names, and verifies file descriptor isolation traps.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "zygisk-namespace.loaded-library-path",
+      "title": "Suspicious loaded-library path",
+      "domainId": "runtime-integrity",
+      "observedObject": "Shared objects enumerated by the process dynamic linker, task comm names, and anonymous trap file descriptors",
+      "proposition": "A loaded object path matches an injection-related rule, or a task comm name / FD trap reveals an active runtime framework",
+      "observationChannel": "dl_iterate_phdr public linker enumeration, /proc/self/task/*/comm, and anonymous FD verification",
+      "availability": "Limited to objects and task directories exposed in the target process",
+      "trustBoundary": "In-process hooks can alter linker enumeration, task comm strings, or file descriptors",
+      "inferenceLimit": "A suspicious library path, thread name, or FD anomaly supports injection evidence but may not uniquely identify Zygisk"
+    }
+  ]
+}

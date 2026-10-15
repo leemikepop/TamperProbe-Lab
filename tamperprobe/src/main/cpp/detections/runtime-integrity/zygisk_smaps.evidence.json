@@ -1,0 +1,20 @@
+{
+  "id": "ZYGISK_SMAPS",
+  "name": "Zygisk Dirty Pages Scan",
+  "description": "Scans /proc/self/smaps for executable system-library code split into one-page dirty regions, the footprint of in-place code patching, and records per-region dirt and heap allocation entropy as context.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "zygisk-smaps.dirty-executable-page",
+      "title": "Dirty executable system-library page",
+      "domainId": "runtime-integrity",
+      "observedObject": "Private or shared dirty counts for executable system-library mappings and mallinfo2 heap allocation ratios",
+      "proposition": "An executable system-library mapping has been split into one-page regions carrying dirty pages",
+      "observationChannel": "/proc/self/smaps parsing and mallinfo2 allocator queries",
+      "availability": "Depends on smaps readability, recognized system-library paths, and mallinfo2 support (API >= 30)",
+      "trustBoundary": "The process-visible procfs view and allocator state can be filtered by in-process or kernel concealment",
+      "inferenceLimit": "One-page dirty regions show that code was patched in place, not who patched it: an inline-hooking SDK in the host app leaves the same shape as an injected framework, and neither implies root. Per-region dirt and heap fragmentation are context only and do not affect the assessment."
+    }
+  ]
+}

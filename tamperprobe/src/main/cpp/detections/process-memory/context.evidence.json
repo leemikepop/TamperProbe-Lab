@@ -1,0 +1,20 @@
+{
+  "id": "SU_CONTEXT",
+  "name": "SU Context Checking",
+  "description": "Checks /proc/self/attr/current and per-process SELinux contexts for root-related anomalies.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "process-memory",
+  "evidenceUnits": [
+    {
+      "id": "su-context.process-domain",
+      "title": "Process SELinux context anomaly",
+      "domainId": "process-memory",
+      "observedObject": "SELinux contexts exposed for the current and visible processes",
+      "proposition": "A visible process context matches a root-related or otherwise abnormal context rule",
+      "observationChannel": "/proc process attribute files",
+      "availability": "Depends on procfs visibility and permission to read process attributes",
+      "trustBoundary": "The process-visible procfs and SELinux views may be mediated",
+      "inferenceLimit": "A context match is an indicator and does not prove that this application can obtain root"
+    }
+  ]
+}

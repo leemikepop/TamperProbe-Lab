@@ -1,0 +1,20 @@
+{
+  "id": "NATIVE_ROOT_SEPOLICY",
+  "name": "Native Root SELinux Policy Oracle",
+  "description": "Uses a controlled app-zygote SELinux policy snapshot to observe Magisk, KernelSU, ADB-root, and su-specific allow rules.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "native-root-sepolicy.policy-oracle",
+      "title": "Root-related SELinux policy oracle",
+      "domainId": "kernel-interface",
+      "observedObject": "Controlled app-zygote SELinux allow-rule decisions and validation controls",
+      "proposition": "A validated policy query permits a maintained Magisk, KernelSU, ADB-root, or su-related rule",
+      "observationChannel": "Native and hidden-framework SELinux policy queries in an app-zygote carrier",
+      "availability": "Requires carrier setup, stable positive and negative controls, and at least one trusted query source",
+      "trustBoundary": "Java-controlled query sources are weaker than native sources and their trust tier remains explicit",
+      "inferenceLimit": "An allowed rule is policy evidence and does not prove current process injection or granted root"
+    }
+  ]
+}

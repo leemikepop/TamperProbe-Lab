@@ -1,0 +1,20 @@
+{
+  "id": "BUILD_PATCH_COHERENCE",
+  "name": "Security Patch and Build Timestamp Coherence",
+  "description": "Compares each partition's declared Android security-patch level against the compile timestamp of that same partition, because a stock image declares a patch at most a few weeks after it was built. The comparison stays inside the property set and therefore survives a forged key attestation.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "build-patch.security-patch-plausibility",
+      "title": "Declared patch level versus own build timestamp",
+      "domainId": "system-state",
+      "observedObject": "Per-partition pairs of security-patch level and build timestamp properties, such as ro.build.version.security_patch with ro.build.date.utc",
+      "proposition": "A partition declares a security-patch level dated substantially later than the compile timestamp of that same partition, which no genuine build can produce",
+      "observationChannel": "Bionic system property reads through __system_property_get",
+      "availability": "Available when at least one partition publishes both a YYYY-MM-DD patch level and an epoch build timestamp; partitions publishing only one half are reported as not comparable",
+      "trustBoundary": "Both values are read from the same property set, so this compares two values an attacker could control; it holds only because spoofing tools rewrite the patch level while leaving build timestamps intact",
+      "inferenceLimit": "Proves the patch level was set after the image was produced but does not name the tool that set it; stock images legitimately declare a patch up to about two months after their build, so only skew far beyond that is graded, and an attacker who also rewrites build timestamps defeats the check entirely"
+    }
+  ]
+}

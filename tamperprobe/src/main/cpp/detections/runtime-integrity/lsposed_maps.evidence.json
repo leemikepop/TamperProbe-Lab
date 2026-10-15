@@ -1,0 +1,20 @@
+{
+  "id": "LSPOSED_MAPS",
+  "name": "LSPosed/Xposed Maps Scan",
+  "description": "Scans /proc/self/maps for LSPosed, Xposed, EdXposed, and Riru framework libraries loaded into the process memory.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "lsposed-maps.framework-marker",
+      "title": "LSPosed or Xposed process-map marker",
+      "domainId": "runtime-integrity",
+      "observedObject": "Mapped paths and names in the current process",
+      "proposition": "A process mapping matches a maintained LSPosed, Xposed, EdXposed, or Riru marker",
+      "observationChannel": "/proc/self/maps parsing",
+      "availability": "Depends on maps readability and marker visibility in the target process",
+      "trustBoundary": "The process map view and parser can be filtered or hooked",
+      "inferenceLimit": "A marker supports framework presence in this process but not module scope or system-wide activation"
+    }
+  ]
+}

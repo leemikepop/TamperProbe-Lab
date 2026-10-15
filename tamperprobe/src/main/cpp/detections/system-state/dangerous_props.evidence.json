@@ -1,0 +1,31 @@
+{
+  "id": "DANGEROUS_PROPS",
+  "name": "Security-Relevant System Properties",
+  "description": "Reports explicit insecure property values and a non-standard adb_enabled setting, with non-assessment emulator and ADB posture telemetry.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "dangerous-props.security-posture",
+      "title": "Security-relevant property posture",
+      "domainId": "system-state",
+      "observedObject": "Selected Android security and debugging property values",
+      "proposition": "An available property value matches an explicitly defined insecure rule",
+      "observationChannel": "Bionic system-property API",
+      "availability": "Depends on property presence and successful property-service access",
+      "trustBoundary": "User-space property APIs may be spoofed or hooked",
+      "inferenceLimit": "An insecure value is contextual evidence and does not identify a root provider"
+    },
+    {
+      "id": "dangerous-props.environment-posture",
+      "title": "Environment property posture",
+      "domainId": "system-state",
+      "observedObject": "Emulator and USB or ADB-related property values, and the Settings.Global adb_enabled value",
+      "proposition": "adb_enabled holds a value outside {0, 1}, which neither the Settings UI nor AdbService writes; emulator and ADB-on posture is only described",
+      "observationChannel": "Bionic system-property API and Settings.Global through the app ContentResolver",
+      "availability": "Depends on property presence, successful property-service access, and a readable Settings.Global provider; from API 37 (Android 17 QPR1) the platform returns adb_enabled = 0 to third-party apps, so a 0 read there is recorded as redacted_by_platform and the rule is not evaluated",
+      "trustBoundary": "User-space property APIs and in-process Settings reads may be spoofed or hooked, and the platform itself redacts adb_enabled for third-party apps from Android 17 QPR1",
+      "inferenceLimit": "A non-standard adb_enabled value shows deliberate setting manipulation, not a root provider; a redacted_by_platform read is an unanswered channel, not ADB off, so the rule can fire only below API 37 or where the platform does not redact; emulator and ADB-on posture remain telemetry"
+    }
+  ]
+}

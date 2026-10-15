@@ -1,0 +1,20 @@
+{
+  "id": "MEMORY_LINKER_VISIBILITY",
+  "name": "Memory Linker Visibility",
+  "description": "Cross-checks public dl_iterate_phdr load ranges with /proc/self/maps and verifies standard library symbol resolution boundaries (GOT/PLT integrity) without private linker symbols.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "process-memory",
+  "evidenceUnits": [
+    {
+      "id": "memory-linker.module-view-consistency",
+      "title": "Linker and process-map view consistency",
+      "domainId": "process-memory",
+      "observedObject": "Normalized module visibility relationships between dl_iterate_phdr objects, executable process mappings, and resolved symbol addresses",
+      "proposition": "The linker and process-map views agree or expose a directional module-visibility mismatch or symbol resolution escape",
+      "observationChannel": "dl_iterate_phdr, dlsym, and /proc/self/maps range comparison",
+      "availability": "Requires public linker enumeration, dlsym symbol resolution, and readable process maps",
+      "trustBoundary": "The user-visible linker tables and process maps can both be mediated and are not independent kernel attestation",
+      "inferenceLimit": "Linker-only mismatches, maps-only hidden modules, or symbol resolution escapes outside valid load ranges indicate memory tampering or hooking"
+    }
+  ]
+}

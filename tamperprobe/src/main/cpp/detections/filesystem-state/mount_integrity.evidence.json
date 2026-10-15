@@ -1,0 +1,42 @@
+{
+  "id": "MOUNT_INTEGRITY",
+  "name": "Mount Table Integrity",
+  "description": "Detects framework-specific mount markers and cross-checks mountinfo against statx and statfs kernel observations; mount ID sequence gaps are recorded as telemetry.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "filesystem-state",
+  "evidenceUnits": [
+    {
+      "id": "mount-integrity.table-marker",
+      "title": "Mount-table marker",
+      "domainId": "filesystem-state",
+      "observedObject": "Mount-table rows and normalized mount relationships",
+      "proposition": "An app-visible mount row satisfies a framework-specific or bounded generic mount rule",
+      "observationChannel": "/proc/self/mountinfo parsing",
+      "availability": "Requires at least one required mount source to be readable and parseable",
+      "trustBoundary": "The process mount namespace can differ from init and can be filtered by concealment",
+      "inferenceLimit": "Generic rules are not framework attribution, and absence is limited to the visible namespace"
+    },
+    {
+      "id": "mount-integrity.kernel-view-consistency",
+      "title": "Kernel and mount-table view consistency",
+      "domainId": "filesystem-state",
+      "observedObject": "Mount IDs and filesystem types returned for selected paths",
+      "proposition": "statx or statfs observations agree or disagree with the parsed mount-table view",
+      "observationChannel": "statx mount ID, statfs type, and mount-table comparison",
+      "availability": "Depends on syscall support, selected path visibility, and readable mount sources",
+      "trustBoundary": "Syscalls and procfs are separate app-visible channels but can share kernel mediation",
+      "inferenceLimit": "Agreement does not prove global mount integrity; unavailable sources must remain explicit"
+    },
+    {
+      "id": "mount-integrity.namespace-observation",
+      "title": "Mount namespace observation",
+      "domainId": "filesystem-state",
+      "observedObject": "Mount ID sequences, mount namespace identifiers, and root mount propagation",
+      "proposition": "The app-visible mount environment has the recorded structural properties, or the process shares the init mount namespace",
+      "observationChannel": "Parsed /proc/self/mountinfo plus the /proc/self/ns/mnt and /proc/1/ns/mnt namespace links",
+      "availability": "Varies by the individual source and is retained even when no finding is produced",
+      "trustBoundary": "Telemetry describes the observed process view rather than a privileged global view",
+      "inferenceLimit": "Telemetry fields do not prove global mount configuration. Mount ID sequence gaps occur on unmodified phones and are not evidence of mount hiding; only a shared init namespace contributes a signal."
+    }
+  ]
+}

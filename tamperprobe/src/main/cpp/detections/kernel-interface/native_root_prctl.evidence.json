@@ -1,0 +1,20 @@
+{
+  "id": "NATIVE_ROOT_PRCTL",
+  "name": "Native Root Interface Probe",
+  "description": "Detects KernelSU, APatch, and native root frameworks by probing kernel prctl, supercall latency, cgroups, and driver file descriptors.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "native-root-prctl.kernelsu-protocol",
+      "title": "KernelSU and native root protocol response",
+      "domainId": "kernel-interface",
+      "observedObject": "Kernel responses to root prctl commands, supercall latency, cgroup allocations, and driver file descriptors",
+      "proposition": "The kernel interface or process environment returned a response satisfying a native root framework indicator",
+      "observationChannel": "Direct native prctl, syscall latency benchmarking, /proc/self/cgroup, and /proc/self/fd",
+      "availability": "Requires kernel interfaces and procfs nodes to execute without interception that suppresses or emulates responses",
+      "trustBoundary": "The kernel syscall boundary is below ordinary Java mediation but can be modified by the kernel",
+      "inferenceLimit": "The response identifies protocol compatibility or anomaly, not the full privilege granted to the app. The supercall latency deviation is a timing measurement taken without CPU pinning or frequency control, so it is treated as moderate corroboration rather than a direct marker."
+    }
+  ]
+}

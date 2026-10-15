@@ -1,0 +1,5 @@
+com.topjohnwu.magisk	com.topjohnwu.magisk.REQUEST_INSTALL
+com.topjohnwu.magisk	com.topjohnwu.magisk.SHOW
+de.robv.android.xposed.installer	de.robv.android.xposed.installer.SHOW
+io.github.a13e300.ksuwebui	io.github.a13e300.ksuwebui.LAUNCH
+org.lsposed.manager	org.lsposed.manager.SHOW

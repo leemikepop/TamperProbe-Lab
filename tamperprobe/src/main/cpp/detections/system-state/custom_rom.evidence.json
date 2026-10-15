@@ -1,0 +1,20 @@
+{
+  "id": "CUSTOM_ROM",
+  "name": "Custom ROM Detection",
+  "description": "Checks build properties (test-keys, ro.debuggable, ro.secure) and known custom ROM identifiers (LineageOS, PixelExperience, etc.).",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "custom-rom.build-fingerprint",
+      "title": "Custom or debug build fingerprint",
+      "domainId": "system-state",
+      "observedObject": "Build tags, debugging and security properties, and maintained ROM identifiers",
+      "proposition": "An app-visible build value matches a maintained custom-ROM or debug-build rule",
+      "observationChannel": "Android build and system-property observations",
+      "availability": "Depends on property availability and the maintained identifier set",
+      "trustBoundary": "Build and property values are user-space observations that can be spoofed",
+      "inferenceLimit": "A custom or debug build is not equivalent to root or malicious tampering"
+    }
+  ]
+}

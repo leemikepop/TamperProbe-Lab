@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "evidenceDomains": [
+    {
+      "id": "binary-artifact",
+      "title": "Binary and Executable Artifacts",
+      "shortTitle": "Binary Artifacts",
+      "description": "Visible binary and executable filesystem objects inspected as bounded artifacts."
+    },
+    {
+      "id": "filesystem-state",
+      "title": "Filesystem and Mount State",
+      "shortTitle": "Filesystem State",
+      "description": "Filesystem paths, permissions, mounts, filesystems, and namespace-visible state."
+    },
+    {
+      "id": "kernel-interface",
+      "title": "Kernel and Privilege Interfaces",
+      "shortTitle": "Kernel Interfaces",
+      "description": "Kernel protocols, privilege interfaces, policy queries, and kernel-mediated side channels."
+    },
+    {
+      "id": "process-memory",
+      "title": "Process and Memory State",
+      "shortTitle": "Process & Memory",
+      "description": "Procfs, process context, file descriptors, linker visibility, mappings, and memory state."
+    },
+    {
+      "id": "runtime-integrity",
+      "title": "Runtime Injection and Code Integrity",
+      "shortTitle": "Runtime Integrity",
+      "description": "Runtime instrumentation, injected components, hooks, and executable code integrity."
+    },
+    {
+      "id": "system-state",
+      "title": "System Configuration and Security State",
+      "shortTitle": "System State",
+      "description": "Properties, build identity, SELinux state, and other system security posture."
+    },
+    {
+      "id": "app-visibility",
+      "title": "Package and Application Visibility",
+      "shortTitle": "App Visibility",
+      "description": "Package identities, application data paths, and package-associated storage visibility."
+    },
+    {
+      "id": "hardware-attestation",
+      "title": "Hardware-backed Attestation and Trusted Execution",
+      "shortTitle": "Hardware Attestation",
+      "description": "Android Keystore, attestation chains, RootOfTrust, and trusted execution state."
+    }
+  ]
+}

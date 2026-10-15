@@ -1,0 +1,31 @@
+{
+  "id": "PROLOGUE_SCANNER",
+  "name": "Prologue Scanner",
+  "description": "Compares resolved libc and dynamic-linker function entries with their backing ELF bytes to identify runtime code redirection or modification.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "prologue-scanner.entry-integrity",
+      "title": "Resolved function-entry integrity",
+      "domainId": "runtime-integrity",
+      "observedObject": "Resolved libc or linker function entry bytes and their backing ELF bytes",
+      "proposition": "A resolved function entry is redirected outside its expected module or differs from backing bytes",
+      "observationChannel": "dlsym, dladdr, in-memory bytes, and backing ELF comparison",
+      "availability": "Depends on symbol resolution, expected module availability, and readable backing ELF data",
+      "trustBoundary": "Dynamic linker APIs and process memory are observable within the potentially instrumented process",
+      "inferenceLimit": "Modification supports code-redirection evidence but does not attribute a framework or intent"
+    },
+    {
+      "id": "prologue-scanner.entry-pattern",
+      "title": "Function-entry pattern",
+      "domainId": "runtime-integrity",
+      "observedObject": "Architecture-specific branch and trampoline-like entry-byte patterns",
+      "proposition": "The resolved entry bytes match the recorded descriptive pattern",
+      "observationChannel": "Bounded architecture-specific byte classification",
+      "availability": "Requires a supported architecture and readable function-entry bytes",
+      "trustBoundary": "The pattern is derived from the same process-visible bytes as the integrity comparison",
+      "inferenceLimit": "Pattern telemetry is diagnostic-only and does not independently affect assessment"
+    }
+  ]
+}

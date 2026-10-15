@@ -1,0 +1,20 @@
+{
+  "id": "NATIVE_ROOT_DEVPTS",
+  "name": "Devpts Permission Anomaly",
+  "description": "Checks /dev/pts/ pseudo-terminal permissions and SELinux contexts. KernelSU hooks may stamp PTYs with root ownership or ksu_file context.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "native-root-devpts.pty-metadata",
+      "title": "Devpts ownership and context anomaly",
+      "domainId": "kernel-interface",
+      "observedObject": "Visible pseudo-terminal ownership, permissions, freshness, and SELinux context",
+      "proposition": "A tested pseudo-terminal satisfies an explicit root-related metadata or context rule",
+      "observationChannel": "devpts enumeration, stat metadata, and SELinux file context",
+      "availability": "Depends on devpts visibility, an available PTY, and readable metadata or contexts",
+      "trustBoundary": "The process-visible devpts mount and context view may be mediated",
+      "inferenceLimit": "PTY metadata can have non-root producers and does not prove application privilege"
+    }
+  ]
+}

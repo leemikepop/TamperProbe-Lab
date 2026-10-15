@@ -1,0 +1,31 @@
+{
+  "id": "DANGEROUS_PACKAGES",
+  "name": "Dangerous Package Indicators",
+  "description": "Probes dangerous packages through PackageManager and visible native path indicators.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "app-visibility",
+  "evidenceUnits": [
+    {
+      "id": "dangerous-packages.package-identity-visibility",
+      "title": "Package identity visibility",
+      "domainId": "app-visibility",
+      "observedObject": "An installed package identity queried through Android PackageManager",
+      "proposition": "A package on the maintained dangerous-package indicator list is visible to the app",
+      "observationChannel": "PackageManager queries subject to package visibility rules",
+      "availability": "Depends on generated queries, installed package state, and platform visibility filtering",
+      "trustBoundary": "PackageManager is a framework-mediated app-local view",
+      "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state"
+    },
+    {
+      "id": "dangerous-packages.app-data-path-visibility",
+      "title": "Application data path visibility",
+      "domainId": "app-visibility",
+      "observedObject": "A canonical application data path derived from a maintained package identity",
+      "proposition": "A package-derived private-data path is visible through the application filesystem view",
+      "observationChannel": "Native access probes over canonical package-data paths",
+      "availability": "Depends on package-data layout, namespace, permissions, and concealment affecting the app-local VFS view; under the app data isolation current Android enables, other applications' data directories are not visible and the unit reports itself unavailable",
+      "trustBoundary": "Path resolution is mediated by the process mount namespace and kernel VFS",
+      "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege"
+    }
+  ]
+}

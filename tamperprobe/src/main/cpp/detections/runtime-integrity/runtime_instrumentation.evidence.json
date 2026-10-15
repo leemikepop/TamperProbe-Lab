@@ -1,0 +1,31 @@
+{
+  "id": "RUNTIME_INSTRUMENTATION",
+  "name": "Runtime Instrumentation",
+  "description": "Correlates portable process maps, FD, thread, and public linker markers while keeping generic runtime artifacts as telemetry.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "runtime-instrumentation.direct-marker",
+      "title": "Direct runtime instrumentation marker",
+      "domainId": "runtime-integrity",
+      "observedObject": "Process mappings, file descriptors, threads, or linker objects containing maintained direct markers",
+      "proposition": "A portable process observation matches a maintained runtime instrumentation marker",
+      "observationChannel": "procfs maps, fd and task directories, plus public linker enumeration",
+      "availability": "Depends on procfs readability and linker enumeration within the target process",
+      "trustBoundary": "All channels are app-local and can be altered by in-process or kernel mediation",
+      "inferenceLimit": "Marker attribution is bounded to the matched string and does not establish device-level compromise"
+    },
+    {
+      "id": "runtime-instrumentation.generic-anomaly",
+      "title": "Generic runtime anomaly telemetry",
+      "domainId": "process-memory",
+      "observedObject": "Portable process artifacts that are non-unique to instrumentation frameworks",
+      "proposition": "A generic runtime artifact matching a telemetry rule is present",
+      "observationChannel": "procfs and public linker observations",
+      "availability": "Depends on the underlying process sources being readable",
+      "trustBoundary": "The observations are app-local and may be mediated",
+      "inferenceLimit": "Generic anomalies are telemetry-only and must not be promoted to findings without a new validated rule"
+    }
+  ]
+}

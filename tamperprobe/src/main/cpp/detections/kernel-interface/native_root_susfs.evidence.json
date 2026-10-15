@@ -1,0 +1,20 @@
+{
+  "id": "NATIVE_ROOT_SUSFS",
+  "name": "SUSFS Side-Channel Probe",
+  "description": "Detects SUSFS (KernelSU filesystem hiding module) via a side-channel: a child process attempts setresuid and SUSFS kills it with SIGKILL instead of returning EPERM.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "native-root-susfs.child-signal",
+      "title": "SUSFS syscall side-channel",
+      "domainId": "kernel-interface",
+      "observedObject": "Child-process termination behavior during a controlled setresuid probe",
+      "proposition": "The child was terminated with the detector-defined signal pattern instead of returning the expected permission error",
+      "observationChannel": "Forked child, setresuid syscall, and parent wait status",
+      "availability": "Requires process creation, syscall execution, and reliable wait-status collection",
+      "trustBoundary": "The kernel controls syscall and signal behavior and can intentionally imitate or hide the pattern",
+      "inferenceLimit": "The side-channel is associated with tested SUSFS behavior but is not a universal or version-independent proof"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "MEMORY_MAPS_ANOMALY",
+  "name": "Memory Maps Anomaly",
+  "description": "Reports non-ART writable, anonymous, or deleted executable mappings, smaps dirty-page code modifications, and suspicious signal handler registrations.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "process-memory",
+  "evidenceUnits": [
+    {
+      "id": "memory-maps.executable-mapping-anomaly",
+      "title": "Executable mapping anomaly",
+      "domainId": "process-memory",
+      "observedObject": "Non-ART writable, anonymous, deleted executable mappings, smaps dirty code pages, and signal handler targets",
+      "proposition": "A normalized process-map entry, smaps dirty page, or signal handler target satisfies an anomaly rule",
+      "observationChannel": "/proc/self/maps parsing, /proc/self/smaps dirty page audit, and sigaction query",
+      "availability": "Depends on maps/smaps readability and sigaction accessibility",
+      "trustBoundary": "The process map and smaps views can be filtered or rewritten",
+      "inferenceLimit": "Generic mapping anomalies have legitimate producers. Anonymous or instrumentation-owned signal handlers and writable executable mappings drive the assessment; dirty system code pages are collected as context only, because relocation and copy-on-write dirty executable pages on ordinary devices and the size thresholds are not yet calibrated against a clean baseline."
+    }
+  ]
+}

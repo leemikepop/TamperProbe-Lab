@@ -1,0 +1,20 @@
+{
+  "id": "NATIVE_ROOT_PATHS",
+  "name": "Native Root Paths",
+  "description": "Probes filesystem paths associated with KernelSU, APatch, and Magisk using multi-confirmation (stat/lstat/open) to detect root management artifacts.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "filesystem-state",
+  "evidenceUnits": [
+    {
+      "id": "native-root-paths.framework-artifact",
+      "title": "Native root-framework path artifact",
+      "domainId": "filesystem-state",
+      "observedObject": "Filesystem paths associated with KernelSU, APatch, or Magisk",
+      "proposition": "A maintained framework path was confirmed by the recorded native path operations",
+      "observationChannel": "Native stat, lstat, and open confirmations",
+      "availability": "Depends on path visibility, permissions, and process mount namespace",
+      "trustBoundary": "The app-local VFS can be filtered by concealment or kernel changes",
+      "inferenceLimit": "A path artifact does not prove that the associated provider is active for this process"
+    }
+  ]
+}

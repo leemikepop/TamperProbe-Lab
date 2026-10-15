@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <provider
+            android:authorities="io.leemikepop.tamperprobe.lab.fixture.storageowner.control" />
+    </queries>
+    <application
+        android:zygotePreloadName="io.leemikepop.tamperprobe.lab.internal.policyoracle.TamperProbeAppZygotePreload" />
+</manifest>

@@ -1,0 +1,42 @@
+{
+  "id": "EMULATOR_HARDWARE_INDICATORS",
+  "name": "Emulator Hardware Indicators",
+  "description": "Detects virtualized and emulated hardware environments using offscreen OpenGL ES renderers, ARM64 hardware timer registers, and scheduler jitter analysis.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "emulator-hardware.egl-renderer",
+      "title": "Offscreen OpenGL ES renderer",
+      "domainId": "system-state",
+      "observedObject": "EGL display and OpenGL ES GL_RENDERER and GL_VENDOR strings",
+      "proposition": "The offscreen OpenGL ES renderer identifies a software rasterizer or virtual machine graphics driver",
+      "observationChannel": "EGL 1.4 and OpenGL ES 2.0 API",
+      "availability": "Requires EGL display initialization and pbuffer surface support",
+      "trustBoundary": "Vendor strings can be spoofed in modified emulator builds",
+      "inferenceLimit": "Identifies known emulator rendering drivers; does not classify physical GPU variants"
+    },
+    {
+      "id": "emulator-hardware.timer-register-deviation",
+      "title": "ARM64 hardware timer register deviation",
+      "domainId": "system-state",
+      "observedObject": "ARM64 cntvct_el0 and cntfrq_el0 virtual counter registers",
+      "proposition": "The ARM64 virtual counter frequency or drift deviates significantly from CLOCK_MONOTONIC",
+      "observationChannel": "ARM64 inline assembly instructions and POSIX monotonic clock",
+      "availability": "Supported exclusively on 64-bit ARM (aarch64) platforms",
+      "trustBoundary": "Hypervisors may trap or emulate timer register reads with overhead",
+      "inferenceLimit": "Indicates virtualized counter timing characteristics; does not pinpoint hypervisor vendor"
+    },
+    {
+      "id": "emulator-hardware.sched-jitter",
+      "title": "Scheduler yield jitter distribution",
+      "domainId": "system-state",
+      "observedObject": "POSIX sched_yield latency distribution across 32 iterations",
+      "proposition": "The thread yield latency exhibits abnormally low coefficient of variation characteristic of deterministic virtualization",
+      "observationChannel": "POSIX sched_yield and clock_gettime syscalls",
+      "availability": "Requires monotonic clock access and thread scheduling privileges",
+      "trustBoundary": "Physical system quiescence may occasionally reduce scheduling jitter",
+      "inferenceLimit": "Statistical heuristic indicating virtualization; requires correlation with hardware signals"
+    }
+  ]
+}

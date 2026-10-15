@@ -1,0 +1,20 @@
+{
+  "id": "ELF_TEXT_INTEGRITY",
+  "name": "ELF Text Integrity",
+  "description": "Compares selected libc, ART, and input-library non-writable executable PT_LOAD bytes with their file-backed ELF without changing page protections.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "elf-text.mapped-file-mismatch",
+      "title": "Mapped ELF text mismatch",
+      "domainId": "runtime-integrity",
+      "observedObject": "Selected non-writable executable PT_LOAD bytes and their backing ELF bytes",
+      "proposition": "A compared executable segment differs from the corresponding file-backed ELF range",
+      "observationChannel": "Public linker enumeration, process maps, memory reads, and backing-file reads",
+      "availability": "Depends on module presence, resolved backing files, readable mappings, and supported ELF layout",
+      "trustBoundary": "Both in-memory and file-backed observations are made from the potentially mediated process",
+      "inferenceLimit": "A mismatch indicates code divergence but does not identify the modifier or prove malicious behavior"
+    }
+  ]
+}

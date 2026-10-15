@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.jar binary
+*.png binary
+
+# Read by the Xposed framework as a class name; a trailing CR would name a class that does not exist.
+test-fixtures/xposed-control/src/main/assets/xposed_init text eol=lf

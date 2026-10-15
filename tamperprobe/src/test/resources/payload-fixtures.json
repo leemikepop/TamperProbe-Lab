@@ -1,0 +1,1897 @@
+{
+  "BUSYBOX": {
+    "overview": {
+      "candidateCount": 1,
+      "environmentCandidateCount": 0,
+      "availableCandidateCount": 1,
+      "unavailableCandidateCount": 0,
+      "findingCount": 1,
+      "strongFindingCount": 0,
+      "weakFindingCount": 1,
+      "deniedOperationCount": 0,
+      "errorOperationCount": 0
+    },
+    "foundPaths": [
+      "/system/xbin/busybox"
+    ],
+    "findings": [
+      {
+        "id": "visible_artifact",
+        "path": "/system/xbin/busybox",
+        "candidateSource": "fixed_path",
+        "strength": "weak",
+        "classification": "busybox_artifact",
+        "summary": "A BusyBox artifact is visible; legitimate utility and custom-ROM producers remain possible"
+      }
+    ],
+    "probes": [
+      {
+        "path": "/system/xbin/busybox",
+        "candidateSource": "fixed_path",
+        "access": {
+          "state": "present",
+          "errno": 0
+        },
+        "lstat": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "regular",
+          "mode": 493,
+          "uid": 0,
+          "gid": 0,
+          "size": 4096,
+          "device": 1,
+          "inode": 101
+        },
+        "openPath": {
+          "state": "present",
+          "errno": 0
+        },
+        "fstat": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "regular",
+          "mode": 493,
+          "uid": 0,
+          "gid": 0,
+          "size": 4096,
+          "device": 1,
+          "inode": 101
+        },
+        "header": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "regular",
+          "mode": 493,
+          "uid": 0,
+          "gid": 0,
+          "size": 4096,
+          "device": 1,
+          "inode": 101,
+          "format": "elf_magic",
+          "bytesRead": 4,
+          "sameResolvedObject": true
+        }
+      }
+    ]
+  },
+  "SU_BINARY": {
+    "overview": {
+      "candidateCount": 1,
+      "environmentCandidateCount": 0,
+      "availableCandidateCount": 1,
+      "unavailableCandidateCount": 0,
+      "findingCount": 1,
+      "strongFindingCount": 1,
+      "weakFindingCount": 0,
+      "deniedOperationCount": 0,
+      "errorOperationCount": 0
+    },
+    "foundPaths": [
+      "/system/xbin/su"
+    ],
+    "findings": [
+      {
+        "id": "executable_elf_magic",
+        "path": "/system/xbin/su",
+        "candidateSource": "fixed_path",
+        "strength": "strong",
+        "classification": "su_executable_elf_magic_artifact",
+        "summary": "Executable su artifact with ELF magic is visible"
+      }
+    ],
+    "probes": [
+      {
+        "path": "/system/xbin/su",
+        "candidateSource": "fixed_path",
+        "access": {
+          "state": "present",
+          "errno": 0
+        },
+        "lstat": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "symlink",
+          "mode": 511,
+          "uid": 0,
+          "gid": 0,
+          "size": 16,
+          "device": 1,
+          "inode": 201
+        },
+        "openPath": {
+          "state": "present",
+          "errno": 0
+        },
+        "fstat": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "regular",
+          "mode": 493,
+          "uid": 0,
+          "gid": 0,
+          "size": 8192,
+          "device": 1,
+          "inode": 202
+        },
+        "header": {
+          "state": "present",
+          "errno": 0,
+          "fileType": "regular",
+          "mode": 493,
+          "uid": 0,
+          "gid": 0,
+          "size": 8192,
+          "device": 1,
+          "inode": 202,
+          "format": "elf_magic",
+          "bytesRead": 4,
+          "sameResolvedObject": true
+        }
+      }
+    ]
+  },
+  "SU_CONTEXT": {
+    "contextScan": {
+      "selfContext": "u:r:untrusted_app:s0",
+      "selfAbnormal": false,
+      "procChecked": 4,
+      "procDenied": 1,
+      "suspiciousProcesses": []
+    }
+  },
+  "DANGEROUS_PACKAGES": {
+    "packageIdentity": {
+      "targetCount": 1,
+      "completedQueryCount": 1,
+      "detectedPackages": [
+        "com.topjohnwu.magisk"
+      ],
+      "issues": []
+    },
+    "appDataPath": {
+      "attemptedPathCount": 2,
+      "completedPathCount": 1,
+      "notFoundPathCount": 0,
+      "foundPaths": [
+        "/data/user/0/com.topjohnwu.magisk"
+      ],
+      "inaccessiblePaths": [
+        "/data/data/com.topjohnwu.magisk"
+      ],
+      "issues": [
+        {
+          "code": "path-inaccessible",
+          "message": "Package-derived path could not be observed conclusively",
+          "attributes": {
+            "path": "/data/data/com.topjohnwu.magisk",
+            "errno": "13"
+          }
+        }
+      ]
+    }
+  },
+  "PACKAGE_STORAGE_VISIBILITY": {
+    "storageContext": {
+      "userId": 0,
+      "storageRoot": "/storage/emulated/0",
+      "statfsAvailable": true,
+      "fsType": 65793,
+      "fuseBpfState": "true",
+      "appDataIsolationState": "true",
+      "rootProbe": {
+        "state": "present",
+        "errno": 0,
+        "inode": 11,
+        "device": 22
+      }
+    },
+    "overview": {
+      "targetCount": 1,
+      "completedBaselineCount": 2,
+      "transformedProbeCount": 138,
+      "candidateCount": 2,
+      "findingCount": 2,
+      "telemetryCount": 1,
+      "droppedObservationCount": 0,
+      "droppedCollectionErrorCount": 0
+    },
+    "packageObservations": [
+      {
+        "package": "com.topjohnwu.magisk",
+        "protectedRoot": "data",
+        "variantId": "zero_width_space_android_inside",
+        "variantType": "unicode",
+        "codePoint": "U+200B",
+        "placement": "android_inside",
+        "canonicalStat": {
+          "state": "not_found",
+          "errno": 2
+        },
+        "canonicalAccess": {
+          "state": "not_found",
+          "errno": 2
+        },
+        "canonicalOpen": {
+          "state": "not_found",
+          "errno": 2
+        },
+        "variantStat": {
+          "state": "present",
+          "errno": 0,
+          "inode": 33,
+          "device": 22
+        },
+        "variantAccess": {
+          "state": "present",
+          "errno": 0
+        },
+        "variantOpen": {
+          "state": "denied",
+          "errno": 13
+        },
+        "variantList": {
+          "state": "denied",
+          "errno": 13
+        },
+        "assessmentImpact": "weak_finding"
+      }
+    ],
+    "findings": [
+      {
+        "id": "canonical_package_data",
+        "package": "com.topjohnwu.magisk",
+        "protectedRoot": "obb",
+        "variantId": "canonical",
+        "strength": "weak",
+        "classification": "package_data_artifact",
+        "summary": "Dangerous-package storage artifact is directly visible"
+      },
+      {
+        "id": "unicode_alias",
+        "package": "com.topjohnwu.magisk",
+        "protectedRoot": "data",
+        "variantId": "zero_width_space_android_inside",
+        "codePoint": "U+200B",
+        "placement": "android_inside",
+        "strength": "weak",
+        "classification": "package_data_artifact",
+        "summary": "Unicode storage alias reveals a dangerous-package artifact"
+      }
+    ],
+    "telemetry": [
+      {
+        "id": "platform_oracle",
+        "classification": "storage_isolation_behavior",
+        "assessmentImpact": "telemetry_only",
+        "summary": "Storage path aliases produced a platform-level behavioral differential",
+        "differentialCount": 1
+      }
+    ],
+    "collectionErrors": [
+      {
+        "source": "canonical:obb",
+        "errno": 13,
+        "message": "Permission denied"
+      }
+    ]
+  },
+  "DANGEROUS_PROPS": {
+    "overview": {
+      "checkedRuleCount": 9,
+      "availableRuleCount": 8,
+      "findingCount": 1,
+      "telemetryCount": 2,
+      "weakFindingCount": 1,
+      "moderateFindingCount": 0
+    },
+    "observations": [
+      {
+        "property": "ro.debuggable",
+        "source": "bionic",
+        "state": "present",
+        "value": "1"
+      },
+      {
+        "property": "service.adb.root",
+        "source": "bionic",
+        "state": "missing"
+      },
+      {
+        "property": "ro.secure",
+        "source": "bionic",
+        "state": "unavailable",
+        "error": "property service unavailable"
+      },
+      {
+        "property": "ro.boot.qemu",
+        "source": "bionic",
+        "state": "present",
+        "value": "1"
+      },
+      {
+        "property": "sys.usb.config",
+        "source": "bionic",
+        "state": "present",
+        "value": "mtp,adb"
+      },
+      {
+        "property": "adb_enabled",
+        "source": "settings_global",
+        "state": "present",
+        "value": "1"
+      }
+    ],
+    "findings": [
+      {
+        "id": "debuggable_build",
+        "property": "ro.debuggable",
+        "expected": "not 1",
+        "actual": "1",
+        "comparison": "equals",
+        "strength": "weak",
+        "summary": "The Android build is debuggable",
+        "detail": "ro.debuggable is explicitly 1."
+      }
+    ],
+    "telemetry": [
+      {
+        "id": "emulator_environment",
+        "classification": "device_posture",
+        "assessmentImpact": "telemetry_only",
+        "summary": "Emulator environment properties are active",
+        "detail": "One or more QEMU environment properties are explicitly 1.",
+        "properties": [
+          "ro.boot.qemu"
+        ],
+        "values": [
+          "1"
+        ]
+      },
+      {
+        "id": "adb_transport_enabled",
+        "classification": "device_posture",
+        "assessmentImpact": "telemetry_only",
+        "summary": "ADB transport is enabled in the USB configuration",
+        "detail": "One or more USB configuration properties contain the adb function.",
+        "properties": [
+          "sys.usb.config"
+        ],
+        "values": [
+          "mtp,adb"
+        ]
+      }
+    ],
+    "collectionErrors": [
+      {
+        "source": "bionic",
+        "property": "ro.secure",
+        "errno": 0,
+        "message": "property service unavailable"
+      }
+    ],
+    "collectionWarnings": []
+  },
+  "SELINUX_CHECK": {
+    "filesystem": {
+      "path": "/sys/fs/selinux",
+      "state": "selinuxfs",
+      "fsType": 4185718668
+    },
+    "enforcementSources": [
+      {
+        "source": "selinuxfs_enforce",
+        "state": "present",
+        "mode": "enforcing"
+      },
+      {
+        "source": "selinuxfs_read_denial",
+        "state": "not_applicable",
+        "mode": "unknown"
+      },
+      {
+        "source": "libselinux",
+        "state": "unavailable",
+        "mode": "unknown",
+        "error": "library unavailable"
+      }
+    ],
+    "readDenialInference": {
+      "readErrno": 0,
+      "state": "not_applicable"
+    },
+    "writeProbe": {
+      "path": "/sys/fs/selinux/enforce",
+      "state": "denied",
+      "writable": false,
+      "errno": 13
+    },
+    "processContext": {
+      "path": "/proc/self/attr/current",
+      "state": "present",
+      "context": "u:r:untrusted_app:s0",
+      "domain": "untrusted_app"
+    },
+    "findings": [],
+    "collectionErrors": [
+      {
+        "source": "libselinux",
+        "path": "libselinux.so",
+        "errno": 0,
+        "message": "library unavailable"
+      }
+    ]
+  },
+  "SYSTEM_PROPERTIES_TAMPER": {
+    "overview": {
+      "comparedPropertyCount": 8,
+      "mismatchCount": 1,
+      "unreferencedHoleCount": 1,
+      "strongestFinding": "strong"
+    },
+    "sources": [
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "bionic",
+        "state": "present",
+        "value": "green"
+      },
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "bionic_legacy",
+        "state": "present",
+        "value": "orange"
+      },
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "android_system_properties",
+        "state": "present",
+        "value": "green"
+      },
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "getprop",
+        "state": "present",
+        "value": "green"
+      },
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "property_area:u:object_r:default_prop:s0",
+        "state": "present",
+        "value": "green"
+      },
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "source": "proc_cmdline",
+        "state": "present",
+        "value": "green"
+      }
+    ],
+    "comparisons": [
+      {
+        "property": "ro.boot.verifiedbootstate",
+        "availableSourceCount": 6,
+        "distinctValueCount": 2,
+        "comparable": true,
+        "mismatch": true,
+        "strength": "strong",
+        "outlierSources": [
+          "bionic_legacy"
+        ],
+        "majorityValue": "green",
+        "sources": [
+          "bionic",
+          "bionic_legacy",
+          "android_system_properties",
+          "getprop",
+          "property_area:u:object_r:default_prop:s0",
+          "proc_cmdline"
+        ],
+        "values": [
+          "green",
+          "orange",
+          "green",
+          "green",
+          "green",
+          "green"
+        ]
+      }
+    ],
+    "propertyAreas": [
+      {
+        "path": "/dev/__properties__/u:object_r:default_prop:s0",
+        "context": "u:object_r:default_prop:s0",
+        "status": "parsed",
+        "magic": 1347375696,
+        "version": 4235116715,
+        "bytesUsed": 112,
+        "referencedBytes": 108,
+        "unreferencedBytes": 4,
+        "unreferencedRanges": [
+          {
+            "offset": 108,
+            "length": 4
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "property_accessor_contradiction",
+        "property": "ro.boot.verifiedbootstate",
+        "outlierSources": [
+          "bionic_legacy"
+        ],
+        "strength": "strong",
+        "summary": "Equivalent Android property sources disagree",
+        "detail": "The property-area bytes and the bionic accessor report different values for the same property. Sources for ro.boot.verifiedbootstate: bionic=green bionic_legacy=orange android_system_properties=green getprop=green property_area:u:object_r:default_prop:s0=green proc_cmdline=green",
+        "sources": [
+          "bionic",
+          "bionic_legacy",
+          "android_system_properties",
+          "getprop",
+          "property_area:u:object_r:default_prop:s0",
+          "proc_cmdline"
+        ],
+        "values": [
+          "green",
+          "orange",
+          "green",
+          "green",
+          "green",
+          "green"
+        ]
+      }
+    ],
+    "collectionErrors": []
+  },
+  "RW_PATHS": {
+    "writablePaths": [
+      "/system"
+    ],
+    "attemptedPathCount": 7,
+    "completedPathCount": 5,
+    "notFoundPathCount": 2,
+    "errorPathCount": 0
+  },
+  "MOUNT_INTEGRITY": {
+    "findings": [
+      {
+        "id": "magisk_mount",
+        "ruleId": "magisk_mount",
+        "family": "magisk",
+        "confidence": "strong",
+        "marker": ".magisk",
+        "summary": "Magisk-specific mount marker is visible",
+        "path": "/system/bin",
+        "detail": "/.magisk/block/system -> /system/bin (ext4)",
+        "source": "/.magisk/block/system",
+        "target": "/system/bin",
+        "fsType": "ext4",
+        "options": "ro"
+      }
+    ],
+    "collectionErrors": [],
+    "statxChecks": [
+      {
+        "path": "/system",
+        "succeeded": true,
+        "mountId": 42,
+        "presentInMountInfo": true
+      }
+    ],
+    "statfsChecks": [
+      {
+        "path": "/system",
+        "succeeded": true,
+        "fsType": 16914836,
+        "overlay": false
+      }
+    ],
+    "directBlockMounts": [],
+    "mountIdSequence": {
+      "experimental": true,
+      "artMountId": 100,
+      "dataMirrorMountId": 104,
+      "visibleCount": 2,
+      "missingCount": 1,
+      "maximumGap": 1,
+      "gapRanges": [
+        {
+          "start": 102,
+          "end": 102,
+          "size": 1
+        }
+      ],
+      "assessmentImpact": "telemetry_only"
+    },
+    "mountInfoReadable": true,
+    "mountInfoEntryCount": 200,
+    "overlayDeclared": false,
+    "rootPropagationPrivate": false,
+    "selfNamespace": "mnt:[4026533000]",
+    "initNamespace": "mnt:[4026531840]",
+    "sharesInitNamespace": false,
+    "completedStatxChecks": 1,
+    "completedStatfsChecks": 1,
+    "hiddenMountIdCount": 0,
+    "hiddenOverlayCount": 0,
+    "strongFindingCount": 1,
+    "weakFindingCount": 0,
+    "findingCount": 1
+  },
+  "PROLOGUE_SCANNER": {
+    "targetLibraries": [
+      "libc.so",
+      "libdl.so"
+    ],
+    "checkedLibraries": [
+      "libc.so",
+      "libdl.so"
+    ],
+    "unavailableLibraries": [],
+    "comparisonMethod": "resolved_module_and_backing_elf",
+    "entryPatternPolicy": "diagnostic_only",
+    "entryPatternArchitecture": "aarch64",
+    "patternObservationCount": 2,
+    "branchLikeFunctionCount": 1,
+    "trampolineFunctionCount": 1,
+    "checks": [
+      {
+        "targetLibrary": "libc.so",
+        "expectedLibraries": [
+          "libc.so"
+        ],
+        "function": "open",
+        "status": "clean",
+        "reason": "memory_matches_backing_elf",
+        "resolvedPath": "/apex/com.android.runtime/lib64/bionic/libc.so",
+        "backingFileOffset": 4096,
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": true,
+        "branchLike": true,
+        "expectedPrologue": false,
+        "trampolineLike": true,
+        "suspiciousJump": false,
+        "entryPattern": "trampoline_like",
+        "entryBytesHex": "000000141f2003d50000000000000000",
+        "patternAssessmentImpact": "diagnostic_only"
+      },
+      {
+        "targetLibrary": "libc.so",
+        "expectedLibraries": [
+          "libc.so"
+        ],
+        "function": "read",
+        "status": "modified",
+        "reason": "resolved_outside_expected_library",
+        "resolvedPath": "/data/local/tmp/libhook.so",
+        "backingFileOffset": 0,
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": true,
+        "branchLike": false,
+        "expectedPrologue": true,
+        "trampolineLike": false,
+        "suspiciousJump": false,
+        "entryPattern": "expected_prologue",
+        "entryBytesHex": "fd7bbfa9fd0300910000000000000000",
+        "patternAssessmentImpact": "diagnostic_only"
+      },
+      {
+        "targetLibrary": "libdl.so",
+        "expectedLibraries": [
+          "libdl.so",
+          "linker",
+          "linker64"
+        ],
+        "function": "dlsym",
+        "status": "unavailable",
+        "reason": "backing_elf_not_readable",
+        "resolvedPath": "/apex/com.android.runtime/lib64/bionic/libdl.so",
+        "backingFileOffset": 0,
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": false,
+        "branchLike": false,
+        "expectedPrologue": false,
+        "trampolineLike": false,
+        "suspiciousJump": false,
+        "entryPattern": "unavailable",
+        "entryBytesHex": "",
+        "patternAssessmentImpact": "diagnostic_only"
+      }
+    ],
+    "patterns": [
+      {
+        "targetLibrary": "libc.so",
+        "function": "open",
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": true,
+        "branchLike": true,
+        "expectedPrologue": false,
+        "trampolineLike": true,
+        "suspiciousJump": false,
+        "entryPattern": "trampoline_like",
+        "entryBytesHex": "000000141f2003d50000000000000000",
+        "patternAssessmentImpact": "diagnostic_only"
+      },
+      {
+        "targetLibrary": "libc.so",
+        "function": "read",
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": true,
+        "branchLike": false,
+        "expectedPrologue": true,
+        "trampolineLike": false,
+        "suspiciousJump": false,
+        "entryPattern": "expected_prologue",
+        "entryBytesHex": "fd7bbfa9fd0300910000000000000000",
+        "patternAssessmentImpact": "diagnostic_only"
+      },
+      {
+        "targetLibrary": "libdl.so",
+        "function": "dlsym",
+        "patternArchitecture": "aarch64",
+        "patternSupported": true,
+        "patternAvailable": false,
+        "branchLike": false,
+        "expectedPrologue": false,
+        "trampolineLike": false,
+        "suspiciousJump": false,
+        "entryPattern": "unavailable",
+        "entryBytesHex": "",
+        "patternAssessmentImpact": "diagnostic_only"
+      }
+    ],
+    "checkedFunctions": [
+      "open",
+      "read"
+    ],
+    "triggeredFunctions": [
+      "read"
+    ],
+    "unavailableFunctions": [
+      "dlsym"
+    ]
+  },
+  "RUNTIME_INSTRUMENTATION": {
+    "directMarkers": [
+      {
+        "channel": "thread",
+        "value": "gum-js-loop",
+        "classification": "direct_marker",
+        "marker": "gum-js",
+        "attribution": "Frida",
+        "assessmentImpact": "moderate"
+      },
+      {
+        "channel": "maps",
+        "value": "/data/adb/modules/playintegrityfix/libpif.so",
+        "classification": "direct_marker",
+        "marker": "playintegrityfix",
+        "attribution": "Play Integrity Fix",
+        "assessmentImpact": "moderate"
+      }
+    ],
+    "genericAnomalies": [
+      {
+        "channel": "thread",
+        "value": "gmain",
+        "classification": "generic_anomaly",
+        "assessmentImpact": "telemetry_only"
+      }
+    ],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "fdDirectoryReadable": true,
+    "taskDirectoryReadable": true,
+    "scannedMappings": 120,
+    "scannedFds": 18,
+    "scannedThreads": 24,
+    "malformedMapLines": 0,
+    "linkerObjectCount": 30,
+    "directMarkerCount": 2,
+    "genericAnomalyCount": 1
+  },
+  "ELF_TEXT_INTEGRITY": {
+    "targetLibraries": [
+      "libc.so",
+      "libart.so",
+      "libinput.so"
+    ],
+    "requiredLibraries": [
+      "libc.so"
+    ],
+    "resolvedModules": [
+      {
+        "library": "libc.so",
+        "path": "/apex/com.android.runtime/lib64/bionic/libc.so",
+        "required": true,
+        "executableSegmentCount": 2
+      },
+      {
+        "library": "libart.so",
+        "path": "/apex/com.android.art/lib64/libart.so",
+        "required": false,
+        "executableSegmentCount": 1
+      }
+    ],
+    "missingRequiredLibraries": [],
+    "missingOptionalLibraries": [
+      "libinput.so"
+    ],
+    "comparisonMethod": "public_phdr_to_backing_elf",
+    "checkedSegments": [
+      {
+        "library": "libc.so",
+        "path": "/apex/com.android.runtime/lib64/bionic/libc.so",
+        "segmentIndex": 1,
+        "memoryStart": 4096,
+        "fileOffset": 4096,
+        "byteCount": 8192,
+        "comparedBytes": 8192,
+        "firstMismatchOffset": 0,
+        "reason": "memory_matches_backing_elf"
+      }
+    ],
+    "modifiedSegments": [
+      {
+        "library": "libart.so",
+        "path": "/apex/com.android.art/lib64/libart.so",
+        "segmentIndex": 2,
+        "memoryStart": 12288,
+        "fileOffset": 12288,
+        "byteCount": 4096,
+        "comparedBytes": 4096,
+        "firstMismatchOffset": 16,
+        "reason": "memory_differs_from_backing_elf"
+      }
+    ],
+    "unavailableSegments": [],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "malformedMapLines": 0,
+    "checkedSegmentCount": 1,
+    "modifiedSegmentCount": 1,
+    "unavailableSegmentCount": 0
+  },
+  "VDSO_INTEGRITY": {
+    "findings": [
+      {
+        "type": "auxv_mapping_mismatch",
+        "detail": "AT_SYSINFO_EHDR does not match the VDSO mapping base",
+        "assessmentImpact": "moderate"
+      }
+    ],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "malformedMapLines": 0,
+    "mappingCount": 1,
+    "mappingStart": 28672,
+    "mappingEnd": 32768,
+    "mappingPermissions": "r-xp",
+    "auxvAddress": 28928,
+    "auxvMatchesMapping": false,
+    "elfHeaderValid": true,
+    "loadSegmentsValid": true,
+    "linkerOwnerFound": true,
+    "linkerOwnerPath": "linux-vdso.so.1",
+    "symbolCheckAvailable": true,
+    "checkedSymbol": "__kernel_clock_gettime",
+    "resolvedSymbolAddress": 29184,
+    "symbolOwnedByVdso": true,
+    "findingCount": 1
+  },
+  "TEE_ATTESTATION": {
+    "attestation": {
+      "certificateAvailable": true,
+      "certificateChainLength": 3,
+      "chain": {
+        "signaturesChecked": 2,
+        "signaturesValid": true,
+        "trustedRootState": "trusted",
+        "trustedRootCount": 2,
+        "attestationCertificateIndex": 0,
+        "attestationExtensionCount": 1,
+        "rkpProvisioningExtensionPresent": true,
+        "rkpProvisioningCertificateIndex": 1,
+        "provisioningExpiryState": "valid",
+        "certificateValidity": [
+          {
+            "index": 0,
+            "state": "valid"
+          },
+          {
+            "index": 1,
+            "state": "valid"
+          },
+          {
+            "index": 2,
+            "state": "valid"
+          }
+        ]
+      },
+      "challenge": {
+        "expectedLength": 32,
+        "present": true,
+        "matches": true
+      },
+      "versions": {
+        "attestationVersion": 400,
+        "keymasterVersion": 400,
+        "attestationSecurityLevel": "TrustedEnvironment",
+        "attestationSecurityLevelCode": 1,
+        "keymasterSecurityLevel": "TrustedEnvironment",
+        "keymasterSecurityLevelCode": 1
+      },
+      "hasAttestationExtension": true,
+      "rootOfTrust": {
+        "parseOk": true,
+        "deviceLocked": true,
+        "verifiedBootState": "Verified",
+        "verifiedBootStateCode": 0,
+        "verifiedBootKeyHex": "1234",
+        "verifiedBootHashHex": "5678"
+      },
+      "bootConsistency": {
+        "runtimeDigestAvailable": true,
+        "runtimeDigestHex": "5678",
+        "attestedDigestHex": "5678",
+        "comparable": true,
+        "matches": true,
+        "zeroBootKey": false,
+        "zeroBootHash": false
+      },
+      "revocation": {
+        "statusJsonLoaded": true,
+        "validationState": "checked",
+        "revoked": false,
+        "suspended": false,
+        "expiredEntryCount": 0,
+        "hits": []
+      }
+    },
+    "findings": [],
+    "collectionWarnings": []
+  },
+  "TEE_KEYSTORE_CONSISTENCY": {
+    "checks": [
+      {
+        "id": "ec_signature_roundtrip",
+        "required": true,
+        "state": "passed",
+        "detail": {
+          "keySecurityLevel": "level_1"
+        }
+      },
+      {
+        "id": "key_lifecycle",
+        "required": true,
+        "state": "passed",
+        "detail": {
+          "absentAfterDelete": true,
+          "freshPublicMaterial": true
+        }
+      },
+      {
+        "id": "certificate_only_entry",
+        "required": true,
+        "state": "passed",
+        "detail": {
+          "trustedCertificateEntry": true,
+          "privateKeyAbsent": true
+        }
+      },
+      {
+        "id": "aes_gcm_roundtrip",
+        "required": false,
+        "state": "passed",
+        "detail": {}
+      },
+      {
+        "id": "strongbox_capability",
+        "required": false,
+        "state": "not_declared",
+        "detail": {}
+      }
+    ],
+    "findings": [],
+    "collectionWarnings": [],
+    "requiredCheckCount": 3,
+    "completedRequiredCheckCount": 3,
+    "requiredContradictionCount": 0
+  },
+  "TEE_OVERSIZED_CHALLENGE": {
+    "checked": true,
+    "accepted": false,
+    "state": "rejected",
+    "stage": "generate",
+    "errorCategory": "challenge_too_large",
+    "numericErrorCode": 9,
+    "aliasCleanupSucceeded": true,
+    "challengeSize": 256,
+    "findings": [],
+    "collectionWarnings": []
+  },
+  "NATIVE_ROOT_PATHS": {
+    "findings": [
+      {
+        "path": "/data/adb/ksu",
+        "label": "KernelSU data",
+        "rootTool": "KernelSU",
+        "confirmations": 2,
+        "evidence": "path and context"
+      }
+    ],
+    "hitCount": 1,
+    "checkedCount": 21,
+    "attemptedPathCount": 21,
+    "completedPathCount": 21,
+    "notFoundPathCount": 20,
+    "errorPathCount": 0,
+    "inaccessiblePaths": [],
+    "concealableNotFoundPathCount": 0,
+    "concealableNotFoundPaths": [],
+    "ksuFound": true,
+    "apatchFound": false,
+    "magiskFound": false
+  },
+  "NATIVE_ROOT_PRCTL": {
+    "findings": [
+      {
+        "probe": "KSU_GET_VERSION",
+        "result": "12000",
+        "severity": "strong"
+      }
+    ],
+    "ksuDetected": true,
+    "ksuVersion": 12000
+  },
+  "NATIVE_ROOT_SUSFS": {
+    "currentUid": 10234,
+    "targetUid": 10234,
+    "result": "filtered",
+    "detail": "probe result changed",
+    "susfsDetected": true
+  },
+  "NATIVE_ROOT_DEVPTS": {
+    "findings": [
+      {
+        "path": "/dev/pts/0",
+        "owner": "root",
+        "selinuxContext": "u:object_r:ksu_file:s0",
+        "ksuFileContext": true,
+        "freshPty": false
+      }
+    ],
+    "checkedCount": 2,
+    "hitCount": 1
+  },
+  "NATIVE_ROOT_SEPOLICY": {
+    "overview": {
+      "oracleState": "observed",
+      "gateCount": 6,
+      "passedGateCount": 6,
+      "ruleCount": 4,
+      "findingCount": 1,
+      "trustedNegativeCount": 0,
+      "concealableNegativeCount": 0
+    },
+    "carrier": {
+      "state": "present",
+      "context": "u:r:app_zygote:s0",
+      "domain": "app_zygote",
+      "uid": 10234,
+      "applicationUid": 10234,
+      "uidMatches": true
+    },
+    "device": {
+      "buildType": "user"
+    },
+    "trust": {
+      "nativeTrusted": false,
+      "javaControlled": true,
+      "contradiction": false
+    },
+    "enforcementSources": [
+      {
+        "source": "libselinux",
+        "state": "unavailable",
+        "enabled": false,
+        "mode": "unknown"
+      },
+      {
+        "source": "hidden_android_selinux",
+        "state": "present",
+        "enabled": true,
+        "mode": "enforcing"
+      }
+    ],
+    "querySources": [
+      {
+        "source": "native_libselinux",
+        "state": "unavailable",
+        "required": false
+      },
+      {
+        "source": "hidden_android_selinux",
+        "state": "available",
+        "required": false
+      }
+    ],
+    "controls": [
+      {
+        "id": "positive_app_zygote_dyntransition",
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaStable": true,
+        "stable": true,
+        "sourcesAgree": true,
+        "observationAvailable": true,
+        "decision": "allowed",
+        "trustedTier": "java_controlled",
+        "javaPassed": true
+      },
+      {
+        "id": "negative_untrusted_app_ptrace_init",
+        "javaAvailable": true,
+        "javaDecisions": [
+          "denied",
+          "denied"
+        ],
+        "javaStable": true,
+        "stable": true,
+        "sourcesAgree": true,
+        "observationAvailable": true,
+        "decision": "denied",
+        "trustedTier": "java_controlled",
+        "javaPassed": true
+      }
+    ],
+    "rules": [
+      {
+        "id": "magisk_binder_call",
+        "sourceContextState": "unavailable",
+        "targetContextState": "unavailable",
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaStable": true,
+        "stable": true,
+        "sourcesAgree": true,
+        "observationAvailable": true,
+        "decision": "allowed",
+        "trustedTier": "java_controlled",
+        "assessmentImpact": "weak_finding"
+      },
+      {
+        "id": "ksu_file_read",
+        "sourceContextState": "unavailable",
+        "targetContextState": "unavailable",
+        "javaAvailable": true,
+        "javaDecisions": [
+          "denied",
+          "denied"
+        ],
+        "javaStable": true,
+        "stable": true,
+        "sourcesAgree": true,
+        "observationAvailable": true,
+        "decision": "denied",
+        "trustedTier": "java_controlled",
+        "assessmentImpact": "weak_finding"
+      },
+      {
+        "id": "adbd_adbroot_binder_call",
+        "sourceContextState": "unavailable",
+        "targetContextState": "unavailable",
+        "javaAvailable": false,
+        "trustedTier": "untrusted",
+        "assessmentImpact": "weak_finding"
+      },
+      {
+        "id": "shell_su_transition",
+        "sourceContextState": "unavailable",
+        "targetContextState": "unavailable",
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaStable": true,
+        "stable": true,
+        "sourcesAgree": true,
+        "observationAvailable": true,
+        "decision": "allowed",
+        "trustedTier": "java_controlled",
+        "assessmentImpact": "user_build_weak_finding"
+      }
+    ],
+    "findings": [
+      {
+        "id": "magisk_binder_allowed",
+        "ruleId": "magisk_binder_call",
+        "strength": "weak",
+        "trustTier": "java_controlled",
+        "summary": "Magisk binder call is allowed by SELinux policy",
+        "detail": "A controlled Java policy query allows the tool-specific rule."
+      }
+    ],
+    "concealableNegatives": [],
+    "collectionErrors": [
+      {
+        "source": "native_libselinux",
+        "errno": 0,
+        "message": "Native symbols are unavailable."
+      }
+    ]
+  },
+  "ZYGISK_SMAPS": {
+    "dirtyMappings": [],
+    "hitCount": 0,
+    "systemLibraryDirt": [
+      {
+        "path": "/apex/com.android.art/lib64/libart.so",
+        "executableRegionCount": 19,
+        "dirtyRegionCount": 9,
+        "singlePageDirtyRegionCount": 9,
+        "privateDirtyKB": 36,
+        "sharedDirtyKB": 0,
+        "largestDirtyRegionKB": 4
+      }
+    ],
+    "dirtySystemLibraryCount": 1,
+    "singlePageDirtyRegionCount": 9,
+    "dirtyMappingImpact": "telemetry_only",
+    "singlePageDirtyImpact": "moderate",
+    "heapEntropyImpact": "telemetry_only"
+  },
+  "ZYGISK_NAMESPACE": {
+    "totalLibCount": 42,
+    "suspiciousLibs": [
+      "libzygisk.so"
+    ]
+  },
+  "ZYGISK_FD_FORENSICS": {
+    "overview": {
+      "hostConfirmedCount": 1,
+      "carrierConfirmedCount": 0,
+      "findingCount": 1,
+      "carrierAvailable": true,
+      "hostViewsUsable": true,
+      "carrierViewsUsable": true,
+      "processDivergence": true
+    },
+    "hostProcess": {
+      "scannedDescriptorRange": 1024,
+      "iterateViewReadable": true,
+      "tableOpenCount": 37,
+      "lookupOpenCount": 37,
+      "candidateCount": 1,
+      "unstableCandidateCount": 0,
+      "procfsUnusable": false,
+      "hiddenFromIterateCount": 1,
+      "hiddenFromLookupCount": 0,
+      "phantomCount": 0,
+      "confirmedCount": 1,
+      "contradictions": [
+        {
+          "descriptor": 41,
+          "tableOpen": true,
+          "lookupOpen": true,
+          "iterateOpen": false,
+          "category": "hidden_from_iterate",
+          "targetClass": "app_storage+deleted"
+        }
+      ]
+    },
+    "carrierProcess": {
+      "available": true,
+      "descriptorTable": {
+        "scannedDescriptorRange": 1024,
+        "iterateViewReadable": true,
+        "tableOpenCount": 21,
+        "lookupOpenCount": 21,
+        "candidateCount": 0,
+        "unstableCandidateCount": 0,
+        "procfsUnusable": false,
+        "hiddenFromIterateCount": 0,
+        "hiddenFromLookupCount": 0,
+        "phantomCount": 0,
+        "confirmedCount": 0,
+        "contradictions": []
+      },
+      "trapDescriptor": {
+        "status": "survived",
+        "targetClass": "app_storage+deleted"
+      }
+    },
+    "trapChannel": {
+      "carrierStatus": "survived",
+      "assessmentImpact": "telemetry_only"
+    },
+    "findings": [
+      {
+        "id": "descriptor_hidden_from_iterate",
+        "unitId": "zygisk-fd-forensics.descriptor-view-differential",
+        "process": "host",
+        "category": "hidden_from_iterate",
+        "descriptor": 41,
+        "targetClass": "app_storage+deleted",
+        "strength": "MODERATE",
+        "summary": "A descriptor resolves through /proc/self/fd but is absent from its listing",
+        "detail": "The procfs lookup and iterate paths disagree about the same descriptor across repeated sweeps, which is consistent with a filtered directory listing rather than with a concurrent close."
+      }
+    ],
+    "collectionErrors": [],
+    "collectionStatus": "complete"
+  },
+  "LSPOSED_MAPS": {
+    "findings": [
+      {
+        "marker": "lsposed",
+        "path": "/memfd:jit-cache"
+      }
+    ],
+    "hitCount": 1
+  },
+  "LSPOSED_SEPOLICY": {
+    "overview": {
+      "oracleState": "observed",
+      "gateCount": 6,
+      "passedGateCount": 6,
+      "ruleCount": 3,
+      "findingCount": 1,
+      "trustedNegativeCount": 0,
+      "concealableNegativeCount": 0
+    },
+    "carrier": {
+      "state": "present",
+      "context": "u:r:app_zygote:s0",
+      "domain": "app_zygote",
+      "uid": 10234,
+      "applicationUid": 10234,
+      "uidMatches": true
+    },
+    "enforcementSources": [
+      {
+        "source": "libselinux",
+        "state": "present",
+        "enabled": true,
+        "mode": "enforcing"
+      },
+      {
+        "source": "hidden_android_selinux",
+        "state": "present",
+        "mode": "enforcing"
+      }
+    ],
+    "querySources": [
+      {
+        "source": "native_libselinux",
+        "state": "available",
+        "required": true
+      },
+      {
+        "source": "hidden_android_selinux",
+        "state": "available",
+        "required": false
+      }
+    ],
+    "controls": [
+      {
+        "id": "positive_app_zygote_dyntransition",
+        "sourceContext": "u:r:app_zygote:s0",
+        "targetContext": "u:r:isolated_app:s0",
+        "targetClass": "process",
+        "permission": "dyntransition",
+        "expected": "allowed",
+        "contextsValid": true,
+        "nativeAvailable": true,
+        "nativeDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "stable": true,
+        "sourcesAgree": true,
+        "decision": "allowed",
+        "trusted": true,
+        "passed": true
+      },
+      {
+        "id": "negative_untrusted_app_ptrace_init",
+        "sourceContext": "u:r:untrusted_app:s0",
+        "targetContext": "u:r:init:s0",
+        "targetClass": "process",
+        "permission": "ptrace",
+        "expected": "denied",
+        "contextsValid": true,
+        "nativeAvailable": true,
+        "nativeDecisions": [
+          "denied",
+          "denied"
+        ],
+        "javaAvailable": true,
+        "javaDecisions": [
+          "denied",
+          "denied"
+        ],
+        "stable": true,
+        "sourcesAgree": true,
+        "decision": "denied",
+        "trusted": true,
+        "passed": true
+      }
+    ],
+    "rules": [
+      {
+        "id": "lsposed_file_read",
+        "sourceContext": "u:r:untrusted_app:s0",
+        "targetContext": "u:object_r:lsposed_file:s0",
+        "targetClass": "file",
+        "permission": "read",
+        "targetContextState": "valid",
+        "nativeAvailable": true,
+        "nativeDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "stable": true,
+        "sourcesAgree": true,
+        "decision": "allowed",
+        "trusted": true,
+        "assessmentImpact": "moderate_finding"
+      },
+      {
+        "id": "system_server_execmem",
+        "sourceContext": "u:r:system_server:s0",
+        "targetContext": "u:r:system_server:s0",
+        "targetClass": "process",
+        "permission": "execmem",
+        "targetContextState": "valid",
+        "nativeAvailable": true,
+        "nativeDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "stable": true,
+        "sourcesAgree": true,
+        "decision": "allowed",
+        "trusted": true,
+        "assessmentImpact": "telemetry_only"
+      },
+      {
+        "id": "magisk_binder_call",
+        "sourceContext": "u:r:untrusted_app:s0",
+        "targetContext": "u:r:magisk:s0",
+        "targetClass": "binder",
+        "permission": "call",
+        "targetContextState": "valid",
+        "nativeAvailable": true,
+        "nativeDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "javaAvailable": true,
+        "javaDecisions": [
+          "allowed",
+          "allowed"
+        ],
+        "stable": true,
+        "sourcesAgree": true,
+        "decision": "allowed",
+        "trusted": true,
+        "assessmentImpact": "telemetry_only"
+      }
+    ],
+    "findings": [
+      {
+        "id": "lsposed_file_read_allowed",
+        "ruleId": "lsposed_file_read",
+        "strength": "moderate",
+        "summary": "LSPosed file read is allowed by SELinux policy",
+        "detail": "Validated Enforcing policy allows untrusted_app to read lsposed_file."
+      }
+    ],
+    "concealableNegatives": [],
+    "collectionErrors": []
+  },
+  "MEMORY_FD_ANOMALY": {
+    "findings": [
+      {
+        "type": "executable_memfd",
+        "source": "fd",
+        "classification": "direct_marker",
+        "fd": "12",
+        "target": "/memfd:frida-agent"
+      }
+    ],
+    "candidates": [
+      {
+        "type": "deleted_executable",
+        "source": "maps",
+        "classification": "generic_candidate",
+        "path": "/data/app/base.apk (deleted)",
+        "permissions": "r-xp",
+        "start": 4096,
+        "end": 8192
+      }
+    ],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "fdDirectoryReadable": true,
+    "scannedMappings": 120,
+    "scannedFds": 18,
+    "malformedMapLines": 0,
+    "findingCount": 1,
+    "candidateCount": 1
+  },
+  "MEMORY_MAPS_ANOMALY": {
+    "findings": [
+      {
+        "type": "writable_executable",
+        "path": "[anonymous]",
+        "permissions": "rwxp",
+        "start": 12288,
+        "end": 16384,
+        "assessmentImpact": "moderate"
+      },
+      {
+        "type": "smaps_dirty_page",
+        "path": "/system/lib64/libc.so",
+        "permissions": "r-xp",
+        "start": 4096,
+        "end": 8192,
+        "privateDirtyKB": 16,
+        "sharedDirtyKB": 0,
+        "assessmentImpact": "moderate"
+      },
+      {
+        "type": "suspicious_signal_handler",
+        "path": "[anonymous]",
+        "permissions": "r-xp",
+        "start": 8192,
+        "end": 12288,
+        "signum": 5,
+        "signalName": "SIGTRAP",
+        "handlerAddress": 8200,
+        "assessmentImpact": "moderate"
+      }
+    ],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "scannedMappings": 120,
+    "malformedMapLines": 0,
+    "findingCount": 3
+  },
+  "MEMORY_LINKER_VISIBILITY": {
+    "linkerOnlyModules": [
+      {
+        "path": "/system/lib64/libc.so",
+        "loadRangeCount": 4,
+        "assessmentImpact": "moderate"
+      }
+    ],
+    "mapsOnlyModules": [
+      {
+        "path": "/data/local/tmp/libagent.so",
+        "assessmentImpact": "moderate"
+      }
+    ],
+    "gotPltEscapes": [
+      {
+        "symbol": "open",
+        "address": 4096,
+        "resolvedPath": "/data/local/tmp/libhook.so",
+        "expectedLibrary": "libc.so",
+        "assessmentImpact": "strong"
+      }
+    ],
+    "collectionErrors": [],
+    "mapsReadable": true,
+    "scannedMappings": 120,
+    "malformedMapLines": 0,
+    "linkerObjectCount": 30,
+    "findingCount": 3
+  },
+  "CUSTOM_ROM": {
+    "buildTags": "test-keys",
+    "roDebuggable": "1",
+    "roSecure": "0",
+    "hitCount": 1,
+    "findings": [
+      {
+        "check": "build_tags",
+        "value": "test-keys",
+        "detail": "Non-release build tags"
+      }
+    ]
+  },
+  "KERNEL_CHECK": {
+    "kernelRelease": "6.1.0-android",
+    "kernelVersion": "#1 SMP",
+    "kallsymsReadable": false,
+    "nonZeroAddresses": 0,
+    "hitCount": 1,
+    "findings": [
+      {
+        "check": "release_marker",
+        "marker": "KernelSU",
+        "value": "6.1.0-android-KernelSU"
+      }
+    ]
+  },
+  "EMULATOR_HARDWARE_INDICATORS": {
+    "overview": {
+      "findingCount": 1,
+      "strongFindingCount": 1,
+      "moderateFindingCount": 0,
+      "weakFindingCount": 0
+    },
+    "egl": {
+      "available": true,
+      "renderer": "Android Emulator OpenGL ES Translator",
+      "vendor": "Google",
+      "version": "OpenGL ES 2.0 (Google)",
+      "isEmulator": true,
+      "matchedMarker": "Android Emulator OpenGL ES Translator"
+    },
+    "timer": {
+      "supported": true,
+      "frequencyHz": 1000000000,
+      "counterDelta": 1000,
+      "counterNs": 1000,
+      "wallDeltaNs": 1000,
+      "driftNs": 0,
+      "isAnomalous": false,
+      "detail": "Clean timer"
+    },
+    "schedJitter": {
+      "sampleCount": 32,
+      "meanNs": 1000.0,
+      "stdDevNs": 100.0,
+      "cv": 0.1,
+      "uniqueMicrosecondBuckets": 10,
+      "isAnomalous": false,
+      "detail": "Clean jitter"
+    },
+    "findings": [
+      {
+        "id": "egl_renderer_match",
+        "unitId": "emulator-hardware.egl-renderer",
+        "strength": "strong",
+        "summary": "Offscreen OpenGL renderer matches emulator pattern",
+        "detail": "Renderer is Android Emulator OpenGL ES Translator"
+      }
+    ],
+    "collectionErrors": []
+  },
+  "EMULATOR_SYSTEM_PROFILE": {
+    "overview": {
+      "checkedPropertyCount": 5,
+      "matchedPropertyCount": 1,
+      "findingCount": 1,
+      "strongFindingCount": 1,
+      "moderateFindingCount": 0,
+      "weakFindingCount": 0
+    },
+    "properties": [
+      {
+        "property": "ro.kernel.qemu",
+        "value": "1",
+        "matched": true,
+        "severity": "strong"
+      }
+    ],
+    "buildFingerprint": "google/sdk_gphone64_arm64/emu64a:14/UE1A.230829.036.A1/11223948:user/release-keys",
+    "fingerprintMatched": true,
+    "findings": [
+      {
+        "id": "qemu_system_property",
+        "unitId": "emulator-profile.qemu-properties",
+        "property": "ro.kernel.qemu",
+        "value": "1",
+        "strength": "strong",
+        "summary": "QEMU environment property is active",
+        "detail": "ro.kernel.qemu is 1"
+      }
+    ],
+    "collectionErrors": []
+  },
+  "PROPERTY_AREA_RESIDUE": {
+    "parsedAreaCount": 68,
+    "totalPropertiesInspected": 1250,
+    "serialAnomalyCount": 1,
+    "trailingResidueCount": 1,
+    "findings": [
+      {
+        "property": "ro.build.type",
+        "unitId": "system-property-residue.trailing-bytes",
+        "anomalyType": "TRAILING_BYTES",
+        "strength": "strong",
+        "areaContext": "u:object_r:build_prop:s0",
+        "serial": 67108864,
+        "serialLength": 4,
+        "actualLength": 4,
+        "serialCounter": 0,
+        "trailingBytesCount": 5,
+        "trailingSnippet": "ebug",
+        "detail": "Property ro.build.type in u:object_r:build_prop:s0 carries 5 trailing dirty byte(s) past NUL terminator [snippet: \"ebug\"]"
+      },
+      {
+        "property": "ro.build.tags",
+        "unitId": "system-property-residue.serial-anomaly",
+        "anomalyType": "RO_SERIAL_MODIFIED",
+        "strength": "strong",
+        "areaContext": "u:object_r:build_prop:s0",
+        "serial": 201326593,
+        "serialLength": 12,
+        "actualLength": 12,
+        "serialCounter": 1,
+        "trailingBytesCount": 0,
+        "trailingSnippet": "",
+        "detail": "Read-only property ro.build.tags in u:object_r:build_prop:s0 has non-zero serial update counter 1 (supposedly immutable property was updated at runtime)"
+      }
+    ],
+    "collectionErrors": []
+  },
+  "BUILD_PATCH_COHERENCE": {
+    "comparablePartitionCount": 2,
+    "maximumSkewDays": 670,
+    "partitions": [
+      {
+        "partition": "system",
+        "patchProperty": "ro.build.version.security_patch",
+        "buildDateProperty": "ro.build.date.utc",
+        "patchLevel": "2026-07-05",
+        "comparable": true,
+        "skewDays": 670
+      },
+      {
+        "partition": "vendor",
+        "patchProperty": "ro.vendor.build.security_patch",
+        "buildDateProperty": "ro.vendor.build.date.utc",
+        "patchLevel": "2026-07-05",
+        "comparable": true,
+        "skewDays": 670
+      },
+      {
+        "partition": "odm",
+        "patchProperty": "ro.odm.build.security_patch",
+        "buildDateProperty": "ro.odm.build.date.utc",
+        "patchLevel": "",
+        "comparable": false,
+        "skewDays": 0,
+        "reason": "patch level absent or not YYYY-MM-DD"
+      }
+    ],
+    "findings": [
+      {
+        "id": "security_patch_postdates_build",
+        "unitId": "build-patch.security-patch-plausibility",
+        "partition": "system",
+        "strength": "strong",
+        "skewDays": 670,
+        "patchLevel": "2026-07-05",
+        "summary": "Declared security patch postdates the compile timestamp of the same partition",
+        "detail": "Partition system declares security patch 2026-07-05, which is 670 days later than that partition's own build timestamp. An image cannot contain a patch published after it was compiled; only a single bulletin cycle of forward declaration is legitimate."
+      }
+    ],
+    "collectionErrors": []
+  },
+  "DRM_CREDENTIAL_COHERENCE": {
+    "schemeSupported": true,
+    "hardwareSecureAllSupported": true,
+    "securityLevel": "L1",
+    "systemIdState": "unprovisioned_placeholder",
+    "systemId": "2147483647",
+    "drmVersion": "17.0.0",
+    "sessionStatus": "not_provisioned",
+    "comparable": true,
+    "bootClaim": {
+      "verifiedBootState": "green",
+      "flashLocked": "1",
+      "vbmetaDeviceState": "locked",
+      "claimsLocked": true,
+      "claimsUnlocked": false
+    },
+    "findings": [
+      {
+        "id": "locked_claim_without_drm_credential",
+        "unitId": "drm-credential.boot-state-coherence",
+        "strength": "moderate",
+        "sessionStatus": "not_provisioned",
+        "corroboratedBySession": true,
+        "summary": "Device claims a locked, verified boot state while advertising Widevine L1 with no provisioned credential",
+        "detail": "The device reports verifiedbootstate=green and flash.locked=1, and its Widevine plugin advertises L1, but the plugin reports the unprovisioned-system-ID placeholder and could not open a provisioned session. L1 key material is erased when the bootloader is unlocked and cannot be restored from userspace, so these two statements cannot both be true."
+      }
+    ],
+    "collectionErrors": []
+  },
+  "KEYSTORE_GRANT_SPLIT": {
+    "available": true,
+    "apiLevel": 37,
+    "grantIssued": true,
+    "grantReadback": "ok",
+    "controlReadback": "not_run",
+    "split": true,
+    "splitKind": "leaf_certificate",
+    "mismatchIndex": 0,
+    "ownerChain": [
+      {
+        "length": 744,
+        "sha256": "21ce989303701b27000000000000000000000000000000000000000000000000"
+      },
+      {
+        "length": 1012,
+        "sha256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1"
+      }
+    ],
+    "granteeChain": [
+      {
+        "length": 745,
+        "sha256": "d53e9e589a073d59000000000000000000000000000000000000000000000000"
+      },
+      {
+        "length": 1012,
+        "sha256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1"
+      }
+    ],
+    "findings": [
+      {
+        "id": "keystore_grant_chain_split",
+        "unitId": "keystore-grant.chain-consistency",
+        "strength": "strong",
+        "splitKind": "leaf_certificate",
+        "mismatchIndex": 0,
+        "summary": "One Keystore key returned different certificate chains through the alias path and the grant path",
+        "detail": "The same key was read twice, by alias and through a grant issued to this application's own uid, and the two chains disagree at index 0 (leaf_certificate). A stored chain is identical to every reader, so a difference means the chain is being produced per lookup rather than returned from storage."
+      }
+    ],
+    "collectionErrors": []
+  }
+}

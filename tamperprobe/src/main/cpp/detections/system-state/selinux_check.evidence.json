@@ -1,0 +1,42 @@
+{
+  "id": "SELINUX_CHECK",
+  "name": "SELinux Global Enforcement",
+  "description": "Cross-checks global SELinux enforcement observations, infers enforcement from a refused read of the DAC-readable enforce node, and probes enforce-node permissions without writing.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "selinux.enforcement-state",
+      "title": "SELinux enforcement state",
+      "domainId": "system-state",
+      "observedObject": "Enforcement state reported by available SELinux sources, or inferred from an EACCES refusal to read the enforce node",
+      "proposition": "One or more available sources report the current SELinux enforcement mode",
+      "observationChannel": "selinuxfs and libselinux read-only queries, plus stat() of the enforce node when its read is refused with EACCES",
+      "availability": "Depends on selinuxfs visibility and library availability; the read-denial inference needs selinuxfs confirmed by statfs and a DAC mode that permits the read, measured by stat() or taken from the kernel constant 0644 when stat() is refused",
+      "trustBoundary": "Each source is independently mediated and source disagreement remains explicit",
+      "inferenceLimit": "A reported enforcing state does not establish policy integrity; an inferred enforcing state shows only that the app's own domain is enforced, says nothing about other domains, and is defeated by a hook that makes open() return EACCES; unavailable sources are not negative evidence"
+    },
+    {
+      "id": "selinux.enforce-node-access",
+      "title": "SELinux enforce-node access",
+      "domainId": "filesystem-state",
+      "observedObject": "The app process permission result for the SELinux enforce node",
+      "proposition": "The enforce node returned the recorded writable or denied result without performing a write, and its DAC mode is recorded when a read is refused",
+      "observationChannel": "Write-mode open without writing, and stat(), against /sys/fs/selinux/enforce",
+      "availability": "Requires the enforce node to be visible enough to attempt the permission check",
+      "trustBoundary": "The VFS and SELinux permission path can be mediated",
+      "inferenceLimit": "A permission result is contextual and does not alone prove policy tampering"
+    },
+    {
+      "id": "selinux.cross-source-consistency",
+      "title": "SELinux cross-source consistency",
+      "domainId": "system-state",
+      "observedObject": "A contradictory combination of enforcement and filesystem permission observations",
+      "proposition": "Available SELinux observations satisfy a detector-defined contradiction rule; a disagreement that depends on an inferred answer is graded below one between two read sources",
+      "observationChannel": "Cross-check of enforcement sources, selinuxfs state, and permission probes",
+      "availability": "Requires the specific sources needed by a contradiction rule",
+      "trustBoundary": "The rule compares mediated sources and does not create an external ground truth",
+      "inferenceLimit": "The contradiction supports an anomaly claim but not attribution to a particular root framework"
+    }
+  ]
+}

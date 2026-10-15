@@ -1,0 +1,31 @@
+{
+  "id": "EMULATOR_SYSTEM_PROFILE",
+  "name": "Emulator System Profile",
+  "description": "Detects emulator environments through QEMU system properties, virtual hardware identifiers, build fingerprints, and emulator boot characteristics.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "system-state",
+  "evidenceUnits": [
+    {
+      "id": "emulator-profile.qemu-properties",
+      "title": "QEMU and virtual hardware system properties",
+      "domainId": "system-state",
+      "observedObject": "Bionic system properties associated with QEMU and Android emulator platforms",
+      "proposition": "System properties explicitly declare QEMU or virtual hardware drivers",
+      "observationChannel": "Bionic system-property API via direct syscall or __system_property_get",
+      "availability": "Requires readable system property areas in /dev/__properties__",
+      "trustBoundary": "Root processes may modify or unset properties using tools like resetprop",
+      "inferenceLimit": "Identifies standard emulator platform property configurations"
+    },
+    {
+      "id": "emulator-profile.build-fingerprint",
+      "title": "Emulator build fingerprint and model characteristics",
+      "domainId": "system-state",
+      "observedObject": "ro.build.fingerprint and device model properties",
+      "proposition": "The system build fingerprint or product model matches generic emulator patterns",
+      "observationChannel": "Bionic system-property API",
+      "availability": "Requires access to Android build properties",
+      "trustBoundary": "Fingerprints can be spoofed by custom ROMs or Magisk modules",
+      "inferenceLimit": "Indicates build configuration origin; does not detect hardened hypervisor instances"
+    }
+  ]
+}

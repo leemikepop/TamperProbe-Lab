@@ -1,0 +1,20 @@
+{
+  "id": "VDSO_INTEGRITY",
+  "name": "VDSO Integrity",
+  "description": "Cross-checks the VDSO mapping, AT_SYSINFO_EHDR, ELF load ranges, public linker ownership, and available kernel-helper symbol ownership.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "runtime-integrity",
+  "evidenceUnits": [
+    {
+      "id": "vdso.mapping-ownership-consistency",
+      "title": "VDSO mapping and ownership consistency",
+      "domainId": "runtime-integrity",
+      "observedObject": "The VDSO mapping, AT_SYSINFO_EHDR, ELF load ranges, linker owner, and available helper symbol",
+      "proposition": "Available VDSO observations satisfy or violate explicit mapping and ownership consistency rules",
+      "observationChannel": "procfs maps, auxv, ELF parsing, public linker enumeration, and symbol resolution",
+      "availability": "Individual checks depend on readable maps and auxv plus available linker and symbol data",
+      "trustBoundary": "The app-local channels may be mediated and are not independent kernel attestation",
+      "inferenceLimit": "A consistency violation is an anomaly and does not identify the modification mechanism"
+    }
+  ]
+}

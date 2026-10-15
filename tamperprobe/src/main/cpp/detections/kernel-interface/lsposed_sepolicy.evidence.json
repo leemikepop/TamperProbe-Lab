@@ -1,0 +1,20 @@
+{
+  "id": "LSPOSED_SEPOLICY",
+  "name": "LSPosed SELinux Policy Oracle",
+  "description": "Uses a controlled app-zygote SELinux policy snapshot to observe LSPosed and Xposed-specific allow rules.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "lsposed-sepolicy.policy-oracle",
+      "title": "LSPosed-related SELinux policy oracle",
+      "domainId": "kernel-interface",
+      "observedObject": "Controlled app-zygote SELinux allow-rule decisions and validation controls",
+      "proposition": "A validated policy query permits a maintained LSPosed or Xposed-specific rule",
+      "observationChannel": "Native and hidden-framework SELinux policy queries in an app-zygote carrier",
+      "availability": "Requires carrier setup, stable controls, valid contexts, and available query sources",
+      "trustBoundary": "The oracle reports source agreement and trust rather than assuming every query path is independent",
+      "inferenceLimit": "An allowed rule is policy evidence and does not prove that LSPosed is injected into this process"
+    }
+  ]
+}

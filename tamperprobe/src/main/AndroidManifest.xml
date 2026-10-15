@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="com.topjohnwu.magisk.REQUEST_INSTALL" />
+        </intent>
+        <intent>
+            <action android:name="com.topjohnwu.magisk.SHOW" />
+        </intent>
+        <intent>
+            <action android:name="de.robv.android.xposed.installer.SHOW" />
+        </intent>
+        <intent>
+            <action android:name="io.github.a13e300.ksuwebui.LAUNCH" />
+        </intent>
+        <intent>
+            <action android:name="org.lsposed.manager.SHOW" />
+        </intent>
+        <package android:name="Hook.JiuWu.Xp" />
+        <package android:name="bin.mt.termex" />
+        <package android:name="cc.aoeiuv020.iamnotdisabled.hook" />
+        <package android:name="cn.android.x" />
+        <package android:name="cn.aodlyric.xiaowine" />
+        <package android:name="cn.fuckhome.xiaowine" />
+        <package android:name="cn.geektang.privacyspace" />
+        <package android:name="cn.kwaiching.hook" />
+        <package android:name="cn.lyric.getter" />
+        <package android:name="cn.myflv.monitor.noactive" />
+        <package android:name="cn.myflv.noactive" />
+        <package android:name="com.alex193a.rootmypixel" />
+        <package android:name="com.android.vending.billing.InAppBillingService.LUCK" />
+        <package android:name="com.apocalua.run" />
+        <package android:name="com.bug.hookvip" />
+        <package android:name="com.byyoung.setting" />
+        <package android:name="com.chelpus.lackypatch" />
+        <package android:name="com.coderstory.toolkit" />
+        <package android:name="com.cshlolss.vipkill" />
+        <package android:name="com.ddm.qute" />
+        <package android:name="com.demo.serendipity" />
+        <package android:name="com.didjdk.adbhelper" />
+        <package android:name="com.dna.tools" />
+        <package android:name="com.fankes.enforcehighrefreshrate" />
+        <package android:name="com.fankes.tsbattery" />
+        <package android:name="com.fkzhang.wechatxposed" />
+        <package android:name="com.fuck.android.rimet" />
+        <package android:name="com.github.tianma8023.xposed.smscode" />
+        <package android:name="com.hchai.rescueplan" />
+        <package android:name="com.hchen.appretention" />
+        <package android:name="com.hchen.switchfreeform" />
+        <package android:name="com.houvven.guise" />
+        <package android:name="com.houvven.impad" />
+        <package android:name="com.junge.algorithmAidePro" />
+        <package android:name="com.kingo.root" />
+        <package android:name="com.kingroot.kinguser" />
+        <package android:name="com.kooritea.fcmfix" />
+        <package android:name="com.koushikdutta.superuser" />
+        <package android:name="com.lerist.fakelocation" />
+        <package android:name="com.linux.permissionmanager" />
+        <package android:name="com.luckyzyx.luckytool" />
+        <package android:name="com.mio.kitchen" />
+        <package android:name="com.modify.installer" />
+        <package android:name="com.nnnen.plusne" />
+        <package android:name="com.noshufou.android.su" />
+        <package android:name="com.omarea.vtools" />
+        <package android:name="com.padi.hook.hookqq" />
+        <package android:name="com.parallelc.micts" />
+        <package android:name="com.qq.qcxm" />
+        <package android:name="com.resukisu.resukisu" />
+        <package android:name="com.rifsxd.ksunext" />
+        <package android:name="com.rkg.IAMRKG" />
+        <package android:name="com.romide.terminal" />
+        <package android:name="com.rootmynothing.app" />
+        <package android:name="com.sevtinge.hyperceiler" />
+        <package android:name="com.silverlab.app.deviceidchanger.free" />
+        <package android:name="com.smedialink.oneclickroot" />
+        <package android:name="com.sukisu.ultra" />
+        <package android:name="com.suqi8.oshin" />
+        <package android:name="com.syyf.quickpay" />
+        <package android:name="com.tencent.JYNB" />
+        <package android:name="com.tencent.jingshi" />
+        <package android:name="com.termux" />
+        <package android:name="com.termux.api" />
+        <package android:name="com.termux.boot" />
+        <package android:name="com.termux.widget" />
+        <package android:name="com.thirdparty.superuser" />
+        <package android:name="com.topjohnwu.magisk" />
+        <package android:name="com.topmiaohan.hidebllist" />
+        <package android:name="com.tsng.hidemyapplist" />
+        <package android:name="com.tsng.pzyhrx.hma" />
+        <package android:name="com.twifucker.hachidori" />
+        <package android:name="com.wei.vip" />
+        <package android:name="com.wn.app.np" />
+        <package android:name="com.xayah.databackup.foss" />
+        <package android:name="com.yellowes.su" />
+        <package android:name="com.yuanwofei.cardemulator.pro" />
+        <package android:name="com.zhufucyd.motion_emulator" />
+        <package android:name="de.robv.android.xposed.installer" />
+        <package android:name="dev.busung.s25uroot" />
+        <package android:name="dknb.con" />
+        <package android:name="dknb.coo8" />
+        <package android:name="es.chiteroman.bootloaderspoofer" />
+        <package android:name="eu.chainfire.supersu" />
+        <package android:name="eu.faircode.xlua" />
+        <package android:name="github.tornaco.android.thanos" />
+        <package android:name="have.fun" />
+        <package android:name="io.github.Retmon403.oppotheme" />
+        <package android:name="io.github.a13e300.ksuwebui" />
+        <package android:name="io.github.qauxv" />
+        <package android:name="io.github.vvb2060.magisk" />
+        <package android:name="jackpal.androidterm" />
+        <package android:name="kk.dk.anqu" />
+        <package android:name="lin.xposed" />
+        <package android:name="lucky.patcher" />
+        <package android:name="me.bingyue.IceCore" />
+        <package android:name="me.bmax.apatch" />
+        <package android:name="me.gm.cleaner" />
+        <package android:name="me.hd.wauxv" />
+        <package android:name="me.iacn.biliroaming" />
+        <package android:name="me.plusne" />
+        <package android:name="me.simpleHook" />
+        <package android:name="me.teble.xposed.autodaily" />
+        <package android:name="me.weishu.exp" />
+        <package android:name="me.weishu.kernelsu" />
+        <package android:name="miko.client" />
+        <package android:name="moe.fuqiuluo.portal" />
+        <package android:name="moe.shizuku.privileged.api" />
+        <package android:name="moe.shizuku.redirectstorage" />
+        <package android:name="name.monwf.customiuizer" />
+        <package android:name="nep.timeline.freezer" />
+        <package android:name="nep.timeline.re_telegram" />
+        <package android:name="o.dyoo" />
+        <package android:name="one.yufz.hmspush" />
+        <package android:name="org.frknkrc44.hma_oss" />
+        <package android:name="org.lsposed.lspatch" />
+        <package android:name="org.lsposed.manager" />
+        <package android:name="ru.maximoff.apktool" />
+        <package android:name="tmgp.atlas.toolbox" />
+        <package android:name="top.bienvenido.saas.i18n" />
+        <package android:name="top.canyie.magiskkiller" />
+        <package android:name="top.hookvip.pro" />
+        <package android:name="top.sacz.timtool" />
+        <package android:name="tornaco.apps.shortx" />
+        <package android:name="tornaco.apps.shortx.ext" />
+        <package android:name="vn.kwaiching.tao" />
+        <package android:name="web1n.stopapp" />
+        <package android:name="xzr.hkf" />
+        <package android:name="xzr.konabess" />
+        <package android:name="yarolegovich.materialterminal" />
+        <package android:name="zako.zako.zako" />
+    </queries>
+    <application>
+        <service
+            android:name="io.leemikepop.tamperprobe.lab.internal.fdforensics.ZygiskFdForensicsCarrierService"
+            android:exported="false"
+            android:process=":tamperprobe_fd_forensics" />
+        <service
+            android:name="io.leemikepop.tamperprobe.lab.internal.policyoracle.SelinuxPolicyOracleCarrierService"
+            android:exported="false"
+            android:isolatedProcess="true"
+            android:useAppZygote="true" />
+    </application>
+</manifest>

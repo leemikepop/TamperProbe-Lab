@@ -1,0 +1,37 @@
+[
+  {
+    "name": "clean",
+    "expectedAssessment": "NOT_OBSERVED",
+    "payload": {"findings":[],"collectionErrors":[],"mountIdSequence":{"experimental":true},"mountInfoReadable":true,"mountsReadable":true,"completedStatxChecks":1,"completedStatfsChecks":1,"strongFindingCount":0,"weakFindingCount":0}
+  },
+  {
+    "name": "framework marker",
+    "expectedAssessment": "STRONG",
+    "payload": {"findings":[{"id":"magisk_mount","ruleId":"magisk_mount","family":"magisk","confidence":"strong","marker":".magisk","source":"/.magisk/block/system","target":"/system","fsType":"ext4","options":"ro"}],"mountIdSequence":{"experimental":true},"mountInfoReadable":true,"strongFindingCount":1,"weakFindingCount":0}
+  },
+  {
+    "name": "generic heuristic",
+    "expectedAssessment": "WEAK",
+    "payload": {"findings":[{"id":"system_rw","ruleId":"system_rw","family":"mount","confidence":"weak","marker":"rw","source":"/dev/block/dm-0","target":"/system","fsType":"ext4","options":"rw"}],"mountIdSequence":{"experimental":true},"mountInfoReadable":true,"strongFindingCount":0,"weakFindingCount":1}
+  },
+  {
+    "name": "aggregated visible overlay",
+    "expectedAssessment": "NOT_OBSERVED",
+    "payload": {"findings":[],"genericMountHeuristics":[{"ruleId":"system_overlay","partition":"/product","rowCount":22,"assessmentImpact":"telemetry_only","representativeSource":"overlay","representativeTarget":"/product/app","fsType":"overlay","options":"rw"}],"mountIdSequence":{"experimental":true},"mountInfoReadable":true,"completedStatxChecks":1,"completedStatfsChecks":1,"strongFindingCount":0,"weakFindingCount":0,"findingCount":0}
+  },
+  {
+    "name": "deduplicated rows",
+    "expectedAssessment": "STRONG",
+    "payload": {"findings":[{"id":"kernelsu_mount","ruleId":"kernelsu_mount","family":"kernelsu","confidence":"strong","marker":"kernelsu","source":"/data/adb/kernelsu/modules.img","target":"/system","fsType":"overlay","options":"ro"}],"mountIdSequence":{"experimental":true},"mountInfoReadable":true,"mountsReadable":true,"strongFindingCount":1,"findingCount":1}
+  },
+  {
+    "name": "gap telemetry only",
+    "expectedAssessment": "NOT_OBSERVED",
+    "payload": {"findings":[],"mountIdSequence":{"experimental":true,"artMountId":100,"dataMirrorMountId":104,"visibleCount":2,"missingCount":1,"maximumGap":1,"gapRanges":[{"start":102,"end":102,"size":1}]},"mountInfoReadable":true,"completedStatxChecks":1,"completedStatfsChecks":1,"strongFindingCount":0,"weakFindingCount":0}
+  },
+  {
+    "name": "required source unavailable",
+    "expectedAssessment": "INCONCLUSIVE",
+    "payload": {"findings":[],"collectionErrors":[{"source":"/proc/self/mountinfo","errno":13,"message":"Permission denied"}],"mountIdSequence":{"experimental":true},"mountInfoReadable":false,"mountsReadable":true,"completedStatxChecks":1,"completedStatfsChecks":1,"strongFindingCount":0,"weakFindingCount":0}
+  }
+]

@@ -1,0 +1,8 @@
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 120
+BreakBeforeBraces: Attach   # Google 預設是 K&R style (同行)
+AllowShortFunctionsOnASingleLine: Empty
+DerivePointerAlignment: false
+PointerAlignment: Left
+NamespaceIndentation: None   # namespace 內容不縮排 (Google 預設)

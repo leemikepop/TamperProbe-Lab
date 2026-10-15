@@ -1,0 +1,20 @@
+{
+  "id": "BUSYBOX",
+  "name": "BusyBox Checking",
+  "description": "Classifies visible BusyBox paths by object type, resolved metadata, and bounded ELF-magic evidence without treating presence as proof of privilege.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "binary-artifact",
+  "evidenceUnits": [
+    {
+      "id": "busybox.visible-artifact",
+      "title": "Visible BusyBox artifact",
+      "domainId": "binary-artifact",
+      "observedObject": "A resolved filesystem object at a BusyBox candidate path",
+      "proposition": "A BusyBox-compatible artifact is visible through the app process filesystem view",
+      "observationChannel": "Fixed-path access, lstat, O_PATH open, fstat, and bounded header inspection",
+      "availability": "Available only for candidate paths visible and inspectable from the application sandbox",
+      "trustBoundary": "App-local VFS view and user-space parsing can be filtered or hooked",
+      "inferenceLimit": "Presence does not establish that the artifact grants privilege or was installed by a root framework"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "KERNEL_CHECK",
+  "name": "Kernel Integrity Check",
+  "description": "Checks kernel compilation signatures in /proc/version and uname, bootloader lock state from /proc/cmdline, and kptr_restrict address visibility in /proc/kallsyms.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "kernel-interface",
+  "evidenceUnits": [
+    {
+      "id": "kernel-check.integrity-posture",
+      "title": "Kernel and boot integrity posture",
+      "domainId": "kernel-interface",
+      "observedObject": "Kernel build strings, version signatures, bootloader parameters, and kallsyms address visibility",
+      "proposition": "An available kernel or boot observation matches a maintained integrity-posture rule",
+      "observationChannel": "uname, /proc/version, /proc/cmdline, and /proc/kallsyms",
+      "availability": "Each observation depends on kernel configuration, procfs permissions, and platform exposure",
+      "trustBoundary": "The running kernel owns all returned sources and can conceal or rewrite them",
+      "inferenceLimit": "A marker or visibility state is bounded evidence and does not prove a malicious custom kernel"
+    }
+  ]
+}

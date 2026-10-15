@@ -1,0 +1,20 @@
+{
+  "id": "RW_PATHS",
+  "name": "Read-Write Paths Checking",
+  "description": "Checks for the presence of critical system paths that are writable, which can indicate a compromised environment.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "filesystem-state",
+  "evidenceUnits": [
+    {
+      "id": "rw-paths.system-path-writability",
+      "title": "Critical system path writability",
+      "domainId": "filesystem-state",
+      "observedObject": "Selected critical system filesystem paths",
+      "proposition": "The app-local permission probe reports a critical path as writable",
+      "observationChannel": "Filesystem access permission checks",
+      "availability": "Depends on path visibility and the semantics of the tested access operation",
+      "trustBoundary": "The result is scoped to the app mount namespace, credentials, and mediated VFS view",
+      "inferenceLimit": "Writability can have legitimate causes and does not identify a modification mechanism"
+    }
+  ]
+}

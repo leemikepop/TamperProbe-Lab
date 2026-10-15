@@ -1,0 +1,20 @@
+{
+  "id": "SU_BINARY",
+  "name": "SU Binary Checking",
+  "description": "Classifies visible su-related paths by object type, resolved metadata, executable mode, and bounded ELF-magic evidence.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "binary-artifact",
+  "evidenceUnits": [
+    {
+      "id": "su-binary.visible-artifact",
+      "title": "Visible su-related artifact",
+      "domainId": "binary-artifact",
+      "observedObject": "A resolved filesystem object at an su candidate path",
+      "proposition": "An su-related artifact with recorded object and executable-format properties is visible",
+      "observationChannel": "Fixed-path access, lstat, O_PATH open, fstat, mode, and bounded ELF-magic inspection",
+      "availability": "Available only for candidate paths visible and inspectable from the application sandbox",
+      "trustBoundary": "App-local VFS view and user-space parsing can be filtered or hooked",
+      "inferenceLimit": "Visibility does not prove successful privilege escalation or identify the current root provider"
+    }
+  ]
+}

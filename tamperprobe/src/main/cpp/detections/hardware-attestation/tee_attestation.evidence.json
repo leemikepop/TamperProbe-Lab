@@ -1,0 +1,20 @@
+{
+  "id": "TEE_ATTESTATION",
+  "name": "TEE Attestation Validation",
+  "description": "Validates a fresh Android Keystore attestation challenge, certificate chain, trust anchor, revocation status, and RootOfTrust consistency.",
+  "payloadSchemaVersion": 1,
+  "primaryEvidenceDomainId": "hardware-attestation",
+  "evidenceUnits": [
+    {
+      "id": "tee-attestation.chain-and-root-of-trust",
+      "title": "Keystore attestation chain and RootOfTrust",
+      "domainId": "hardware-attestation",
+      "observedObject": "A fresh Android Keystore attestation response, certificate chain, revocation snapshot, challenge, and RootOfTrust fields",
+      "proposition": "The returned attestation artifacts satisfy or violate the recorded cryptographic and structural validation rules",
+      "observationChannel": "Android Keystore key generation and offline certificate or extension validation",
+      "availability": "Depends on Keystore support, certificate availability, parseable extensions, and bundled trust data",
+      "trustBoundary": "Hardware-backed claims originate below the app, while local validation and revocation freshness remain app-managed",
+      "inferenceLimit": "Local attestation is not equivalent to server-side nonce policy or Play Integrity and may be unavailable on supported devices"
+    }
+  ]
+}
