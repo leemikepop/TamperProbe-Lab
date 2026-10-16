@@ -73,12 +73,21 @@ data class EvidenceRecordDetailUiModel(
     val summary: String,
     val signalStrength: EvidenceStrength?,
     val attributes: List<DetailValueUiModel>,
-)
+    val attributeTree: List<AttributeNodeUiModel> = emptyList(),
+) {
+    /** A `.concealable-negative` record is an absence that a hiding tool can also produce. */
+    val isConcealableNegative: Boolean get() = code.endsWith(CONCEALABLE_NEGATIVE_SUFFIX)
+
+    companion object {
+        const val CONCEALABLE_NEGATIVE_SUFFIX = ".concealable-negative"
+    }
+}
 
 data class EvidenceIssueDetailUiModel(
     val code: String,
     val message: String,
     val attributes: List<DetailValueUiModel>,
+    val attributeTree: List<AttributeNodeUiModel> = emptyList(),
 )
 
 data class DetailValueUiModel(
@@ -86,3 +95,31 @@ data class DetailValueUiModel(
     val value: String,
     val isMonospace: Boolean = false,
 )
+
+/**
+ * Attributes regrouped by their dotted key path for display. Every attribute value appears in
+ * exactly one [Field], either directly or inside a [ValueList]; nothing is dropped.
+ */
+sealed interface AttributeNodeUiModel {
+    /** A single `key -> value` attribute. [value] is the raw value (possibly blank). */
+    data class Field(
+        val label: String,
+        val value: String,
+        val isMonospace: Boolean,
+    ) : AttributeNodeUiModel
+
+    /** An indexed list of plain values (`x.0`, `x.1`, ...), shown as one row. */
+    data class ValueList(
+        val label: String,
+        val values: List<Field>,
+    ) : AttributeNodeUiModel
+
+    /** A nested object (`a.b.*`), an indexed list of objects, or one item of such a list. */
+    data class Group(
+        val title: String,
+        val kind: GroupKind,
+        val children: List<AttributeNodeUiModel>,
+    ) : AttributeNodeUiModel
+
+    enum class GroupKind { SECTION, LIST, LIST_ITEM }
+}

@@ -25,7 +25,6 @@ import io.leemikepop.tamperprobe.lab.presentation.components.details.DetectorDet
 import io.leemikepop.tamperprobe.lab.presentation.model.DetectionCardUiModel
 import io.leemikepop.tamperprobe.lab.presentation.mapper.DetectionUiMapper
 import io.leemikepop.tamperprobe.lab.presentation.viewmodel.TamperProbeViewModel
-import io.leemikepop.tamperprobe.lab.ui.theme.LocalDetectionColors
 import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -206,20 +205,17 @@ private fun SummaryCard(
     onRescan: () -> Unit,
     onExport: () -> Unit,
 ) {
-    val detectionColors = LocalDetectionColors.current
     val hasResults = resultCount > 0
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = when {
-                isLoading -> MaterialTheme.colorScheme.surfaceVariant
-                error != null -> MaterialTheme.colorScheme.errorContainer
-                hasResults -> detectionColors.safeContainer.copy(alpha = 0.4f)
-                else -> MaterialTheme.colorScheme.surfaceVariant
+                error != null && !isLoading -> MaterialTheme.colorScheme.errorContainer
+                else -> MaterialTheme.colorScheme.surfaceContainerHigh
             }
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier
@@ -249,7 +245,7 @@ private fun SummaryCard(
                     Text(
                         text = "Scan complete",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
 
@@ -277,18 +273,21 @@ private fun SummaryCard(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "Raw report · no policy applied",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "Raw report · no policy applied",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,

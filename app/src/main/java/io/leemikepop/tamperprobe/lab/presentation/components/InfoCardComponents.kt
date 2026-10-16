@@ -1,8 +1,8 @@
 package io.leemikepop.tamperprobe.lab.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -14,8 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,8 +25,8 @@ import io.leemikepop.tamperprobe.lab.presentation.model.DetectionCardUiModel
 import io.leemikepop.tamperprobe.lab.presentation.model.assessmentContainerColor
 import io.leemikepop.tamperprobe.lab.presentation.model.assessmentDisplayColor
 import io.leemikepop.tamperprobe.lab.presentation.model.assessmentDisplayText
-import io.leemikepop.tamperprobe.lab.ui.theme.LocalDetectionColors
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun InfoCardItem(
     card: DetectionCardUiModel,
@@ -47,81 +47,84 @@ fun InfoCardItem(
         -> Icons.Filled.Info
     }
     val iconColor = assessmentDisplayColor(card.outcome, card.evidenceStrength)
-    val containerColor = assessmentContainerColor(card.outcome, card.evidenceStrength)
+    val isObserved = card.outcome == DetectionOutcome.OBSERVED
+    val containerColor = if (isObserved) {
+        assessmentContainerColor(card.outcome, card.evidenceStrength).copy(alpha = 0.35f)
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerLow
+    }
 
     Card(
         modifier = modifier.fillMaxWidth().then(
-            if (onCardClick != null) Modifier.clickable { onCardClick(card) } else Modifier
+            if (onCardClick != null) {
+                Modifier.clickable(role = Role.Button) { onCardClick(card) }
+            } else {
+                Modifier
+            }
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.35f)),
-        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        border = BorderStroke(
+            1.dp,
+            if (isObserved) iconColor.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outlineVariant,
+        ),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = card.outcome.name,
                 tint = iconColor,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .size(22.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = card.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = card.id,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (card.evidenceDomainTags.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        card.evidenceDomainTags.forEach { domain ->
-                            Surface(
-                                color = if (domain.isPrimary) {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                },
-                                shape = MaterialTheme.shapes.extraSmall,
-                                modifier = Modifier.semantics {
-                                    contentDescription = if (domain.isPrimary) {
-                                        "Primary Evidence Domain: ${domain.title}"
-                                    } else {
-                                        "Direct Evidence Domain: ${domain.title}"
-                                    }
-                                },
-                            ) {
-                                Text(
-                                    text = domain.shortTitle,
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            }
-                        }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = card.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = card.id,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Normal,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    InfoChip(
+                        text = assessmentDisplayText(card.outcome, card.evidenceStrength),
+                        containerColor = assessmentContainerColor(card.outcome, card.evidenceStrength),
+                        contentColor = iconColor,
+                        description = "Outcome ${card.outcome.name}, strength ${card.evidenceStrength.name}",
+                    )
+                    card.evidenceDomainTags.forEach { domain ->
+                        DomainChip(
+                            shortTitle = domain.shortTitle,
+                            title = domain.title,
+                            isPrimary = domain.isPrimary,
+                        )
                     }
                 }
-                Text(
-                    text = assessmentDisplayText(card.outcome, card.evidenceStrength),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = iconColor,
-                )
             }
         }
     }

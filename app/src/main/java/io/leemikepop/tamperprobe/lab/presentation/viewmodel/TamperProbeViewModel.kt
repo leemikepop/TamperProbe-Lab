@@ -113,7 +113,7 @@ class TamperProbeViewModel(app: Application) : AndroidViewModel(app) {
                     it.copy(
                         isLoading = false,
                         canExport = exportStore.canExport(),
-                        error = e.message ?: "未知錯誤",
+                        error = e.message ?: "Unknown error",
                     )
                 }
             }

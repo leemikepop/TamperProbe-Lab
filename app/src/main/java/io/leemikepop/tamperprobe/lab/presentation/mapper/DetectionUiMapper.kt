@@ -99,6 +99,7 @@ object DetectionUiMapper {
                 code = issue.code,
                 message = issue.message,
                 attributes = attributeValues(issue.attributes),
+                attributeTree = AttributeTreeBuilder.build(issue.attributes),
             )
         }
         val signals = recordsByKind[EvidenceRecordKind.SIGNAL].orEmpty().map(::recordDetail)
@@ -135,6 +136,7 @@ object DetectionUiMapper {
             summary = record.summary,
             signalStrength = record.signalStrength,
             attributes = attributeValues(record.attributes),
+            attributeTree = AttributeTreeBuilder.build(record.attributes),
         )
 
     private fun attributeValues(attributes: Map<String, String>): List<DetailValueUiModel> =
@@ -151,17 +153,8 @@ object DetectionUiMapper {
         domainById: Map<String, EvidenceDomainDescriptor>,
     ): String = domainById[domainId]?.title ?: domainId
 
-    private fun formatKey(value: String): String = value
-        .replace(Regex("([a-z0-9])([A-Z])"), "$1 $2")
-        .replace('_', ' ')
-        .replace('.', ' ')
-        .trim()
-        .replaceFirstChar { it.uppercase() }
+    private fun formatKey(value: String): String = AttributeTreeBuilder.formatKey(value)
 
-    private fun shouldUseMonospace(value: String): Boolean = value.contains('/')
-        || value.contains('\\')
-        || value.contains(':')
-        || value.contains("0x")
-        || value.contains("sha256", ignoreCase = true)
-        || value.length >= 24 && value.none(Char::isWhitespace)
+    private fun shouldUseMonospace(value: String): Boolean =
+        AttributeTreeBuilder.shouldUseMonospace(value)
 }
