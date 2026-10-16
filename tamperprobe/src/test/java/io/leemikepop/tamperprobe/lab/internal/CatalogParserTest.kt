@@ -17,7 +17,7 @@ class CatalogParserTest {
         assertEquals(1, catalog.evidenceContractVersion)
         assertEquals(8, catalog.evidenceDomains.size)
         assertEquals(38, catalog.descriptors.size)
-        assertEquals(53, catalog.descriptors.sumOf { it.evidenceUnits.size })
+        assertEquals(54, catalog.descriptors.sumOf { it.evidenceUnits.size })
         assertTrue(catalog.descriptors.all { it.payloadSchemaVersion == 1 })
         assertTrue(catalog.descriptors.all { descriptor ->
             descriptor.evidenceUnits.any { it.domainId == descriptor.primaryEvidenceDomainId }

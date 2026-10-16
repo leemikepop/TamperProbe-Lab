@@ -22,6 +22,10 @@ internal data class KernelCheckPayload(
     val hasTelegram: Boolean = false,
     val hasAtMention: Boolean = false,
     val customKeywords: List<String> = emptyList(),
+    val bannerSources: List<String> = emptyList(),
+    val bannerConcealableNegatives: List<KernelCheckConcealableNegativePayload> = emptyList(),
+    val identityCoherence: KernelIdentityCoherencePayload = KernelIdentityCoherencePayload(),
+    val identityConcealableNegatives: List<KernelCheckConcealableNegativePayload> = emptyList(),
     val hitCount: Int = 0,
     val findings: List<KernelCheckFindingPayload> = emptyList(),
 ) : DetectionPayload
@@ -29,7 +33,38 @@ internal data class KernelCheckPayload(
 @Serializable
 internal data class KernelCheckFindingPayload(
     val check: String = "",
+    val unitId: String? = null,
     val marker: String? = null,
     val value: String = "",
     val detail: String? = null,
+)
+
+/**
+ * A not-found the detector could not trust, because concealment produces the same absence: a
+ * banner scan that saw only the uname syscall, or release sources that agree.
+ */
+@Serializable
+internal data class KernelCheckConcealableNegativePayload(
+    val check: String = "",
+    val source: String? = null,
+    val comparedSources: List<String> = emptyList(),
+    val concealable: Boolean = true,
+    val reason: String = "",
+)
+
+/** Kernel release as read from each source; `state` is `agree`, `disagree` or `unavailable`. */
+@Serializable
+internal data class KernelIdentityCoherencePayload(
+    val state: String = "unavailable",
+    val readableSourceCount: Int = 0,
+    val distinctReleaseCount: Int = 0,
+    val sources: List<KernelIdentitySourcePayload> = emptyList(),
+    val unreadableSources: List<String> = emptyList(),
+)
+
+@Serializable
+internal data class KernelIdentitySourcePayload(
+    val source: String = "",
+    val readable: Boolean = false,
+    val value: String = "",
 )

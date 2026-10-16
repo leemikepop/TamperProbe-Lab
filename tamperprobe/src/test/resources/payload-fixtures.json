@@ -1656,6 +1656,19 @@
     "kernelVersion": "#1 SMP",
     "kallsymsReadable": false,
     "nonZeroAddresses": 0,
+    "bannerSources": ["uname"],
+    "identityCoherence": {
+      "state": "agree",
+      "readableSourceCount": 2,
+      "distinctReleaseCount": 1,
+      "sources": [
+        {"source": "zygote_os_version", "readable": true, "value": "6.1.0-android"},
+        {"source": "uname_release", "readable": true, "value": "6.1.0-android"},
+        {"source": "proc_sys_kernel_osrelease", "readable": false, "value": ""},
+        {"source": "proc_version_release", "readable": false, "value": ""}
+      ],
+      "unreadableSources": ["proc_sys_kernel_osrelease", "proc_version_release"]
+    },
     "hitCount": 1,
     "findings": [
       {

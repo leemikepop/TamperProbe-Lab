@@ -72,3 +72,33 @@ payload decoder, evidence adapter, catalog unit, fixture, and traceability revie
 SUSFS detectors probe narrow kernel/VFS side channels and keep unavailable or ambiguous channels
 explicit. These mechanisms can be patched or filtered and do not establish universal provider
 coverage or successful root access.
+
+`KERNEL_CHECK` has two units. `kernel-check.integrity-posture` is the marker, cmdline, kptr and
+symbol scan. When `/proc/version` is unreadable (the usual case for an app), its banner scan saw
+only the uname syscall, which a kernel-side uname spoof (SUSFS `spoof_uname` hooks `newuname`)
+rewrites to a stock string; that not-found is listed in `bannerConcealableNegatives` and published
+as a `KERNEL_CHECK.integrity-posture.concealable-negative` OBSERVATION record, the same Rule 3
+treatment as `NATIVE_ROOT_PATHS`' `concealableNotFoundPaths` and the policy oracle's
+`concealableNegatives`. The outcome stays `NOT_OBSERVED`, as it does for the policy oracle.
+
+`kernel-check.identity-coherence` compares the kernel release from up to four sources: the
+`os.version` property (read through JNI with the scan's `JNIEnv`), which libcore fills from
+`uname().release` while Zygote initialises and every app inherits; the live `uname()` release;
+`/proc/sys/kernel/osrelease`; and the release parsed from `/proc/version`. The comparison is the
+pure function `kernel_identity::compareReleases` in `kernel_identity_coherence.{h,cpp}`. Any two
+readable sources that differ give a `kernel_identity_mismatch` finding and a MODERATE signal, which
+makes the detector `OBSERVED` (posture hits keep their own grading; the stronger result wins).
+MODERATE matches `BUILD_PATCH_COHERENCE` and `DRM_CREDENTIAL_COHERENCE`: the contradiction is sound,
+but the snapshot is a Java value an in-process hook can rewrite and no clean control has been
+measured on this build. Agreement is published as a concealable negative
+(`identityConcealableNegatives`), and fewer than two readable sources leave the unit `UNAVAILABLE`
+with a `kernel_identity` issue, never a negative.
+
+The snapshot only helps when the spoof lands after Zygote cached the release. A spoof applied after
+Zygote started (observed on a Pixel 7 with a blu_spark kernel and susfs4ksu: `os.version`
+`6.1.162+blu-spark`, live `uname()` the stock `6.1.162-android14-11-g2ec90535fa34-ab15810641`) is
+caught. A spoof applied before Zygote initialises, as the SUSFS reference module does from
+`post-fs-data.sh`, makes the snapshot carry the spoofed value too; the unit then agrees and only the
+procfs sources, which an app usually cannot read, could still differ. The idea is adapted from
+Duck-Detector's `KernelIdentityConsistencyUtils.kt` (eltavine/Duck-Detector-Refactoring,
+Apache-2.0); no code was copied.

@@ -15,6 +15,7 @@
 
 #include "../common/proc_maps.h"
 #include "../detections/binary-artifact/binary_artifact_probe.h"
+#include "../detections/kernel-interface/kernel_identity_coherence.h"
 #include "../detections/kernel-interface/lsposed_sepolicy.h"
 #include "../detections/kernel-interface/native_root_sepolicy.h"
 #include "../detections/app-visibility/dangerous_packages_logic.h"
@@ -1989,8 +1990,108 @@ nlohmann::json runTeeAssessmentFixtures() {
     return {{"caseCount", caseCount}, {"failures", failures}};
 }
 
+nlohmann::json runKernelIdentityFixtures() {
+    using kernel_identity::CoherenceState;
+    using kernel_identity::compareReleases;
+    nlohmann::json failures = nlohmann::json::array();
+    int caseCount = 0;
+
+    // The Pixel 7 shape: SUSFS rewrote newuname after Zygote cached os.version.
+    ++caseCount;
+    const auto lateSpoof = compareReleases({{"zygote_os_version", "6.1.162+blu-spark"},
+                                            {"uname_release",
+                                             "6.1.162-android14-11-g2ec90535fa34-ab15810641"},
+                                            {"proc_sys_kernel_osrelease", ""},
+                                            {"proc_version_release", ""}});
+    expect(lateSpoof.state == CoherenceState::DISAGREE &&
+                   lateSpoof.distinctReleases.size() == 2 &&
+                   lateSpoof.readableSourceIds.size() == 2 &&
+                   lateSpoof.unreadableSourceIds.size() == 2,
+           "kernel_identity_disagree", failures);
+
+    // A spoof applied before Zygote: every readable source carries the same string.
+    ++caseCount;
+    const auto earlySpoof = compareReleases({{"zygote_os_version", "6.1.162-stock"},
+                                             {"uname_release", "6.1.162-stock\n"},
+                                             {"proc_sys_kernel_osrelease", ""},
+                                             {"proc_version_release", ""}});
+    expect(earlySpoof.state == CoherenceState::AGREE && earlySpoof.distinctReleases.size() == 1,
+           "kernel_identity_agree_after_trim", failures);
+
+    ++caseCount;
+    const auto single = compareReleases({{"zygote_os_version", ""},
+                                         {"uname_release", "6.1.162-stock"},
+                                         {"proc_sys_kernel_osrelease", "  "},
+                                         {"proc_version_release", ""}});
+    expect(single.state == CoherenceState::UNAVAILABLE && single.readableSourceIds.size() == 1,
+           "kernel_identity_single_source_unavailable", failures);
+
+    // procfs disagreeing with both Java and syscall views is still a disagreement.
+    ++caseCount;
+    const auto procfs = compareReleases({{"zygote_os_version", "6.1.162-stock"},
+                                         {"uname_release", "6.1.162-stock"},
+                                         {"proc_sys_kernel_osrelease", "6.1.162+custom"},
+                                         {"proc_version_release", ""}});
+    expect(procfs.state == CoherenceState::DISAGREE, "kernel_identity_procfs_disagree", failures);
+
+    ++caseCount;
+    expect(kernel_identity::parseProcVersionRelease(
+                   "Linux version 6.1.162-android14-11 (build-user@build-host) (clang) #1 SMP") ==
+                   "6.1.162-android14-11",
+           "kernel_identity_proc_version_parse", failures);
+
+    ++caseCount;
+    expect(kernel_identity::parseProcVersionRelease("6.1.162 something else").empty() &&
+                   kernel_identity::parseProcVersionRelease("Linux version").empty(),
+           "kernel_identity_proc_version_reject", failures);
+
+    ++caseCount;
+    expect(kernel_identity::assessKernelCheck({.postureHitCount = 0,
+                                               .coherence = CoherenceState::DISAGREE,
+                                               .anyPostureSourceReadable = true}) ==
+                   DetectionAssessment::moderateObserved(),
+           "kernel_check_disagree_observed", failures);
+
+    ++caseCount;
+    expect(kernel_identity::assessKernelCheck({.postureHitCount = 0,
+                                               .coherence = CoherenceState::AGREE,
+                                               .anyPostureSourceReadable = true}) ==
+                   DetectionAssessment::notObserved(),
+           "kernel_check_agree_not_observed", failures);
+
+    ++caseCount;
+    expect(kernel_identity::assessKernelCheck({.postureHitCount = 0,
+                                               .coherence = CoherenceState::UNAVAILABLE,
+                                               .anyPostureSourceReadable = false}) ==
+                   DetectionAssessment::inconclusive(),
+           "kernel_check_nothing_read_inconclusive", failures);
+
+    ++caseCount;
+    expect(kernel_identity::assessKernelCheck({.postureHitCount = 2,
+                                               .coherence = CoherenceState::DISAGREE,
+                                               .anyPostureSourceReadable = true}) ==
+                   DetectionAssessment::strongObserved(),
+           "kernel_check_posture_strong_kept", failures);
+
+    ++caseCount;
+    expect(kernel_identity::assessKernelCheck({.postureHitCount = 1,
+                                               .coherence = CoherenceState::DISAGREE,
+                                               .anyPostureSourceReadable = true}) ==
+                   DetectionAssessment::moderateObserved(),
+           "kernel_check_mismatch_never_strong_alone", failures);
+
+    return {{"caseCount", caseCount}, {"failures", failures}};
+}
+
 }  // namespace
 }  // namespace tamperprobe
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_io_leemikepop_tamperprobe_lab_lib_TamperProbeInstrumentedTest_runNativeKernelIdentityFixtures(JNIEnv* env,
+                                                                                               jobject) {
+    const std::string result = tamperprobe::runKernelIdentityFixtures().dump();
+    return env->NewStringUTF(result.c_str());
+}
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_io_leemikepop_tamperprobe_lab_lib_TamperProbeInstrumentedTest_runNativeMemoryHookFixtures(JNIEnv* env, jobject,

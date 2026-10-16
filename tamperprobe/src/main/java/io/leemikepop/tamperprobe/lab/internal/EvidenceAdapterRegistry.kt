@@ -147,6 +147,12 @@ internal data class UnitPlan(
      * hiding tool can remove was absent".
      */
     val concealableNegativeKey: String? = null,
+    /**
+     * True when the payload says this unit's channel produced nothing it could compare. The
+     * unit then publishes no record, only its issues, so it reads UNAVAILABLE instead of as a
+     * negative whatever the detector outcome is.
+     */
+    val unavailableMatcher: ((JsonObject) -> Boolean)? = null,
 )
 
 internal class ConfiguredEvidenceAdapter(
@@ -166,11 +172,14 @@ internal class ConfiguredEvidenceAdapter(
                 "${input.descriptor.id} adapter units do not match the catalog descriptor",
             )
         }
+        val unavailableUnits = plans
+            .filter { it.unavailableMatcher?.invoke(input.payload) == true }
+            .mapTo(mutableSetOf()) { it.unitId }
         val dynamicallyMatchedSignalUnits = plans
-            .filter { it.signalMatcher?.invoke(input.payload) == true }
+            .filter { it.unitId !in unavailableUnits && it.signalMatcher?.invoke(input.payload) == true }
             .mapTo(mutableSetOf()) { it.unitId }
         val fallbackSignalUnitId = signalUnitId ?: input.descriptor.evidenceUnits
-            .firstOrNull { planById[it.id]?.researchOnly != true }
+            .firstOrNull { planById[it.id]?.researchOnly != true && it.id !in unavailableUnits }
             ?.id
 
         return input.descriptor.evidenceUnits.map { descriptor ->
@@ -184,6 +193,22 @@ internal class ConfiguredEvidenceAdapter(
                 input.outcome,
                 sharedSuffix = input.descriptor.evidenceUnits.size > 1,
             )
+            if (descriptor.id in unavailableUnits) {
+                val unavailableIssues = issues.ifEmpty {
+                    listOf(
+                        EvidenceIssue(
+                            code = "$recordPrefix.unavailable",
+                            message = "The unit's channel produced nothing this scan could compare",
+                        ),
+                    )
+                }
+                return@map EvidenceUnitResult(
+                    descriptor,
+                    EvidenceUnitCollectionStatus.UNAVAILABLE,
+                    emptyList(),
+                    unavailableIssues,
+                )
+            }
             val attributes = selectAttributes(input.payload, plan.payloadKeys)
             val records = mutableListOf<EvidenceRecord>()
 

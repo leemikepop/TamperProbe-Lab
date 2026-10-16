@@ -28,6 +28,7 @@ class TamperProbeInstrumentedTest {
     private external fun runNativeBinaryArtifactFixtures(cacheDirectory: String): String
     private external fun runNativePackageStorageVisibilityFixtures(): String
     private external fun runNativeTeeAssessmentFixtures(): String
+    private external fun runNativeKernelIdentityFixtures(): String
 
     @Test
     fun nativeMemoryHookFixturesExerciseCppSeams() {
@@ -99,6 +100,14 @@ class TamperProbeInstrumentedTest {
         val failures = result.getValue("failures").jsonArray
         assertEquals(24, result.getValue("caseCount").jsonPrimitive.content.toInt())
         assertTrue("Native TEE fixture failures: $failures", failures.isEmpty())
+    }
+
+    @Test
+    fun nativeKernelIdentityFixturesCoverDisagreeAgreeAndUnavailable() {
+        val result = Json.parseToJsonElement(runNativeKernelIdentityFixtures()).jsonObject
+        val failures = result.getValue("failures").jsonArray
+        assertEquals(11, result.getValue("caseCount").jsonPrimitive.content.toInt())
+        assertTrue("Native kernel identity fixture failures: $failures", failures.isEmpty())
     }
 
     @Test

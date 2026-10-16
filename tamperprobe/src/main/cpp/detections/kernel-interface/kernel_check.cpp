@@ -8,9 +8,11 @@
 #include <set>
 
 #include "../../common/io_utils.h"
+#include "../../common/jni_call.hpp"
 #include "../../core/detection.h"
 #include "../../core/detection_registry.h"
 #include "../../nlohmann/json.hpp"
+#include "kernel_identity_coherence.h"
 
 namespace tamperprobe {
 
@@ -143,7 +145,7 @@ bool scanAtMentions(const std::string& text, std::string& matchSample) {
 
 bool scanCustomKeywords(const std::string& text, std::string& matchSample) {
     static const char* customKernelMarkers[] = {
-        "arter97", "franco", "elementalx", "blu_spark", "sultan",
+        "arter97", "franco", "elementalx", "blu_spark", "blu-spark", "sultan",
         "caf-", "SilkSmoothKernel", "NetHunter", "dirty", "custom",
         "perf+", "overclock", "xiaoxiaow", "qdykernel", "shirkneko",
         "aptkernel", "sukisu", "KernelSU", "APatch", "numbers",
@@ -185,6 +187,40 @@ std::vector<std::string> scanKernelSymbolTokens(const std::string& haystack) {
     return matched;
 }
 
+// The Zygote snapshot of the kernel release. libcore fills the "os.version" system property
+// from uname().release while Zygote initialises, and every app process forked from Zygote
+// inherits that value, so it records the release as it was before this app started. Read
+// through the scan's JNIEnv; any JNI failure leaves the source unreadable, never a guess.
+std::string readZygoteOsVersion(const DetectionContext& scanContext, std::string& error) {
+    JNIEnv* env = scanContext.env;
+    if (env == nullptr) {
+        error = "JNI environment not available";
+        return {};
+    }
+    try {
+        jni::ScopedLocalRef<jstring> key(env, env->NewStringUTF("os.version"));
+        jni::ThrowIfExceptionPending(env);
+        if (key.get() == nullptr) {
+            error = "Could not allocate the property name";
+            return {};
+        }
+        jni::ScopedLocalRef<jstring> value(
+            env, jni::CallStaticMethod<jstring>(env, "java/lang/System", "getProperty",
+                                                "(Ljava/lang/String;)Ljava/lang/String;",
+                                                key.get()));
+        if (value.get() == nullptr) {
+            error = "System.getProperty(\"os.version\") returned null";
+            return {};
+        }
+        return jni::JStringToString(env, value.get());
+    } catch (const jni::JNIException&) {
+        error = "System.getProperty(\"os.version\") raised a Java exception";
+        return {};
+    }
+}
+
+constexpr char kIdentityCoherenceUnitId[] = "kernel-check.identity-coherence";
+
 }  // namespace
 
 /**
@@ -192,8 +228,12 @@ std::vector<std::string> scanKernelSymbolTokens(const std::string& haystack) {
  * 1. kptr_restrict check: parse first 20 lines of /proc/kallsyms (>50% non-zero -> SIGNAL)
  * 2. /proc/version and uname signature scan (CJK, emoji, t.me/, @ mentions, custom kernel tags -> MODERATE SIGNAL)
  * 3. Bootloader state and kernel parameters from /proc/cmdline
+ * 4. Kernel identity coherence: the Zygote snapshot of the release (os.version) against the
+ *    live uname() release and the procfs exports of the same string (disagreement -> MODERATE)
  *
- * References: Duck-Detector kernelcheck/native_bridge.cpp & KernelCheckRepository.kt
+ * References: Duck-Detector kernelcheck/native_bridge.cpp & KernelCheckRepository.kt; the
+ * identity cross-check adapts the idea of Duck-Detector's KernelIdentityConsistencyUtils.kt
+ * (Apache-2.0). No code was copied.
  */
 class KernelCheckDetection : public Detection {
    public:
@@ -286,6 +326,26 @@ class KernelCheckDetection : public Detection {
             payload["findings"].push_back(f);
         }
         payload["customKeywords"] = matchedKeywords;
+
+        // Rule 3: a negative that concealment can produce is not trusted. When /proc/version
+        // is unreadable, the banner scan above saw only what the uname syscall returned, and a
+        // kernel-side uname spoof (SUSFS spoof_uname hooks newuname) returns a stock string
+        // with no marker in it. That not-found is published as a concealable negative instead
+        // of standing as an answer.
+        const bool bannerFromUnameOnly = unameOk && procVersion.empty();
+        payload["bannerSources"] = nlohmann::json::array();
+        if (unameOk) payload["bannerSources"].push_back("uname");
+        if (!procVersion.empty()) payload["bannerSources"].push_back("proc_version");
+        payload["bannerConcealableNegatives"] = nlohmann::json::array();
+        if (bannerFromUnameOnly && !hasCjk && !hasEmoji && !hasTelegram && !hasAtMention &&
+            matchedKeywords.empty()) {
+            payload["bannerConcealableNegatives"].push_back(
+                {{"check", "custom_kernel_signature"},
+                 {"source", "uname"},
+                 {"concealable", true},
+                 {"reason", "No marker in the uname banner, and /proc/version was unreadable; "
+                            "a uname spoof produces the same absence."}});
+        }
 
         // 2. Check /proc/cmdline for bootloader state and root parameters
         std::string cmdline = read_text_file("/proc/cmdline", 4096);
@@ -400,6 +460,14 @@ class KernelCheckDetection : public Detection {
         }
         std::vector<std::string> symbolMatches(symbolMatchSet.begin(), symbolMatchSet.end());
         payload["kernelSymbolMatches"] = symbolMatches;
+        if (bannerFromUnameOnly && symbolMatches.empty() && !kallsymsReadable && !modulesReadable) {
+            payload["bannerConcealableNegatives"].push_back(
+                {{"check", "kernel_symbol_token"},
+                 {"source", "uname"},
+                 {"concealable", true},
+                 {"reason", "The symbol-token scan saw only the uname banner; a uname spoof "
+                            "produces the same absence."}});
+        }
         for (const std::string& token : symbolMatches) {
             hitCount++;
             nlohmann::json f;
@@ -410,13 +478,85 @@ class KernelCheckDetection : public Detection {
             payload["findings"].push_back(f);
         }
 
+        // 4. Kernel identity coherence. The kernel copies one utsname release into every
+        // source below, and it cannot change without a reboot, so on an unmodified device
+        // they all agree. A spoof that rewrites one surface after Zygote started (SUSFS
+        // patching newuname from a late boot stage) leaves the Zygote snapshot and the live
+        // syscall disagreeing. The procfs exports are best effort: an app's SELinux domain
+        // usually cannot read them.
+        std::string zygoteError;
+        const std::string zygoteOsVersion = readZygoteOsVersion(scanContext, zygoteError);
+        const std::string sysctlOsRelease = read_text_file("/proc/sys/kernel/osrelease", 256);
+        const std::string procVersionRelease = kernel_identity::parseProcVersionRelease(procVersion);
+        const std::vector<kernel_identity::ReleaseSource> identitySources = {
+            {"zygote_os_version", zygoteOsVersion},
+            {"uname_release", release},
+            {"proc_sys_kernel_osrelease", sysctlOsRelease},
+            {"proc_version_release", procVersionRelease},
+        };
+        const kernel_identity::CoherenceResult coherence =
+            kernel_identity::compareReleases(identitySources);
+
+        nlohmann::json identity = {
+            {"state", kernel_identity::coherenceStateName(coherence.state)},
+            {"readableSourceCount", static_cast<int>(coherence.readableSourceIds.size())},
+            {"distinctReleaseCount", static_cast<int>(coherence.distinctReleases.size())},
+            {"sources", nlohmann::json::array()},
+            {"unreadableSources", coherence.unreadableSourceIds},
+        };
+        for (const auto& source : identitySources) {
+            const std::string value = trim_copy(source.value);
+            identity["sources"].push_back(
+                {{"source", source.id}, {"readable", !value.empty()}, {"value", value}});
+        }
+        payload["identityCoherence"] = identity;
+
+        // Agreement is a negative that a spoof applied before Zygote initialises (the SUSFS
+        // reference module calls set_uname from post-fs-data) also produces: every source
+        // then carries the spoofed string. It is published as a concealable negative.
+        payload["identityConcealableNegatives"] = nlohmann::json::array();
+        if (coherence.state == kernel_identity::CoherenceState::AGREE) {
+            payload["identityConcealableNegatives"].push_back(
+                {{"check", "kernel_identity_coherence"},
+                 {"comparedSources", coherence.readableSourceIds},
+                 {"concealable", true},
+                 {"reason", "Every readable release source agrees; a spoof applied before Zygote "
+                            "initialised makes them agree as well."}});
+        }
+
+        if (coherence.state == kernel_identity::CoherenceState::DISAGREE) {
+            // MODERATE, as for BUILD_PATCH_COHERENCE and DRM_CREDENTIAL_COHERENCE. The
+            // contradiction is sound as an argument (the release cannot change while the
+            // kernel runs), but the snapshot side is a Java value that an in-process hook on
+            // System.getProperty can rewrite, and no clean device has been measured on this
+            // build yet. Raise the grade only once a clean control exists.
+            std::string values;
+            for (const auto& source : identity["sources"]) {
+                if (!source["readable"].get<bool>()) continue;
+                if (!values.empty()) values += ", ";
+                values += source["source"].get<std::string>() + "=" +
+                          source["value"].get<std::string>();
+            }
+            nlohmann::json f;
+            f["check"] = "kernel_identity_mismatch";
+            f["unitId"] = kIdentityCoherenceUnitId;
+            f["marker"] = "release_disagreement";
+            f["value"] = values;
+            f["detail"] = "Kernel release sources disagree (" + values +
+                          "); the release cannot change while the kernel runs, so at least one "
+                          "source was rewritten.";
+            payload["findings"].push_back(f);
+        }
+
         // Honest availability. Three of this detector's sub-checks read files that an app
         // cannot open on current Android: kallsyms (the kptr and symbol checks), modules
         // (the symbol check), and cmdline (the bootloader-state check). When they are
         // unavailable a not-found is not a clean answer, so each unreadable source is
         // recorded as a collection issue, which marks the unit PARTIAL. The uname banner
-        // scan is always available and its result stands. The detector still reports
-        // NOT_OBSERVED rather than INCONCLUSIVE, because that live sub-check did answer.
+        // scan is always available; when it is the banner's only source its negative is
+        // listed in bannerConcealableNegatives. The detector still reports NOT_OBSERVED
+        // rather than INCONCLUSIVE, as the SELinux policy oracle does for a negative resting
+        // on concealable absences, and leaves the distinction to the published records.
         payload["collectionErrors"] = nlohmann::json::array();
         if (!kallsymsReadable) {
             payload["collectionErrors"].push_back(
@@ -436,17 +576,57 @@ class KernelCheckDetection : public Detection {
                  {"message", "/proc/cmdline is not readable by this process; the "
                              "bootloader-state check could not run."}});
         }
+        // /proc/version and uname feed both units (the banner scan and the identity
+        // comparison), so their entries are deliberately left for both; the other identity
+        // sources feed only the coherence unit.
+        if (procVersion.empty()) {
+            payload["collectionErrors"].push_back(
+                {{"source", "proc_version"}, {"errno", 0},
+                 {"message", "/proc/version is not readable by this process; the banner scan "
+                             "saw only uname and the identity comparison could not use it."}});
+        }
+        if (!unameOk) {
+            payload["collectionErrors"].push_back(
+                {{"source", "uname"}, {"errno", 0},
+                 {"message", "uname() failed; neither the banner scan nor the identity "
+                             "comparison could use it."}});
+        }
+        if (sysctlOsRelease.empty()) {
+            payload["collectionErrors"].push_back(
+                {{"source", "proc_sys_kernel_osrelease"}, {"errno", 0},
+                 {"message", "/proc/sys/kernel/osrelease is not readable by this process."}});
+        }
+        if (trim_copy(zygoteOsVersion).empty()) {
+            payload["collectionErrors"].push_back(
+                {{"source", "zygote_os_version"}, {"errno", 0},
+                 {"message", zygoteError.empty()
+                                 ? std::string("System.getProperty(\"os.version\") is empty.")
+                                 : zygoteError}});
+        }
+        if (coherence.state == kernel_identity::CoherenceState::UNAVAILABLE) {
+            // Fewer than two readable sources compare nothing: the unit is unavailable, never
+            // a negative. The values that were read stay on the entry so they are published.
+            nlohmann::json entry = {
+                {"source", "kernel_identity"},
+                {"errno", 0},
+                {"readableSourceCount", static_cast<int>(coherence.readableSourceIds.size())},
+                {"message", "Fewer than two kernel release sources were readable; the identity "
+                            "comparison could not run."}};
+            for (const auto& source : identity["sources"]) {
+                if (source["readable"].get<bool>()) {
+                    entry[source["source"].get<std::string>()] = source["value"];
+                }
+            }
+            payload["collectionErrors"].push_back(entry);
+        }
 
         payload["hitCount"] = hitCount;
 
-        DetectionAssessment assessment = DetectionAssessment::notObserved();
-        if (hitCount >= 2) {
-            assessment = DetectionAssessment::strongObserved();
-        } else if (hitCount > 0) {
-            assessment = DetectionAssessment::moderateObserved();
-        } else if (!kallsymsReadable && procVersion.empty() && cmdline.empty() && !unameOk) {
-            assessment = DetectionAssessment::inconclusive();
-        }
+        const DetectionAssessment assessment = kernel_identity::assessKernelCheck(
+            {.postureHitCount = hitCount,
+             .coherence = coherence.state,
+             .anyPostureSourceReadable =
+                 kallsymsReadable || !procVersion.empty() || !cmdline.empty() || unameOk});
 
         return {assessment, payload.dump()};
     }

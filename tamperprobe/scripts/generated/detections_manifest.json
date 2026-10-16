@@ -291,7 +291,7 @@
     {
       "id": "KERNEL_CHECK",
       "name": "Kernel Integrity Check",
-      "description": "Checks kernel compilation signatures in /proc/version and uname, bootloader lock state from /proc/cmdline, and kptr_restrict address visibility in /proc/kallsyms.",
+      "description": "Checks kernel compilation signatures in /proc/version and uname, bootloader lock state from /proc/cmdline, and kptr_restrict address visibility in /proc/kallsyms, and cross-checks the kernel release the process inherited from Zygote against the live uname() release and its procfs exports.",
       "payloadSchemaVersion": 1,
       "primaryEvidenceDomainId": "kernel-interface",
       "evidenceUnits": [
@@ -305,6 +305,17 @@
           "availability": "Each observation depends on kernel configuration, procfs permissions, and platform exposure",
           "trustBoundary": "The running kernel owns all returned sources and can conceal or rewrite them",
           "inferenceLimit": "A marker or visibility state is bounded evidence and does not prove a malicious custom kernel"
+        },
+        {
+          "id": "kernel-check.identity-coherence",
+          "title": "Kernel release identity across sources",
+          "domainId": "kernel-interface",
+          "observedObject": "The kernel release string as recorded in the os.version system property inherited from Zygote, returned by a live uname() call, and exported by /proc/sys/kernel/osrelease and /proc/version",
+          "proposition": "Two readable sources report different kernel releases, which an unmodified device cannot do because the release cannot change while the kernel runs",
+          "observationChannel": "System.getProperty(\"os.version\") through JNI, the uname() syscall, and bounded procfs reads",
+          "availability": "Comparable when at least two sources are readable; the Zygote snapshot and uname() normally are, while an app's SELinux domain usually cannot read the procfs exports",
+          "trustBoundary": "Crosses from the release Zygote recorded before this app started to what the kernel returns now; a kernel hook can rewrite each live source, and an in-process hook can rewrite the Java property",
+          "inferenceLimit": "A disagreement shows that some source was rewritten, not which one or by which tool; agreement is a concealable negative, because a spoof applied before Zygote initialises makes every source carry the same spoofed release"
         }
       ]
     },

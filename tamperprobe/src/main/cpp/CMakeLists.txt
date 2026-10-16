@@ -54,6 +54,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
         # Kernel and Privilege Interfaces
         detections/kernel-interface/kernel_check.cpp
+        detections/kernel-interface/kernel_identity_coherence.cpp
         detections/kernel-interface/lsposed_sepolicy.cpp
         detections/kernel-interface/native_root_prctl.cpp
         detections/kernel-interface/native_root_susfs.cpp

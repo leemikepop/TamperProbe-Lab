@@ -178,5 +178,7 @@ see [`LICENSE`](LICENSE). Third-party material keeps its own licence:
 - `tamperprobe/src/main/cpp/nlohmann/` is nlohmann/json, under the MIT License.
 - Part of the package list in `DangerousPackageList.kt` is taken from Duck-Detector's
   `DangerousAppsCatalog` (eltavine/Duck-Detector-Refactoring), under the Apache License 2.0.
+- The kernel identity cross-check in `KERNEL_CHECK` (`kernel_identity_coherence.cpp`) adapts the
+  idea of Duck-Detector's `KernelIdentityConsistencyUtils` (Apache License 2.0); no code was copied.
 
 A citation entry will be added when the paper is accepted.
