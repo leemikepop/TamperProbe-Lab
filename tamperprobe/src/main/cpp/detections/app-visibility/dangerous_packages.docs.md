@@ -47,7 +47,9 @@
   APK 也在磁碟上。即使替 App 授予 `QUERY_ALL_PACKAGES` 結果仍相同，而同一時間
   `getApplicationInfo("android")` 與查詢自身套件都成功。換句話說**查詢機制是好的，
   是套件本身被從我們的視野裡拿掉了**。這種情況下「沒找到」不代表「沒安裝」。
-  請務必搭配 `visiblePackageCount` 一起判讀。
+  請務必搭配 `visiblePackageCount` 一起判讀。因此 NOT_OBSERVED 時，package unit 一律另外發布
+  `concealable-negative` OBSERVATION record（`check=package_identity_visibility`，Rule 3）：
+  這個否定是隱藏工具做得出來的，不能當成乾淨的證據。
 - **App data isolation 讓資料路徑通道在現行 Android 上看不到任何目標。** 本節先前寫的是：其他 App 的目錄會回傳 `EACCES` 並歸類為 `Inaccessible`。**實測並非如此。** 2026-09-11 在 Redmi 13C（Android 13）與 Pixel 7（Android 17）上從 Sample App 行程量測：`/data/data/`、`/data/user/0/`、`/data/user_de/0/` 底下，本 App 自己的目錄可見，`com.android.settings` 以及確實已安裝的 `com.topjohnwu.magisk`、`me.weishu.kernelsu` 等一律回傳 `ENOENT`，與不存在無從區分；唯一的例外是 `com.google.android.gms`，兩台都可見。
   由於 `ENOENT` 當時被當成「已確認不存在」並計入 `completedPathCount`，`ablation_2026` 十四格裡本 unit 每一格都回報 156/156 已作答、全部不存在——包括同一次掃描中 package unit 已查到 Magisk 已安裝的 `R0`。自 2026-09-11 起，控制組偵測到這種情形時本 unit 回報 UNAVAILABLE 並附 `app-data-isolated`，但**不會**因此讓整個 detector 變成 INCONCLUSIVE：本 detector 在十四格中的判定本來就全部來自 package unit，沒有任何一格因此改變。
 
@@ -56,7 +58,7 @@
 | 強度 | 建議 |
 |---|---|
 | WEAK | 僅代表裝置上安裝過或殘留相關套件，屬於環境特徵輔助信號，不可單獨用作封鎖使用者的決策依據，應與核心完整性訊號關聯判讀。 |
-| NOT_OBSERVED | 未在維護清單中發現可見的套件或路徑，不代表未安裝（套件可能已隨機化名稱或受系統隱藏）。 |
+| NOT_OBSERVED | 未在維護清單中發現可見的套件或路徑，不代表未安裝（套件可能已隨機化名稱或受系統隱藏）。每個有作答的 unit 都附 `concealable-negative` record。 |
 | INCONCLUSIVE | JNI 上下文不可用或資產檔讀取失敗導致無法執行完整查詢；兩個 unit 皆回報 UNAVAILABLE 並附 `target-list-unavailable`。另外，若本 App 看不見自己的資料目錄（`app-data-self-control-failed`），代表路徑通道本身壞了，也會導致 INCONCLUSIVE——這與 app data isolation 不同，後者不會。 |
 
 ## 成本
@@ -78,10 +80,10 @@
 payload 另外輸出 `visiblePackageCount`，也就是本行程實際列舉得到的套件總數：
 數字正常卻一個目標都沒命中，才是有意義的陰性結果。
 
-記錄透過 PackageManager 查詢到的已安裝危險套件名稱清單（`detectedPackages`）與查詢期間產生的各類 issue（如 Intent 查詢失敗等）。
+記錄透過 PackageManager 查詢到的已安裝危險套件名稱清單（`detectedPackages`）與查詢期間產生的各類 issue（如 Intent 查詢失敗等）。NOT_OBSERVED 且有作答（`completedQueryCount > 0`）時，加發一筆 `concealable-negative` OBSERVATION record。
 
 ### dangerous-packages.app-data-path-visibility
 
 記錄透過原生 `fstatat` 系統呼叫確認存在的私有資料路徑清單（`foundPaths`），以及因權限不足而無法確定的路徑清單（`inaccessiblePaths`）。
 
-另外記錄兩個控制組的結果（`selfControl`、`crossPackageControl`，值為 `exists`／`not_found`／`inaccessible`／`error`／`not_attempted`）、`isolationDetected`，以及因控制組未通過而不計為作答的 `NotFound` 數量（`unconfirmedNotFoundCount`）。在啟用 app data isolation 的裝置上——兩台實測裝置皆是——本 unit 沒有任何作答，狀態為 UNAVAILABLE，控制組結果記錄在 `app-data-isolated` 收集問題的屬性中。
+另外記錄兩個控制組的結果（`selfControl`、`crossPackageControl`，值為 `exists`／`not_found`／`inaccessible`／`error`／`not_attempted`）、`isolationDetected`，以及因控制組未通過而不計為作答的 `NotFound` 數量（`unconfirmedNotFoundCount`）。在啟用 app data isolation 的裝置上——兩台實測裝置皆是——本 unit 沒有任何作答，狀態為 UNAVAILABLE，控制組結果記錄在 `app-data-isolated` 收集問題的屬性中。有作答時，NOT_OBSERVED 且 `notFoundPathCount > 0` 會加發 `concealable-negative` record：路徑隱藏對存在的路徑同樣回傳 `ENOENT`。

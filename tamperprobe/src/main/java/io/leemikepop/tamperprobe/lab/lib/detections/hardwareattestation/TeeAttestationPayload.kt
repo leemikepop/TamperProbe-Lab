@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 internal data class TeeAttestationPayload(
     val attestation: AttestationPayload = AttestationPayload(),
     val findings: List<TeeAttestationFindingPayload> = emptyList(),
+    val concealableNegatives: List<TeeConcealableNegativePayload> = emptyList(),
     val collectionWarnings: List<TeeCollectionWarningPayload> = emptyList(),
     val collectionError: String? = null,
 ) : DetectionPayload
@@ -21,6 +22,7 @@ internal data class AttestationPayload(
     val hasAttestationExtension: Boolean = false,
     val rootOfTrust: RootOfTrustPayload = RootOfTrustPayload(),
     val bootConsistency: BootConsistencyPayload = BootConsistencyPayload(),
+    val bootStateCoherence: BootStateCoherencePayload = BootStateCoherencePayload(),
     val revocation: RevocationPayload = RevocationPayload(),
 )
 
@@ -80,6 +82,35 @@ internal data class BootConsistencyPayload(
     val matches: Boolean = false,
     val zeroBootKey: Boolean = false,
     val zeroBootHash: Boolean = false,
+)
+
+/**
+ * RootOfTrust compared with the boot-state properties. `notComparableReason` is
+ * `attestation_not_trusted` or `no_boot_state_property` when `comparable` is false.
+ */
+@Serializable
+internal data class BootStateCoherencePayload(
+    val comparable: Boolean = false,
+    val notComparableReason: String = "not_evaluated",
+    val claim: BootStateClaimPayload = BootStateClaimPayload(),
+    val comparedProperties: List<String> = emptyList(),
+    val contradictedProperties: List<String> = emptyList(),
+)
+
+@Serializable
+internal data class BootStateClaimPayload(
+    val verifiedBootState: String = "",
+    val flashLocked: String = "",
+    val vbmetaDeviceState: String = "",
+)
+
+/** An agreement the detector could not trust, because concealment produces it too. */
+@Serializable
+internal data class TeeConcealableNegativePayload(
+    val check: String = "",
+    val comparedProperties: List<String> = emptyList(),
+    val concealable: Boolean = true,
+    val reason: String = "",
 )
 
 @Serializable

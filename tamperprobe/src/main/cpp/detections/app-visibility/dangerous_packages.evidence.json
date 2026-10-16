@@ -14,7 +14,7 @@
       "observationChannel": "PackageManager queries subject to package visibility rules",
       "availability": "Depends on generated queries, installed package state, and platform visibility filtering",
       "trustBoundary": "PackageManager is a framework-mediated app-local view",
-      "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state"
+      "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state; an installed package can be filtered from this app by per-app package-visibility concealment, so a negative is concealable"
     },
     {
       "id": "dangerous-packages.app-data-path-visibility",
@@ -25,7 +25,7 @@
       "observationChannel": "Native access probes over canonical package-data paths",
       "availability": "Depends on package-data layout, namespace, permissions, and concealment affecting the app-local VFS view; under the app data isolation current Android enables, other applications' data directories are not visible and the unit reports itself unavailable",
       "trustBoundary": "Path resolution is mediated by the process mount namespace and kernel VFS",
-      "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege"
+      "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege; path hiding returns ENOENT for a path that exists, so a negative is concealable"
     }
   ]
 }

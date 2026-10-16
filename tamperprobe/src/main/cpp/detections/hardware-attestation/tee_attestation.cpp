@@ -231,6 +231,15 @@ class TeeAttestationDetection : public Detection {
                     {"matches", false},
                     {"zeroBootKey", false},
                     {"zeroBootHash", false}}},
+                  {"bootStateCoherence",
+                   {{"comparable", false},
+                    {"notComparableReason", "not_evaluated"},
+                    {"claim",
+                     {{"verifiedBootState", ""},
+                      {"flashLocked", ""},
+                      {"vbmetaDeviceState", ""}}},
+                    {"comparedProperties", nlohmann::json::array()},
+                    {"contradictedProperties", nlohmann::json::array()}}},
                   {"revocation",
                    {{"statusJsonLoaded", false},
                     {"validationState", "unavailable"},
@@ -239,6 +248,7 @@ class TeeAttestationDetection : public Detection {
                     {"expiredEntryCount", 0},
                     {"hits", nlohmann::json::array()}}}}},
                 {"findings", nlohmann::json::array()},
+                {"concealableNegatives", nlohmann::json::array()},
                 {"collectionWarnings", nlohmann::json::array()}};
 
         tee_common::AttestationAssessmentInput assessmentInput;
@@ -417,6 +427,11 @@ class TeeAttestationDetection : public Detection {
                 collector.value("attestationCertificateHex", std::string()));
         const std::vector<uint8_t> expectedChallenge = decodeHex(
                 collector.value("expectedChallengeHex", std::string()));
+        bool challengeMatched = false;
+        bool hardwareBacked = false;
+        bool rootOfTrustParsed = false;
+        bool attestedLocked = false;
+        int attestedBootState = -1;
         tee_info_t info{};
         const bool parserOk = !certificate.empty() &&
                 parse_tee_certificate(certificate.data(),
@@ -452,6 +467,7 @@ class TeeAttestationDetection : public Detection {
                     expectedChallenge.size();
             attestation["challenge"]["present"] = challengePresent;
             attestation["challenge"]["matches"] = challengeMatches;
+            challengeMatched = challengeMatches;
             if (challengePresent && !challengeMatches) {
                 addFinding("challenge_mismatch",
                            "Attestation challenge does not match this scan",
@@ -476,6 +492,9 @@ class TeeAttestationDetection : public Detection {
                         root.verified_boot_state;
                 attestation["rootOfTrust"]["verifiedBootKeyHex"] = bootKey;
                 attestation["rootOfTrust"]["verifiedBootHashHex"] = bootHash;
+                rootOfTrustParsed = true;
+                attestedLocked = root.device_locked != 0;
+                attestedBootState = root.verified_boot_state;
 
                 if (root.device_locked == 0) {
                     addFinding("device_unlocked",
@@ -516,7 +535,9 @@ class TeeAttestationDetection : public Detection {
                 const bool runtimeAvailable = !runtimeDigest.empty();
                 const bool comparable = zeroRelevant && runtimeAvailable &&
                                         !attestedDigest.empty();
-                const bool matches = comparable &&
+                // matches reports equality whenever both digests were read; comparable alone
+                // decides whether a difference is a finding (an Unverified boot is not checked).
+                const bool matches = runtimeAvailable && !attestedDigest.empty() &&
                                      runtimeDigest == attestedDigest;
                 attestation["bootConsistency"]["runtimeDigestAvailable"] =
                         runtimeAvailable;
@@ -539,7 +560,8 @@ class TeeAttestationDetection : public Detection {
                            "RootOfTrust could not be decoded from the attestation record.");
             }
 
-            if (!tee_common::isHardwareBackedAttestation(info.security_level)) {
+            hardwareBacked = tee_common::isHardwareBackedAttestation(info.security_level);
+            if (!hardwareBacked) {
                 addFinding("software_backed_attestation",
                            "Attestation is not TEE or StrongBox backed",
                            std::string("attestationSecurityLevel=") +
@@ -598,6 +620,50 @@ class TeeAttestationDetection : public Detection {
         if (revocation.expiredEntryCount > 0) {
             addWarning("attestation_status", "expired_entry_ignored",
                        "A matched status entry had passed its optional expires date and was not treated as current revocation evidence.");
+        }
+
+        // Attested versus property-claimed boot state. Compared only when the attestation is
+        // one this detector would otherwise accept: a forged chain is already a finding above.
+        const tee_common::BootStateClaim claim{systemProperty("ro.boot.verifiedbootstate"),
+                                               systemProperty("ro.boot.flash.locked"),
+                                               systemProperty("ro.boot.vbmeta.device_state")};
+        const bool attestationTrusted =
+                parserOk && rootOfTrustParsed && challengeMatched && hardwareBacked &&
+                signaturesValid && signatureValidationComplete &&
+                trustedRootState == "trusted" && !revocation.blocked;
+        const tee_common::BootStateCoherence coherence = tee_common::compareAttestedBootState(
+                attestationTrusted, attestedLocked, attestedBootState, claim);
+        auto& bootState = attestation["bootStateCoherence"];
+        bootState["comparable"] = coherence.comparable;
+        bootState["notComparableReason"] = coherence.notComparableReason;
+        bootState["claim"]["verifiedBootState"] = claim.verifiedBootState;
+        bootState["claim"]["flashLocked"] = claim.flashLocked;
+        bootState["claim"]["vbmetaDeviceState"] = claim.vbmetaDeviceState;
+        bootState["comparedProperties"] = coherence.comparedProperties;
+        bootState["contradictedProperties"] = coherence.contradictedProperties;
+        if (!coherence.contradictedProperties.empty()) {
+            std::string contradicted;
+            for (const auto& property : coherence.contradictedProperties) {
+                if (!contradicted.empty()) contradicted += ", ";
+                contradicted += property;
+            }
+            addFinding("attested_boot_state_contradicts_properties",
+                       "Attested boot state contradicts the boot-state properties",
+                       std::string("RootOfTrust reported deviceLocked=") +
+                               (attestedLocked ? "true" : "false") + " and " +
+                               verifiedBootStateToString(attestedBootState) +
+                               "; disagreeing properties: " + contradicted + ".",
+                       EvidenceStrength::MODERATE);
+        } else if (coherence.comparable) {
+            // Agreement is what an honest device shows, and also what an attestation forged
+            // for this app shows next to properties spoofed to match it (Rule 3).
+            payload["concealableNegatives"].push_back(
+                    {{"check", "attested_boot_state_coherence"},
+                     {"comparedProperties", coherence.comparedProperties},
+                     {"concealable", true},
+                     {"reason",
+                      "An attestation layer that targets this app and spoofed boot properties "
+                      "agree just as an unmodified device does."}});
         }
 
         const bool challengeValidationComplete =

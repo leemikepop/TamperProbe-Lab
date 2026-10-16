@@ -29,6 +29,23 @@ the follow-up experiments of the TamperProbe thesis.
    Fixtures show representation, builds show toolchain compatibility, repeated captures show the
    stability of one configuration; none of them is a rate.
 
+## Development and evaluation
+
+Detectors are revised whenever a new concealment configuration reveals a gap. That is expected, and
+it is kept apart from the data the paper reports:
+
+1. **Development.** Any configuration may be tried and any detector changed. Development scans are
+   kept outside this directory (or under `<experiment>/dev/`, marked as such) and are never quoted
+   as results.
+2. **Evaluation.** The repository is tagged, the preregistration names that tag and is committed,
+   and every cell is captured from scratch with that build. No development scan is reused.
+3. **A fix during evaluation** is an amendment: it names the new tag, and every cell is captured
+   again with it, not only the cells that exposed the problem.
+4. **Held-out configurations.** Each preregistration lists the configurations that were not used
+   during development (for example a device or a module version never installed while detectors
+   were being changed). Results on them are reported separately, so a reader can see whether a
+   detector only works on what it was tuned on.
+
 ## Layout
 
 ```

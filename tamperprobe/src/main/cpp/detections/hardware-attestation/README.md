@@ -19,8 +19,10 @@ Signal exists.
 
 Strong findings are restricted to challenge mismatch, a completed chain-signature
 failure, official `REVOKED`/`SUSPENDED` status, and oversized-challenge acceptance.
-Verified-boot contradictions/all-zero comparable fields are moderate. Unlocked,
-non-Verified boot and software-backed posture are weak.
+Verified-boot contradictions/all-zero comparable fields are moderate, and so is a
+trusted RootOfTrust that contradicts the boot-state properties
+(`attested_boot_state_contradicts_properties`); agreement there is a concealable
+negative. Unlocked, non-Verified boot and software-backed posture are weak.
 
 The offline assets are `attestation_roots.json` and `attestation_status.json`. There
 is no implicit SDK networking; the existing

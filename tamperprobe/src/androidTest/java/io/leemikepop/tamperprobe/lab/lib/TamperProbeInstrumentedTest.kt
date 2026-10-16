@@ -98,7 +98,7 @@ class TamperProbeInstrumentedTest {
     fun nativeTeeFixturesExerciseConservativeAssessmentPolicy() {
         val result = Json.parseToJsonElement(runNativeTeeAssessmentFixtures()).jsonObject
         val failures = result.getValue("failures").jsonArray
-        assertEquals(24, result.getValue("caseCount").jsonPrimitive.content.toInt())
+        assertEquals(32, result.getValue("caseCount").jsonPrimitive.content.toInt())
         assertTrue("Native TEE fixture failures: $failures", failures.isEmpty())
     }
 

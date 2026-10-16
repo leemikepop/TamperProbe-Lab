@@ -1987,6 +1987,67 @@ nlohmann::json runTeeAssessmentFixtures() {
                    DetectionAssessment::notObserved(),
            "tee_consistency_clean", failures);
 
+    // Attested versus property-claimed boot state.
+    const tee_common::BootStateClaim lockedGreen{"green", "1", "locked"};
+    const tee_common::BootStateClaim unlockedOrange{"orange", "0", "unlocked"};
+
+    ++caseCount;
+    const auto honestLocked =
+            tee_common::compareAttestedBootState(true, true, 0, lockedGreen);
+    expect(honestLocked.comparable && honestLocked.comparedProperties.size() == 3 &&
+                   honestLocked.contradictedProperties.empty(),
+           "boot_state_locked_verified_agrees", failures);
+
+    ++caseCount;
+    const auto honestUnlocked =
+            tee_common::compareAttestedBootState(true, false, 2, unlockedOrange);
+    expect(honestUnlocked.comparable && honestUnlocked.contradictedProperties.empty(),
+           "boot_state_unlocked_unverified_agrees", failures);
+
+    ++caseCount;
+    const auto spoofedProperties =
+            tee_common::compareAttestedBootState(true, false, 2, lockedGreen);
+    expect(spoofedProperties.comparable &&
+                   spoofedProperties.contradictedProperties ==
+                           std::vector<std::string>{"ro.boot.verifiedbootstate",
+                                                    "ro.boot.flash.locked",
+                                                    "ro.boot.vbmeta.device_state"},
+           "boot_state_spoofed_properties_contradict_attestation", failures);
+
+    ++caseCount;
+    const auto forgedAttestation =
+            tee_common::compareAttestedBootState(true, true, 0, unlockedOrange);
+    expect(forgedAttestation.contradictedProperties.size() == 3,
+           "boot_state_forged_attestation_contradicts_honest_properties", failures);
+
+    ++caseCount;
+    const auto untrusted =
+            tee_common::compareAttestedBootState(false, false, 2, lockedGreen);
+    expect(!untrusted.comparable && untrusted.comparedProperties.empty() &&
+                   untrusted.notComparableReason == "attestation_not_trusted",
+           "boot_state_untrusted_attestation_is_not_compared", failures);
+
+    ++caseCount;
+    const auto missingProperties =
+            tee_common::compareAttestedBootState(true, true, 0, {"", "", "vendor-value"});
+    expect(!missingProperties.comparable &&
+                   missingProperties.notComparableReason == "no_boot_state_property",
+           "boot_state_missing_or_unknown_properties_are_not_compared", failures);
+
+    ++caseCount;
+    const auto partialClaim =
+            tee_common::compareAttestedBootState(true, true, 1, {"YELLOW", "", "locked"});
+    expect(partialClaim.comparable && partialClaim.comparedProperties.size() == 2 &&
+                   partialClaim.contradictedProperties.empty(),
+           "boot_state_self_signed_yellow_agrees_case_insensitively", failures);
+
+    ++caseCount;
+    const auto colourOnly =
+            tee_common::compareAttestedBootState(true, true, 0, {"yellow", "1", "locked"});
+    expect(colourOnly.contradictedProperties ==
+                   std::vector<std::string>{"ro.boot.verifiedbootstate"},
+           "boot_state_colour_mismatch_alone_contradicts", failures);
+
     return {{"caseCount", caseCount}, {"failures", failures}};
 }
 

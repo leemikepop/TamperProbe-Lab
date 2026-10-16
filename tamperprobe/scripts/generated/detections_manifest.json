@@ -129,7 +129,7 @@
           "observationChannel": "PackageManager queries subject to package visibility rules",
           "availability": "Depends on generated queries, installed package state, and platform visibility filtering",
           "trustBoundary": "PackageManager is a framework-mediated app-local view",
-          "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state"
+          "inferenceLimit": "A visible package can be inactive, renamed, cloned, or unrelated to current privilege state; an installed package can be filtered from this app by per-app package-visibility concealment, so a negative is concealable"
         },
         {
           "id": "dangerous-packages.app-data-path-visibility",
@@ -140,7 +140,7 @@
           "observationChannel": "Native access probes over canonical package-data paths",
           "availability": "Depends on package-data layout, namespace, permissions, and concealment affecting the app-local VFS view; under the app data isolation current Android enables, other applications' data directories are not visible and the unit reports itself unavailable",
           "trustBoundary": "Path resolution is mediated by the process mount namespace and kernel VFS",
-          "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege"
+          "inferenceLimit": "The path alone does not prove package activation, ownership, or granted privilege; path hiding returns ENOENT for a path that exists, so a negative is concealable"
         }
       ]
     },
@@ -841,7 +841,7 @@
     {
       "id": "TEE_ATTESTATION",
       "name": "TEE Attestation Validation",
-      "description": "Validates a fresh Android Keystore attestation challenge, certificate chain, trust anchor, revocation status, and RootOfTrust consistency.",
+      "description": "Validates a fresh Android Keystore attestation challenge, certificate chain, trust anchor, revocation status, and RootOfTrust consistency, and compares the attested boot state with the boot-state system properties.",
       "payloadSchemaVersion": 1,
       "primaryEvidenceDomainId": "hardware-attestation",
       "evidenceUnits": [
@@ -849,12 +849,12 @@
           "id": "tee-attestation.chain-and-root-of-trust",
           "title": "Keystore attestation chain and RootOfTrust",
           "domainId": "hardware-attestation",
-          "observedObject": "A fresh Android Keystore attestation response, certificate chain, revocation snapshot, challenge, and RootOfTrust fields",
-          "proposition": "The returned attestation artifacts satisfy or violate the recorded cryptographic and structural validation rules",
+          "observedObject": "A fresh Android Keystore attestation response, certificate chain, revocation snapshot, challenge, and RootOfTrust fields, and the ro.boot.verifiedbootstate, ro.boot.flash.locked and ro.boot.vbmeta.device_state properties",
+          "proposition": "The returned attestation artifacts satisfy or violate the recorded cryptographic and structural validation rules, and a trusted RootOfTrust agrees or disagrees with the boot state the properties claim",
           "observationChannel": "Android Keystore key generation and offline certificate or extension validation",
           "availability": "Depends on Keystore support, certificate availability, parseable extensions, and bundled trust data",
           "trustBoundary": "Hardware-backed claims originate below the app, while local validation and revocation freshness remain app-managed",
-          "inferenceLimit": "Local attestation is not equivalent to server-side nonce policy or Play Integrity and may be unavailable on supported devices"
+          "inferenceLimit": "Local attestation is not equivalent to server-side nonce policy or Play Integrity and may be unavailable on supported devices; an attested boot state that agrees with the properties is what an unmodified device shows and also what an attestation forged for this app next to spoofed properties shows, so agreement is a concealable negative"
         }
       ]
     },

@@ -193,6 +193,98 @@ class RuntimeBindingContractTest {
         assertEquals(EvidenceUnitCollectionStatus.UNAVAILABLE, pathUnit.collectionStatus)
         assertTrue(pathUnit.issues.any { it.code.endsWith(".app-data-isolated") })
         assertTrue(pathUnit.records.none { it.kind == EvidenceRecordKind.SIGNAL })
+        // The package negative is published as concealable: package-visibility filtering
+        // produces the same empty answer. The unavailable path unit publishes nothing.
+        val concealable = packageUnit.records.single { it.code.endsWith(".concealable-negative") }
+        assertEquals(EvidenceRecordKind.OBSERVATION, concealable.kind)
+        assertEquals("package_identity_visibility", concealable.attributes["check"])
+        assertEquals("78", concealable.attributes["completedQueryCount"])
+        assertTrue(pathUnit.records.isEmpty())
+    }
+
+    @Test
+    fun attestedBootStateAgreementIsPublishedAsAConcealableNegative() {
+        val descriptor = catalog.descriptors.single { it.id == "TEE_ATTESTATION" }
+        val payload = buildJsonObject {
+            put("attestation", buildJsonObject {
+                put("bootStateCoherence", buildJsonObject {
+                    put("comparable", true)
+                    put("notComparableReason", "")
+                    put("comparedProperties", buildJsonArray {
+                        add(JsonPrimitive("ro.boot.verifiedbootstate"))
+                        add(JsonPrimitive("ro.boot.flash.locked"))
+                    })
+                    put("contradictedProperties", buildJsonArray {})
+                })
+            })
+            put("findings", buildJsonArray {})
+            put("concealableNegatives", buildJsonArray {
+                add(buildJsonObject {
+                    put("check", "attested_boot_state_coherence")
+                    put("comparedProperties", buildJsonArray {
+                        add(JsonPrimitive("ro.boot.verifiedbootstate"))
+                        add(JsonPrimitive("ro.boot.flash.locked"))
+                    })
+                    put("concealable", true)
+                    put("reason", "agreement")
+                })
+            })
+            put("collectionWarnings", buildJsonArray {})
+        }
+
+        val unit = EvidenceAdapterRegistry.map(
+            EvidenceAdapterInput(descriptor, DetectionOutcome.NOT_OBSERVED, EvidenceStrength.NONE, payload),
+        ).single()
+        val concealable = unit.records.single { it.code.endsWith(".concealable-negative") }
+        assertEquals("attested_boot_state_coherence", concealable.attributes["check"])
+        assertEquals("ro.boot.flash.locked", concealable.attributes["comparedProperties.1"])
+    }
+
+    @Test
+    fun dangerousPackageNegativesAreConcealableOnlyOnNotObserved() {
+        val descriptor = catalog.descriptors.single { it.id == "DANGEROUS_PACKAGES" }
+        fun payload(detected: List<String>) = buildJsonObject {
+            put("packageIdentity", buildJsonObject {
+                put("targetCount", 2)
+                put("completedQueryCount", 2)
+                put("visiblePackageCount", 200)
+                put("detectedPackages", buildJsonArray { detected.forEach { add(JsonPrimitive(it)) } })
+                put("issues", buildJsonArray {})
+            })
+            put("appDataPath", buildJsonObject {
+                put("attemptedPathCount", 4)
+                put("completedPathCount", 4)
+                put("notFoundPathCount", 4)
+                put("foundPaths", buildJsonArray {})
+                put("inaccessiblePaths", buildJsonArray {})
+                put("issues", buildJsonArray {})
+            })
+        }
+
+        val negative = EvidenceAdapterRegistry.map(
+            EvidenceAdapterInput(descriptor, DetectionOutcome.NOT_OBSERVED, EvidenceStrength.NONE, payload(emptyList())),
+        )
+        assertEquals(
+            listOf("package_identity_visibility", "app_data_path_visibility"),
+            negative.flatMap { result -> result.records.filter { it.code.endsWith(".concealable-negative") } }
+                .map { it.attributes["check"] },
+        )
+        assertEquals(
+            "4",
+            negative.single { it.descriptor.id.endsWith("app-data-path-visibility") }
+                .records.single { it.code.endsWith(".concealable-negative") }
+                .attributes["notFoundPathCount"],
+        )
+
+        val observed = EvidenceAdapterRegistry.map(
+            EvidenceAdapterInput(
+                descriptor,
+                DetectionOutcome.OBSERVED,
+                EvidenceStrength.WEAK,
+                payload(listOf("com.example.root")),
+            ),
+        )
+        assertTrue(observed.flatMap { it.records }.none { it.code.endsWith(".concealable-negative") })
     }
 
     @Test

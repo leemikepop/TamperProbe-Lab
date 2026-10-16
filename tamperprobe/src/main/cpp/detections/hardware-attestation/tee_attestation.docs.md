@@ -13,7 +13,8 @@
 3. **ASN.1 擴充欄位解析**（`parse_tee_certificate`）：
    - **Challenge 驗證**：比對憑證內之 challenge 是否與本次掃描生成之 32 位元組隨機值精準吻合（不符則產出 STRONG finding `challenge_mismatch`）。
    - **RootOfTrust 開機狀態**：檢查 `deviceLocked`（若為 0 產出 WEAK finding `device_unlocked`）與 `verifiedBootState`（若非 Verified 產出 WEAK finding `verified_boot_not_verified`）。
-   - **開機金鑰與雜湊完整性**：在 Verified 或 SelfSigned 狀態下，檢查 `verifiedBootKey` 或 `verifiedBootHash` 是否全為零（全零產出 MODERATE finding `zero_verified_boot_key` 或 `zero_verified_boot_hash`），並比對 `verifiedBootHash` 與系統屬性 `ro.boot.vbmeta.digest` 是否一致（不一致產出 MODERATE finding `verified_boot_hash_mismatch`）。兩邊正規化後（小寫、去除空白與冒號、去除 `0x`）的值都發布在 `bootConsistency.runtimeDigestHex` 與 `bootConsistency.attestedDigestHex`。
+   - **開機金鑰與雜湊完整性**：在 Verified 或 SelfSigned 狀態下，檢查 `verifiedBootKey` 或 `verifiedBootHash` 是否全為零（全零產出 MODERATE finding `zero_verified_boot_key` 或 `zero_verified_boot_hash`），並比對 `verifiedBootHash` 與系統屬性 `ro.boot.vbmeta.digest` 是否一致（不一致產出 MODERATE finding `verified_boot_hash_mismatch`）。兩邊正規化後（小寫、去除空白與冒號、去除 `0x`）的值都發布在 `bootConsistency.runtimeDigestHex` 與 `bootConsistency.attestedDigestHex`。`bootConsistency.matches` 只要兩邊都讀得到就如實回報是否相等；是否構成 finding 由 `comparable` 決定（Unverified 開機不比對）。
+   - **證明的開機狀態 vs 屬性宣稱的開機狀態**：證明可信時（鏈簽章完整有效、根憑證是 Google、challenge 吻合、硬體後端、未被吊銷），把 RootOfTrust 的 `deviceLocked`／`verifiedBootState` 與 `ro.boot.verifiedbootstate`（green/yellow/orange/red）、`ro.boot.flash.locked`（1/0）、`ro.boot.vbmeta.device_state`（locked/unlocked）逐一比對。屬性缺少或值不在上述集合內就不比，不算一致。任一屬性矛盾即產出 MODERATE finding `attested_boot_state_contradicts_properties`。原因是兩邊的偽造範圍不同：屬性偽造（resetprop）是全域的，證明偽造（TrickyStore 類）只對目標 App 生效，所以不在目標清單的 App 會看到「硬體說未上鎖、屬性說已上鎖」。結果發布在 `bootStateCoherence`（`comparable`、`notComparableReason`、`claim`、`comparedProperties`、`contradictedProperties`）。
    - **硬體安全層級**：若 securityLevel 非 TrustedEnvironment（1）或 StrongBox（2），產出 WEAK finding `software_backed_attestation`。
 4. **KeyMint 密碼基語探針**：
    - `single_use_ec`：測試限制使用一次之金鑰（`setMaxUsageCount(1)`）是否被繞過而允許第二次簽章（命中產出 MODERATE finding `single_use_ec_bypass`）。
@@ -26,7 +27,7 @@
 | 判定 | 條件 | 代表意義 |
 |---|---|---|
 | STRONG | 憑證鏈簽章無效、Challenge 不符、或憑證序號已被 Google 官方標記為 REVOKED/SUSPENDED | 證明材料在密碼學上無效，或設備所使用的硬體金鑰庫已遭外洩並被 Google 官方吊銷。 |
-| MODERATE | 開機雜湊與 vbmeta.digest 矛盾、開機雜湊為全零，或 KeyMint 密碼基語探針異常 | 證明資料存在結構性矛盾，或 KeyMint 介面遭遇攔截注入。 |
+| MODERATE | 開機雜湊與 vbmeta.digest 矛盾、開機雜湊為全零、證明的開機狀態與開機屬性矛盾，或 KeyMint 密碼基語探針異常 | 證明資料存在結構性矛盾，或 KeyMint 介面遭遇攔截注入，或開機屬性與硬體證明兩者之一被偽造。 |
 | WEAK | 裝置未上鎖（deviceLocked=false）、開機狀態非 Verified，或僅為軟體模擬 Keystore | 設備處於解鎖或非標準開機狀態，常見於客製韌體或無硬體 TEE 之設備。 |
 
 不能推論的：
@@ -44,6 +45,7 @@
 
 - **尚未被 Google 官方吊銷的有效 Keybox 注入。** 例如 TrickyStore 工具若載入未列入 `status.json` 的外洩真實 OEM 憑證金鑰，其數位簽章、Google 信任錨與 Challenge 比對皆能順利通過。
 - **本地記憶體修補（In-process memory patching）。** 攻擊者若於當前行程 hook 驗證函式之回傳值，端點層級驗證會被繞過。
+- **證明與屬性同時被偽造成一致。** App 在證明偽造的目標清單內、屬性又被偽造成同一個狀態時，兩邊一致，和未修改的裝置看起來一樣。所以「一致」只發布為可被隱藏的否定（`concealableNegatives`，Rule 3），不是乾淨的證據。
 
 ## 建議處置
 
@@ -75,4 +77,4 @@
 
 ### tee-attestation.chain-and-root-of-trust
 
-全面承載 Android Keystore 硬體證明之驗證。涵蓋憑證鏈簽章有效性、隨機 Challenge 吻合度、Google 官方根錨信任、本機吊銷清單核對、RootOfTrust 開機狀態與雜湊一致性，以及 KeyMint 密碼基語探針異常。
+全面承載 Android Keystore 硬體證明之驗證。涵蓋憑證鏈簽章有效性、隨機 Challenge 吻合度、Google 官方根錨信任、本機吊銷清單核對、RootOfTrust 開機狀態與雜湊一致性、證明的開機狀態與開機屬性是否一致，以及 KeyMint 密碼基語探針異常。NOT_OBSERVED 時，開機狀態一致會以 `concealable-negative` OBSERVATION record 發布。

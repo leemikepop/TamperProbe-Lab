@@ -14,6 +14,13 @@ import io.leemikepop.tamperprobe.lab.internal.TypedDetectorEvidenceAdapter
 import io.leemikepop.tamperprobe.lab.lib.detections.appvisibility.DangerousPackagesPayload
 import io.leemikepop.tamperprobe.lab.lib.detections.appvisibility.UnitCollectionIssuePayload
 
+/**
+ * Both units answer by absence, and both absences can be produced by concealment: per-app
+ * package-visibility filtering (Hide My Applist and similar) reports an installed package as
+ * missing, and path hiding (SUSFS sus_path and similar) returns ENOENT for a path that exists.
+ * On NOT_OBSERVED each unit that completed its probes therefore also publishes a
+ * `concealable-negative` OBSERVATION record (Rule 3).
+ */
 internal object DangerousPackagesEvidenceAdapter : TypedDetectorEvidenceAdapter<DangerousPackagesPayload> {
     private const val PACKAGE_UNIT_ID = "dangerous-packages.package-identity-visibility"
     private const val PATH_UNIT_ID = "dangerous-packages.app-data-path-visibility"
@@ -96,12 +103,20 @@ internal object DangerousPackagesEvidenceAdapter : TypedDetectorEvidenceAdapter<
                     attributes = attributes,
                 ),
             )
-            observation.completedQueryCount > 0 -> listOf(
+            observation.completedQueryCount > 0 -> listOfNotNull(
                 EvidenceRecord(
                     code = "DANGEROUS_PACKAGES.package-identity-visibility.collection-summary",
                     kind = EvidenceRecordKind.OBSERVATION,
                     summary = "Package identity queries completed without a visible maintained identity",
                     attributes = attributes,
+                ),
+                concealableNegative(
+                    input,
+                    code = "DANGEROUS_PACKAGES.package-identity-visibility.concealable-negative",
+                    check = "package_identity_visibility",
+                    count = "completedQueryCount" to observation.completedQueryCount,
+                    reason = "Per-app package-visibility filtering reports an installed package as not " +
+                        "installed, which is the same answer an absent package gives.",
                 ),
             )
             else -> emptyList()
@@ -149,17 +164,46 @@ internal object DangerousPackagesEvidenceAdapter : TypedDetectorEvidenceAdapter<
                     attributes = attributes,
                 ),
             )
-            observation.completedPathCount > 0 -> listOf(
+            observation.completedPathCount > 0 -> listOfNotNull(
                 EvidenceRecord(
                     code = "DANGEROUS_PACKAGES.app-data-path-visibility.collection-summary",
                     kind = EvidenceRecordKind.OBSERVATION,
                     summary = "Package-derived path probes completed without a visible path",
                     attributes = attributes,
                 ),
+                concealableNegative(
+                    input,
+                    code = "DANGEROUS_PACKAGES.app-data-path-visibility.concealable-negative",
+                    check = "app_data_path_visibility",
+                    count = "notFoundPathCount" to observation.notFoundPathCount,
+                    reason = "Path hiding returns ENOENT for a path that exists, which is the same " +
+                        "answer an absent path gives.",
+                ).takeIf { observation.notFoundPathCount > 0 },
             )
             else -> emptyList()
         }
         return unitResult(descriptor, records, observation.issues)
+    }
+
+    private fun concealableNegative(
+        input: EvidenceAdapterInput,
+        code: String,
+        check: String,
+        count: Pair<String, Int>,
+        reason: String,
+    ): EvidenceRecord? {
+        if (input.outcome != DetectionOutcome.NOT_OBSERVED) return null
+        return EvidenceRecord(
+            code = code,
+            kind = EvidenceRecordKind.OBSERVATION,
+            summary = "Negative rests on an absence that concealment can produce",
+            attributes = linkedMapOf(
+                "check" to check,
+                count.first to count.second.toString(),
+                "concealable" to "true",
+                "reason" to reason,
+            ),
+        )
     }
 
     private fun unitResult(
