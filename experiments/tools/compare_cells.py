@@ -3,11 +3,12 @@
 Reads the export documents that capture_cell.ps1 pulled into ``<experiment>/raw/<cell>/``.
 
   python compare_cells.py --provenance <cell dir>
-      Checks one cell: every export must come from one Sample App build (version, commit,
-      dirty flag, build type) and one device. Exits 1 if they do not. Also reports whether
-      the repetitions of each selection agree on every detector's outcome and strength.
+      Checks one cell: every export must come from one device, and the exports of each
+      selection from one app build (version, commit, dirty flag, build type). Exits 1 if they
+      do not. Also reports whether the repetitions of each selection agree on every detector's
+      outcome and strength.
 
-  python compare_cells.py <cell dir> <cell dir> ... [--selection full|default]
+  python compare_cells.py <cell dir> <cell dir> ... [--selection full|default|rootbeer|ruru]
                           [--attr DETECTOR:attributeKey ...]
       Prints an outcome matrix across cells, listing only detectors that are not
       NOT_OBSERVED in every cell (O:S / O:M / O:W observed with strength, ? inconclusive,
@@ -19,6 +20,9 @@ Reads the export documents that capture_cell.ps1 pulled into ``<experiment>/raw/
   python compare_cells.py --keys DETECTOR <cell dir>
       Lists every record attribute key the detector published in that cell, with its value,
       so the right --attr names can be chosen.
+
+The selection is the export file name's last part: `full` and `default` come from the probe
+app, `rootbeer` and `ruru` from the contract retrofits in ../../retrofit.
 
 Always run with the TamperProbe venv interpreter.
 """
@@ -32,6 +36,7 @@ from pathlib import Path
 SYMBOL = {"NOT_OBSERVED": ".", "INCONCLUSIVE": "?", "FAILED": "F"}
 WEIGHT = {"WEAK": 1, "MODERATE": 2, "STRONG": 4}
 INCONCLUSIVE_WEIGHT = 1
+SELECTIONS = ("default", "full", "rootbeer", "ruru")
 
 
 def load(cell: Path, selection: str | None = None) -> list[dict]:
@@ -64,22 +69,27 @@ def reference_score(document: dict) -> int:
 
 def provenance(cell: Path) -> int:
     documents = load(cell)
-    builds = {json.dumps(d["provenance"]["sampleApp"], sort_keys=True) for d in documents}
     devices = {d["provenance"]["device"]["buildFingerprint"] for d in documents}
-    for build in builds:
-        print(f"sampleApp: {build}")
     for device in devices:
         print(f"device:    {device}")
     status = 0
-    if len(builds) != 1 or len(devices) != 1:
-        print("STOP: exports in this cell come from more than one build or device")
+    if len(devices) != 1:
+        print("STOP: exports in this cell come from more than one device")
         status = 1
-    if any(json.loads(b).get("gitDirty") for b in builds):
-        print("WARNING: gitDirty is true; the build does not map to an exact commit")
-    for selection in ("default", "full"):
-        runs = [outcomes(d) for d in load(cell, selection)]
-        disagreements = sorted(k for k in runs[0] if len({r.get(k) for r in runs}) > 1)
-        print(f"{selection}: {len(runs)} runs, repetition disagreements: "
+    present = [s for s in SELECTIONS if any(d["__file"].endswith(f"-{s}.json") for d in documents)]
+    for selection in present:
+        runs = load(cell, selection)
+        builds = {json.dumps(d["provenance"]["sampleApp"], sort_keys=True) for d in runs}
+        for build in builds:
+            print(f"{selection} build: {build}")
+        if len(builds) != 1:
+            print(f"STOP: {selection} exports in this cell come from more than one build")
+            status = 1
+        if any(json.loads(b).get("gitDirty") for b in builds):
+            print("WARNING: gitDirty is true; the build does not map to an exact commit")
+        tables = [outcomes(d) for d in runs]
+        disagreements = sorted(k for k in tables[0] if len({t.get(k) for t in tables}) > 1)
+        print(f"{selection}: {len(tables)} runs, repetition disagreements: "
               f"{disagreements if disagreements else 'none'}")
     return status
 
@@ -144,7 +154,7 @@ def main() -> int:
     parser.add_argument("cells", nargs="*", type=Path)
     parser.add_argument("--provenance", type=Path)
     parser.add_argument("--keys", metavar="DETECTOR")
-    parser.add_argument("--selection", choices=("full", "default"), default="full")
+    parser.add_argument("--selection", choices=SELECTIONS, default="full")
     parser.add_argument("--attr", action="append", default=[])
     args = parser.parse_args()
     if args.provenance:

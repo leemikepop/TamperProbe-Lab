@@ -14,9 +14,12 @@ activityCompose = "1.13.0"
 lifecycleRuntimeKtx = "2.11.0"
 lifecycleViewmodelCompose = "2.11.0"
 xposedApi = "82"
+# Ruru's only native dependency (prefab), at the version its library/build.gradle.kts pins.
+xposedDetector = "2.2"
 
 [libraries]
 xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposedApi" }
+xposed-detector = { group = "io.github.vvb2060.ndk", name = "xposeddetector", version.ref = "xposedDetector" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

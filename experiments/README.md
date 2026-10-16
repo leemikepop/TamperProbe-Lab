@@ -66,5 +66,6 @@ where exports came from a full and a default selection; the Lab has only the ful
 | ID | Experiment | Status |
 | --- | --- | --- |
 | A | Re-run of the module ablation on this code | not registered |
-| B | RootBeer contract retrofit (see `../retrofit/`) | not registered |
+| B (E2) | RootBeer contract retrofit (see `../retrofit/`) | implemented; not registered |
+| E3′ | Ruru contract retrofit (see `../retrofit/`) | implemented; not registered |
 | D | RASP deployability on open-source F-Droid apps | not registered; optional |

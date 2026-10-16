@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        RootBeer (de7bc7b) declares no <queries>, so on Android 11 and later an integrator must
+        declare the packages its checks look up, or every lookup reports "not installed". This
+        host declares exactly Const.knownRootAppsPackages and Const.knownDangerousAppsPackages
+        (RootBeerManifestTest checks the two stay equal), and nothing else: no QUERY_ALL_PACKAGES.
+    -->
+    <queries>
+        <package android:name="com.noshufou.android.su" />
+        <package android:name="com.noshufou.android.su.elite" />
+        <package android:name="eu.chainfire.supersu" />
+        <package android:name="com.koushikdutta.superuser" />
+        <package android:name="com.thirdparty.superuser" />
+        <package android:name="com.yellowes.su" />
+        <package android:name="com.topjohnwu.magisk" />
+        <package android:name="com.kingroot.kinguser" />
+        <package android:name="com.kingo.root" />
+        <package android:name="com.smedialink.oneclickroot" />
+        <package android:name="com.zhiqupk.root.global" />
+        <package android:name="com.alephzain.framaroot" />
+        <package android:name="com.koushikdutta.rommanager" />
+        <package android:name="com.koushikdutta.rommanager.license" />
+        <package android:name="com.dimonvideo.luckypatcher" />
+        <package android:name="com.chelpus.lackypatch" />
+        <package android:name="com.ramdroid.appquarantine" />
+        <package android:name="com.ramdroid.appquarantinepro" />
+        <package android:name="com.android.vending.billing.InAppBillingService.COIN" />
+        <package android:name="com.android.vending.billing.InAppBillingService.LUCK" />
+        <package android:name="com.chelpus.luckypatcher" />
+        <package android:name="com.blackmartalpha" />
+        <package android:name="org.blackmart.market" />
+        <package android:name="com.allinone.free" />
+        <package android:name="com.repodroid.app" />
+        <package android:name="org.creeplays.hack" />
+        <package android:name="com.baseappfull.fwd" />
+        <package android:name="com.zmapp" />
+        <package android:name="com.dv.marketmod.installer" />
+        <package android:name="org.mobilism.android" />
+        <package android:name="com.android.wp.net.log" />
+        <package android:name="com.android.camera.update" />
+        <package android:name="cc.madkite.freedom" />
+        <package android:name="com.solohsu.android.edxp.manager" />
+        <package android:name="org.meowcat.edxposed.manager" />
+        <package android:name="com.xmodgame" />
+        <package android:name="com.cih.game_cih" />
+        <package android:name="com.charles.lpoqasert" />
+        <package android:name="catch_.me_.if_.you_.can_" />
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:label="RootBeer retrofit"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+        <activity
+            android:name=".RootBeerRetrofitActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

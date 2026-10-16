@@ -26,7 +26,8 @@ a research-mode RASP adapter with a command-line injector.
 | Experiment | What it needs from this repository |
 | --- | --- |
 | A: ablation findings | the probe app (every detector, JSON export) and `experiments/tools/compare_cells.py` |
-| B: RootBeer contract retrofit | `retrofit/` (planned): RootBeer's checks reported through the Evidence Contract |
+| B (E2): RootBeer contract retrofit | `retrofit/rootbeer`: RootBeer's nine checks reported through the Evidence Contract |
+| E3′: Ruru contract retrofit | `retrofit/ruru`: ten of Ruru's checks reported through the Evidence Contract |
 | D: RASP deployability on open-source F-Droid apps | `tamperprobe-rasp` (research mode) and `injector/` |
 
 No result in this repository is a detection rate or a false-positive rate. A handful of phones in
@@ -61,14 +62,14 @@ The catalog is generated from one `*.evidence.json` sidecar per detector (next t
 | Path | Contents |
 | --- | --- |
 | `tamperprobe/` | Native engine (`src/main/cpp`, one folder per evidence domain, JNI `performScan`, wire schema 1) and the minimal Kotlin SDK (`scan()` → raw report). `scripts/generate_detections_manifest.py` validates the sidecars and generates the catalog. |
-| `shared/` | Java sources compiled into both the SDK and the RASP adapter (not a Gradle module): DRM credential, FD forensics carrier, SELinux Policy Oracle carrier, TEE keystore, attestation roots. |
+| `shared/` | Sources compiled into more than one module (not Gradle modules): the Evidence Contract model (SDK and retrofits); DRM credential, FD forensics carrier, SELinux Policy Oracle carrier, TEE keystore, attestation roots (SDK and RASP adapter). |
 | `app/` | Probe app: scans every detector, shows each detector's units, records and issues, and exports the report as JSON. |
 | `tamperprobe-rasp/` | Java-only RASP adapter in research mode, and the Gradle tasks that build the RASP bundle. |
 | `injector/` | Command-line injector: `inject.sh`, `merge_manifest.py`, `verify_bundle.py`, tests. |
 | `test-fixtures/` | `xposed-control` (a positive-control inline hook for LSPosed) and `storage-owner` (a fixture app for the package-storage visibility test). |
 | `samples/rasp-java-host/` | A minimal pure-Java APK to inject into when testing the injector. |
 | `experiments/` | Preregistration rules and template, and analysis tools. Raw data from new experiments goes here. |
-| `retrofit/` | Placeholder for experiment B (RootBeer contract retrofit). |
+| `retrofit/` | Contract retrofits of RootBeer (E2) and Ruru (E3′): the vendored, unmodified upstream code, a host app for each, and the summary tool. See [`retrofit/README.md`](retrofit/README.md). |
 | `scripts/` | `analyze_scan_durations.py` for per-detector timing. |
 
 Per-detector developer notes (`*.docs.md` beside each `.cpp`) are inherited from the product and
@@ -87,7 +88,12 @@ export TAMPERPROBE_LAB_PYTHON=python3             # interpreter used by the cata
 python3 -m unittest discover -s tamperprobe/scripts/tests
 python3 -m unittest discover -s injector/tests
 python3 -m unittest discover -s scripts/tests
+python3 -m unittest discover -s retrofit/tools/tests
 ```
+
+`assembleDebug` also builds the two retrofit hosts; their JVM tests are
+`:retrofit:common:testDebugUnitTest`, `:retrofit:rootbeer:testDebugUnitTest` and
+`:retrofit:ruru:testDebugUnitTest`.
 
 On Windows use `gradlew.bat` and set the variables with `$env:NAME = "..."`. `local.properties` is
 ignored by git; never commit it.

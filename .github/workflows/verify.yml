@@ -49,7 +49,7 @@ jobs:
         run: ./gradlew :tamperprobe:externalNativeBuildDebug --no-daemon
 
       - name: JVM unit tests
-        run: ./gradlew :tamperprobe:testDebugUnitTest :app:testDebugUnitTest :tamperprobe-rasp:testDebugUnitTest --no-daemon
+        run: ./gradlew :tamperprobe:testDebugUnitTest :app:testDebugUnitTest :tamperprobe-rasp:testDebugUnitTest :retrofit:common:testDebugUnitTest :retrofit:rootbeer:testDebugUnitTest :retrofit:ruru:testDebugUnitTest --no-daemon
 
       - name: Assemble the probe app and the research RASP bundle
         run: ./gradlew assembleDebug :tamperprobe-rasp:prepareRaspBundle --no-daemon
@@ -59,6 +59,10 @@ jobs:
           python3 -m unittest discover -s tamperprobe/scripts/tests -v
           python3 -m unittest discover -s injector/tests -v
           python3 -m unittest discover -s scripts/tests -v
+          python3 -m unittest discover -s retrofit/tools/tests -v
+
+      - name: Verify the vendored upstream code is unmodified
+        run: python3 retrofit/tools/verify_upstream.py
 
       - name: Verify the staged RASP bundle
         run: python3 injector/verify_bundle.py tamperprobe-rasp/build/rasp-bundle/staging

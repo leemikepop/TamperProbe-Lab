@@ -70,6 +70,10 @@ android {
 
 androidComponents {
     onVariants(selector().all()) { variant ->
+        // The Evidence Contract model is shared with the contract retrofits in retrofit/.
+        variant.sources.kotlin?.addStaticSourceDirectory(
+            rootProject.file("shared/evidence-contract/src/main/java").absolutePath,
+        )
         variant.sources.java?.addStaticSourceDirectory(
             rootProject.file("shared/drm-credential/src/main/java").absolutePath,
         )

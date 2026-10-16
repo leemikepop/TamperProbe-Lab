@@ -9,6 +9,8 @@ build/
 captures/
 .navigation/
 *.apk
+# Ruru's MagiskApp check compares candidates against this stub; see retrofit/ruru/upstream/UPSTREAM.md
+!/retrofit/ruru/upstream/assets/stub.apk
 *.aab
 *.ap_
 *.dex

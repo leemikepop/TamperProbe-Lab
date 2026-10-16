@@ -1,0 +1,17 @@
+b3cbae60248d85fa542b2ebd9cff1c97fab4b602  assets/stub.apk
+358cc3fa6ffc996056296692da09e4319d06b25a  cpp/environment.cpp
+921471fe5a89bdfe2a57ff80c95ec684738f202f  cpp/file_detection.cpp
+d3791cd4e9c802c157dd8ddfb6d0d9803a9b3d22  external/linux_syscall_support/linux_syscall_support.h
+1dbbf28892668bf8111bb4f8c6604744c60f3d2f  java/icu/nullptr/applistdetector/AbnormalEnvironment.kt
+ee0a60b8b57dd3cdbe8add841abe852cc4810b5a  java/icu/nullptr/applistdetector/Accessibility.kt
+88a3950434f72becfdd6d067175b5d2925151128  java/icu/nullptr/applistdetector/Account.kt
+f666f94e90ab3fd5b231812c63a0cad585b7c8c1  java/icu/nullptr/applistdetector/FileDetection.kt
+503d8504ea84a2ab5083d38df29e2d1a13058ffa  java/icu/nullptr/applistdetector/IDetector.kt
+7fc527351ec31998dbf0a26761164d0ec7dbefd8  java/icu/nullptr/applistdetector/MagiskApp.kt
+3fca2d2617b03e28a898a94f26c1536d05d88040  java/icu/nullptr/applistdetector/PMCommand.kt
+08664b70945e890b57bb166dacbc6b31d5581a95  java/icu/nullptr/applistdetector/PMConventionalAPIs.kt
+77630d9ae80617a5abc8e1057e336d8597bdc371  java/icu/nullptr/applistdetector/PMQueryIntentActivities.kt
+005b1f0fa446b92e78efb780ae0a365f994aec25  java/icu/nullptr/applistdetector/PMSundryAPIs.kt
+424a980289b0d0bdab7ebc24f33f2f84c6d3a3c7  java/icu/nullptr/applistdetector/SettingProp.kt
+529d683581eba9683a9344f7a942b845f7a07b57  java/icu/nullptr/applistdetector/XposedModules.kt
+261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64  LICENSE.md
