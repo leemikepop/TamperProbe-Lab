@@ -61,3 +61,10 @@ attestation anomalies were detected"; Custom ROM Warning → Info.
 
 Order as registered (1023, then 521, then 1023 restored, sha256 checked after each install). The
 operator drove Duck's UI and exported the reports; this session pulled and deleted them.
+
+## Note added 2026-10-17 (after P3a)
+
+Duck 521's TEE verdict in this cell ("Policy-backed attestation anomalies were detected",
+"Tampered") comes with its local certificate chain failing (chain length 0, trust root unknown);
+in P3a the same build obtained a 5-certificate Google chain again. The change is a Duck-side
+attestation failure in this single run and is not attributed to the P2 factor.
