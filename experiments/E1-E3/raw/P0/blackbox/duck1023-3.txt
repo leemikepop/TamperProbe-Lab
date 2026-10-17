@@ -1,0 +1,28 @@
+SELinux
+Enforcing with KSU context materialized
+Danger
+System Properties
+3 high-risk property or coherence signal(s)
+Danger
+ADB Runtime
+ADB enabled
+Warning
+Custom ROM
+1 modification signal(s) detected
+Warning
+Dangerous Apps
+2 risky package(s) surfaced
+Warning
+LSPosed
+Dirty SELinux policy signal(s)
+Warning
+Root Managers
+Root manager apps found
+Warning
+Duck Detector
+Telegram
+首頁
+首頁
+設定
+設定
+ALPHA

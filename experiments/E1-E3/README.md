@@ -193,3 +193,17 @@ retaken.
 ---
 
 <!-- Below this line: append only. -->
+
+## Amendment 2026-10-17
+
+Made during P0, before any other cell.
+
+- **Duck records.** For each Duck build, the record is Duck's own full report, exported with its
+  "Export Report" action into `Download/`, pulled into `raw/<cell>/blackbox/duck<versionCode>-report.txt`
+  and then deleted from the device, plus a screenshot of the first result screen. Scrolling
+  screenshots of every card are no longer taken. Duck's update prompt is dismissed and never
+  accepted; the user agreement shown after each reinstall is accepted.
+- **Other apps on the Pixel.** The product repository's apps (`io.leemikepop.tamperprobe` and its
+  test and fixture packages) are not installed on the Pixel for the rest of the experiment. One of
+  them is an Xposed module that Ruru 1.1.1 reported in the first P0 capture, which is kept in
+  `raw/P0-superseded/` and not used.

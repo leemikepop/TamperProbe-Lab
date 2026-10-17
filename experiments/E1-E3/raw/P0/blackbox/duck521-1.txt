@@ -1,0 +1,23 @@
+Duck Detector
+2026.​08.​28-​c1c8e0c17577​(521)
+Build Time (UTC)
+2026-​08-​28 13:​50:​27
+Export Report
+Scanned at 2026-​10-​17 20:​26:​20
+Total time 15s
+Danger
+Start with Bootloader and SELinux.​
+Danger
+4
+Warning
+3
+Ready
+15
+Pending
+0
+Top findings
+Priority review queue
+3
+MAIN
+SETTINGS
+ALPHA

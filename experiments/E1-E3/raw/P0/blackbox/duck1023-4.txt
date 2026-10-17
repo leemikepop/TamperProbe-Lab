@@ -1,0 +1,28 @@
+LSPosed
+Dirty SELinux policy signal(s)
+Warning
+Root Managers
+Root manager apps found
+Warning
+TEE
+Attestation aligned; local probes need review
+Warning
+Kernel Check
+CVE patch state is informational
+Info
+Native Root
+Native root scan has reduced coverage
+Info
+SU
+No root indicators
+Info
+Zygote heap residue
+No target trace observed
+Info
+Duck Detector
+Telegram
+首頁
+首頁
+設定
+設定
+ALPHA

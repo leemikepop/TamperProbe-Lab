@@ -1,0 +1,33 @@
+Danger
+Start with Bootloader and SELinux.
+2026.10.14-9fcc940074ed (1023)
+Build (UTC) · 2026-10-14 13:01:26
+Tap to export full report
+Scanned at 2026-10-17 20:23:08 · Total time 14s
+3
+Danger
+6
+Warning
+18
+Ready
+0
+Pending
+Bootloader
+High
+8 critical boot integrity signal(s)
+Unlocked state, attestation contradictions, broken certificate trust, or verified-boot failures indicate reduced device trust.
+SELinux
+High
+Enforcing with KSU context materialized
+SELinux is enforcing and the visible policy surface looks internally consistent. Permission-denied probes also reinforced the enforcing verdict. Controlled app_zygote writes repeatedly recognized privileged contexts: KernelSU, KernelSU file. This is supporting policy evidence with limited version coverage. A trusted DirtySepolicy-style access query reported untrusted_app -> ksu_file read as allowed. Audit rewrite checks remained non-proving from the current app context. The context validity oracle accepted both KSU-specific contexts from the current carrier.
+System Properties
+High
+3 high-risk property or coherence signal(s)
+Property values, raw boot contradictions, cross-source drift, cross-check drift, or raw property-area residue indicate insecure build state, spoofing risk, or modified boot context.
+Telegram
+Duck Detector
+首頁
+首頁
+設定
+設定
+ALPHA

@@ -1,0 +1,27 @@
+Google 遠端金鑰配置
+遠端配置的認證金鑰有更強的安全性和更高的可用性。
+開機載入器已解鎖
+憑證鏈
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Sat Oct 17 20:22:04 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Sat Oct 17 20:22:04 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Sat Oct 17 20:22:04 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Sat Oct 17 20:22:04 GMT+08:00 2026
+過去 30 天憑證頒發數量：64
+製造商：Google
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Sat Oct 17 20:22:04 GMT+08:00 2026
+撤銷清單發布時間
+2026年10月16日 下午11:38:00 UTC
+✅ CRL 為最新狀態
+Key Attestation
+2.0.2
+更多選項

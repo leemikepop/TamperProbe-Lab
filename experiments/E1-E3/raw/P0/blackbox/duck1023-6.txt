@@ -1,0 +1,28 @@
+Zygote heap residue
+No target trace observed
+Info
+Memory
+No hook-like memory signals
+Clear
+Mount
+No suspicious mount-layer signal
+Clear
+Play Integrity Fix
+No Play Integrity residue surfaced
+Clear
+Virtualization
+No direct virtualization signal
+Clear
+Zygisk
+No Zygisk runtime signal
+Clear
+Device Info
+Have a good day
+Info
+Duck Detector
+Telegram
+首頁
+首頁
+設定
+設定
+ALPHA
