@@ -1,0 +1,1211 @@
+========================================
+  Duck Detector — Security Scan Report
+========================================
+
+App Version : 2026.08.28-c1c8e0c17577 (521)
+Build Hash  : c1c8e0c17577
+Build Time  : 2026-08-28 13:50:27 (UTC)
+Report Time : 2026-10-17 22:43:47 (GMT+08:00)
+
+----- OVERVIEW -----
+Status  : Danger
+Summary : Start with Bootloader and SELinux.
+
+Metrics:
+  Danger: 3
+  Warning: 3
+  Ready: 15
+  Pending: 0
+
+----- TOP FINDINGS -----
+  [DANGER] Bootloader
+    5 critical boot integrity signal(s)
+    Unlocked state, attestation contradictions, broken certificate trust, verified-boot failures, or a corroborated Widevine DRM inconsistency indicate reduced device trust.
+  [DANGER] SELinux
+    Enforcing with KSU context materialized
+    SELinux is enforcing and the visible policy surface looks internally consistent. The dedicated app_zygote carrier hit anomalous /proc/self/attr/current write outcomes while probing privileged contexts: KernelSU, KernelSU file, Magisk file. The zygotePreload app_zygote carrier observed a policyload/access seqno split; treat this as KernelSU-specific evidence bounded to the preload carrier. A trusted DirtySepolicy-style access query reported system_server execmem as allowed. Recent audit evidence exposed readable SELinux AVC denial lines, which indicates audit side-channel leakage rather than direct root-process proof. The context validity oracle accepted both KSU-specific contexts from the current carrier.
+  [DANGER] TEE
+    Attestation aligned; local probes need review
+    Keystore2 operation error handling diverged from native-style semantics. Attestation and trust-path checks still aligned.
+
+----- DETECTOR CARDS -----
+
+  [DANGER] Bootloader
+  Verdict: 5 critical boot integrity signal(s)
+  Header facts:
+    State: Unlocked
+    Proof: Attest
+    Tier: TEE
+    Trust: Google
+  State:
+    Boot state: Unlocked (Bootloader appears unlocked or Verified Boot reported an unverified/orange state.)
+    Evidence source: Attestation (RootOfTrust data was available and took priority over software-readable properties.)
+    Lock state: Unlocked (Derived from RootOfTrust.deviceLocked in attestation.)
+    Trust root: Google (Chain length: 5. Root classification: Google.
+Root fingerprint: 3ee44512a1af2beb39c889490c60ea3f82e43f5d5a5532f5ab9419f676cd07ec)
+  Attestation:
+    Attestation tier: TEE (Certificate chain length: 5. Challenge matched generated nonce.)
+    Certificate chain: Valid (Chain signatures valid: true. Google attestation root matched.)
+    Attested boot state: Unverified (RootOfTrust.verifiedBootState from attestation extension.)
+    Attested deviceLocked: false (RootOfTrust.deviceLocked from attestation extension.)
+    Attested boot hash: 62980a3e921e5e95… (62980a3e921e5e9534a5bde748a7a7615c2b0748dfe5237dfcaa16ba77e9d5b2)
+    Attested boot key: 0000000000000000… (0000000000000000000000000000000000000000000000000000000000000000)
+  Properties:
+    ro.boot.flash.locked: 1 (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: 1)
+    ro.boot.verifiedbootstate: green (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: green)
+    warranty_bit: Intact (Source: Reflection
+warranty_bit is mainly meaningful on Samsung devices.
+Cross-checked across 3 sources.
+Observed value: 0)
+    ro.boot.vbmeta.device_state: locked (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: locked)
+    ro.boot.veritymode: enforcing (Source: Reflection
+dm-verity modes usually map to enforcing, logging, or disabled.
+Cross-checked across 3 sources.
+Observed value: enforcing)
+    ro.boot.vbmeta.hash_alg: sha256 (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: sha256)
+    ro.boot.vbmeta.size: 21504 (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: 21504)
+    ro.boot.vbmeta.digest: 62980a3e921e5e953… (Source: Reflection
+Compared against attested verifiedBootHash when RootOfTrust is available.
+Cross-checked across 3 sources.
+Observed value: 62980a3e921e5e9534a5bde748a7a7615c2b0748dfe5237dfcaa16ba77e9d5b2)
+    ro.boot.avb_version: 1.4 (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: 1.4)
+    ro.boot.vbmeta.invalidate_on_error: yes (Source: Reflection
+Cross-checked across 3 sources.
+Observed value: yes)
+  Consistency:
+    Attested hash vs vbmeta digest: Aligned (Attestation reported Unverified; AOSP allows an all-zero verifiedBootKey and runtime vbmeta comparison was skipped.)
+    Widevine credential: Sentinel system ID (Advertised level: L1; Java system ID: 2147483647; video/mp4 HW_SECURE_ALL capability: SUPPORTED; maximum session: NOT_PROVISIONED; credential availability: AVAILABLE; local key request: NOT_ATTEMPTED; boot context: independent RootOfTrust state is unlocked; sanitized errors: SESSION_OPEN(NOT_PROVISIONED,vendor=7,oem=0,context=0).)
+    Widevine Java/native parity: Aligned (securityLevel(Java=L1, NDK=L1); systemId(Java=2147483647, NDK=2147483647).)
+  Methods:
+    Key attestation: TEE (RootOfTrust availability: true.)
+    Certificate trust: Google (Chain signatures valid: true. Google attestation root matched.)
+    Boot consistency: Aligned (Attestation reported Unverified; AOSP allows an all-zero verifiedBootKey and runtime vbmeta comparison was skipped.)
+    Property catalog: 10 / 21 observed (Tracked boot, AVB, dm-verity, Samsung fuse, and secure-build properties.)
+    Reflection API: 10 hit(s) (android.os.SystemProperties reflection reads for tracked boot properties.)
+    getprop snapshot: 10 hit(s) (Single getprop dump reused for cross-source comparisons.)
+    Native libc: 13 hit(s) (Native libc property cross-checks using the callback-based system property API.)
+    Raw boot params: Unavailable (androidboot.* values from /proc/cmdline and /proc/bootconfig.)
+    Source consistency: Aligned (Cross-source comparison across reflection, getprop, JVM, and native libc reads.)
+    Cross-check rules: Aligned (Raw-boot, lock-state, partition-verity, and build-profile coherence checks.)
+    Widevine credential: Needs review (Widevine credential: Sentinel system ID. Advertised level: L1; Java system ID: 2147483647; video/mp4 HW_SECURE_ALL capability: SUPPORTED; maximum session: NOT_PROVISIONED; credential availability: AVAILABLE; local key request: NOT_ATTEMPTED; boot context: independent RootOfTrust state is unlocked; sanitized errors: SESSION_OPEN(NOT_PROVISIONED,vendor=7,oem=0,context=0).
+Widevine Java/native parity: Aligned. securityLevel(Java=L1, NDK=L1); systemId(Java=2147483647, NDK=2147483647).)
+  Scan:
+    Properties checked: 21
+    Properties observed: 10
+    Native hits: 13
+    Raw boot hits: 0
+    Source mismatches: 0
+    Cross-checks: 1
+    Attestation chain: 5
+    Hardware-backed: Yes
+  Impact:
+    • Unlocked bootloaders allow custom boot images and can disable or bypass normal verified-boot guarantees.
+    • The exact Widevine sentinel requires review but does not override the current bootloader state.
+    • Bootloader evidence should still be read alongside TEE, kernel, SU, package, and property detectors because modern spoofing stacks often spread signals across layers.
+
+  [DANGER] SELinux
+  Verdict: Enforcing with KSU context materialized
+  Header facts:
+    Mode: Enforcing
+    Policy: Strong
+    Audit: Exposed
+    Context: untrusted_app
+  State:
+    Mode: Enforcing
+    Policy enforced: Yes
+    MAC active: Yes
+    Filesystem: Mounted
+    Detection path: Direct confirmation
+    Process context: untrusted_app (u:r:untrusted_app:s0:c116,c257,c512,c768)
+  Policy:
+    Strength: Strong
+    Policy version: Unreadable
+    Security classes: Unreadable (Class directory unreadable from the current app context.)
+    Process context: untrusted_app (u:r:untrusted_app:s0:c116,c257,c512,c768)
+    Dangerous types: None
+    Permissive domains: None
+  Audit:
+    Surface: Exposed
+    Runtime markers: Not observed (Recent auditd event logs were readable, but absence of markers is not proof of a clean audit surface.)
+    AVC side-channel: Not observed (No matching controlled AVC denial surfaced in the readable auditd event window, but absence is not proof.)
+    su-related AVC: 1 hit(s) (Readable AVC denials referenced su/magisk/ksud-related actor strings in comm, exe, path, or name fields.)
+    Residue paths: None (No readable auditpatch residue surfaced under common module paths.)
+    su-related AVC: comm=DefaultDispatch (I/auditd (11473): type=1400 audit(0.0:8262): avc: denied { getattr } for comm="DefaultDispatch" path="/data/adb" dev="dm-59" ino=711 scontext=u:r:untrusted_app:s0:c116,c257,c512...)
+  Device:
+    Android: 17
+    API level: 37
+    Required since: Android 5.0 (API 21)
+  Methods:
+    filesystem: Active (SELinux filesystem mounted with policy nodes)
+    sysfs: Blocked (Enforcing) (enforce file present but unreadable)
+    getenforce: Blocked (Enforcing) (Command blocked by SELinux policy)
+    proc/self/attr: Enforcing (Context: u:r:untrusted_app:s0:c116,c257,c512,c768 (confined to untrusted_app))
+    Context validity oracle: 11 (Carrier=u:r:app_zygote:s0:c512,c768
+ | Carrier state=ok
+ | Carrier match=yes
+ | Carrier control=accepted
+ | Negative control=rejected
+ | File control=accepted
+ | File negative control=rejected
+ | Oracle trusted=yes
+ | Repeatability=stable
+ | Evidence source=dedicated app_zygote carrier
+ | Query=raw selinuxfs write
+ | Both KSU-specific contexts were found by live policy.
+ | Carrier context: u:r:app_zygote:s0:c512,c768 | Expected carrier type: app_zygote | Query method: raw selinuxfs write | Positive control context: u:r:app_zygote:s0:c512,c768 | Negative control context: u:r:duckdetector_context_oracle_sentinel:s0 | File control context: u:object_r:system_data_file:s0 | File negative control context: u:object_r:duckdetector_context_oracle_sentinel_file:s0 | Invalid context: u:r:duckdetector_context_oracle_sentinel:s0 errno=22 | Invalid context: u:object_r:duckdetector_context_oracle_sentinel_file:s0 errno=22 | Carrier control valid=yes | Negative control rejected=yes | File control valid=yes | File negative control rejected=yes | Domain repeat 1=valid | Domain repeat 2=valid | File repeat 1=valid | File repeat 2=valid | Both KSU-specific contexts were accepted by live policy. | Bit pair 11 means both KSU-specific contexts were accepted by live policy.)
+    App-zygote seqno oracle: Seqno split (Evidence source=dedicated app_zygote carrier | Carrier=u:r:app_zygote:s0:c512,c768 | zygotePreloadName required=yes | Probe attempted=yes | status.sequence=4 | status.policyload=0 | access.avd.seqno=1 | process class=2 | This oracle is trusted only when produced by android:zygotePreloadName inside the dedicated app_zygote carrier.)
+    app_zygote attr/current write: Detected: KernelSU, KernelSU file, Magisk file (Evidence source=dedicated app_zygote carrier | KernelSU=DETECTED_NON_EINVAL target=u:r:ksu:s0 raw=ErrnoException: errno=1, write failed: EPERM (Operation not permitted) | KernelSU file=DETECTED_NON_EINVAL target=u:r:ksu_file:s0 raw=ErrnoException: errno=1, write failed: EPERM (Operation not permitted) | Magisk=NORMAL_EINVAL target=u:r:magisk:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument) | Magisk file=DETECTED_NON_EINVAL target=u:r:magisk_file:s0 raw=ErrnoException: errno=1, write failed: EPERM (Operation not permitted) | LSPosed file=NORMAL_EINVAL target=u:r:lsposed_file:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument) | DroidSpaces daemon=NORMAL_EINVAL target=u:r:droidspacesd:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument) | MSD app=NORMAL_EINVAL target=u:r:msd_app:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument) | MSD daemon=NORMAL_EINVAL target=u:r:msd_daemon:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument) | Xposed data=NORMAL_EINVAL target=u:r:xposed_data:s0 raw=ErrnoException: errno=22, write failed: EINVAL (Invalid argument))
+    Dirty sepolicy rule: system_server execmem: Allowed (Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The dedicated access oracles reported this edge as allowed. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Allowed carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: fsck_untrusted sys_admin: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: fsck_untrusted -> fsck_untrusted:capability sys_admin. This should stay denied on stock policy because it represents a DirtySepolicy neverallow-style violation. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: shell -> su transition: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: shell -> su:process transition. This is only evaluated for confirmed user builds because stock user builds should not expose an AOSP su transition path. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: adbd -> adbroot binder: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: adbd -> adbroot:binder call. This should stay denied on stock policy because it is supporting adb-root dirty-policy evidence. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: untrusted_app -> magisk binder: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: untrusted_app -> magisk:binder call. This should stay denied on stock policy because ordinary apps should not talk to a Magisk domain over binder. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: untrusted_app -> ksu_file read: Allowed (Evidence source=dedicated app_zygote carrier | Observed edge: untrusted_app -> ksu_file:file read. This should stay denied on stock policy because ordinary apps should not read KernelSU-labeled files. The dedicated access oracles reported this edge as allowed. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Allowed carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: untrusted_app -> lsposed_file read: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: untrusted_app -> lsposed_file:file read. This should stay denied on stock policy because ordinary apps should not read LSPosed-labeled files. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: Droidspaces: 3 denied (Denied: magisk -> droidspacesd dyntransition, su -> droidspacesd dyntransition, system_server -> droidspacesd binder)
+    Dirty sepolicy rule: MSD: 5 denied (Denied: msd_app -> msd_daemon connectto, msd_daemon -> msd_daemon connectto, msd_daemon -> selinuxfs read, msd_daemon -> configfs dir search, msd_daemon -> configfs file write)
+    Dirty sepolicy rule: untrusted_app -> xposed_data read: Denied (Evidence source=dedicated app_zygote carrier | Observed edge: untrusted_app -> xposed_data:file read. This should stay denied on stock policy because ordinary apps should not read Xposed data directly. The dedicated access oracles reported this edge as denied. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Denied carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+    Dirty sepolicy rule: zygote -> adb_data_file search: Allowed (Evidence source=dedicated app_zygote carrier | Observed edge: zygote -> adb_data_file:dir search. This should stay denied on stock policy because zygote should not traverse adb data directories. The dedicated access oracles reported this edge as allowed. | Native dedicated=Unavailable carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=failed stable=no trusted=no query=selinux_check_access reason=selinux_check_access unavailable from the current carrier. | Java dedicated=Allowed carrier=u:r:app_zygote:s0:c512,c768 match=yes controls=passed stable=yes trusted=yes query=android.os.SELinux.checkSELinuxAccess)
+  Impact:
+    • Mandatory access control is active.
+    • Policy violations should be blocked and logged.
+    • Readable SELinux AVC denial lines leaked through the audit surface. This is audit-surface exposure, not direct proof of a root daemon.
+    • The app_zygote carrier validated both KSU-specific contexts in live policy.
+    • The zygotePreload app_zygote carrier observed a policyload/access seqno split.
+    • The dedicated app_zygote carrier observed anomalous /proc/self/attr/current writes for KernelSU, KernelSU file, Magisk file.
+    • A trusted DirtySepolicy-style access rule was allowed: system_server execmem.
+  Policy notes:
+    • Policy version unreadable
+    • Security classes unreadable
+    • Context type 'untrusted_app' looks normal
+    • No permissive domains detected
+  Audit notes:
+    • The auditd event buffer was readable, but no canonical audit rewrite marker or AVC leak surfaced.
+    • AOSP does not guarantee that every device emits or exposes matching audit events to app-visible log readers, so this remains non-proving.
+    • Readable AVC denials also referenced su-related actor strings such as comm/exe/path tokens. Treat this as supporting visibility evidence, not direct proof of a live root daemon.
+    • No readable auditpatch residue surfaced under common module locations.
+    • Absence of residue is not proof of absence because ordinary apps often cannot traverse /data/adb.
+  References:
+    • SELinux paradox: permission denied can prove enforcing mode.
+    • Enforcing mode blocks disallowed actions instead of only logging them.
+    • Production Android devices are expected to run enforcing SELinux.
+    • app_zygote can query SELinux context validity through selinux_check_context, which ultimately writes to /sys/fs/selinux/context.
+    • A dedicated app_zygote carrier can also probe privileged context materialization by writing candidate labels to /proc/self/attr/current and classifying non-EINVAL outcomes.
+    • The policyload/access seqno oracle must be captured inside zygotePreloadName; the isolated child may lose app_zygote SELinuxfs access and should downgrade missing coverage to info.
+    • Audit or log surfaces can be rewritten in user space, so missing suspicious tcontext values is not always proof.
+    • Readable AVC denial lines should be treated as audit-surface leakage, not as direct proof of a root process.
+    • comm, exe, path, and name fields inside AVC logs are supporting hints, not standalone proof of a live su daemon.
+
+  [DANGER] TEE
+  Verdict: Attestation aligned; local probes need review
+  Header facts:
+    Verdict: Aligned + review
+    Tier: StrongBox
+    Trust: Google
+    Score: 10
+  Highlight signals:
+    Local chain: Verified
+    Boot: State only
+    Signals: 0 policy hard • 0 policy review • 1 local
+    CRL: Built-in
+  Trust:
+    Local chain: Verified
+    Trust root: Google root
+    Chain layout: len 5 • ext 1 • trusted #1
+    RKP: Provisioned • 365d leaf
+    CRL: Built-in snapshot • clean
+    Root fingerprint: 3ee44512a1af...
+  Attestation:
+    Tier: StrongBox • attest TEE • keymaster TEE
+    Versions: attest 400 • keymaster 400 • Android 17.0.0
+    Challenge: Matched • len=32, sha256=06d52a2409bb, b64=B3R0UMb++u2t+7aFmB
+    Verified boot: Unverified • unlocked • 62980a3e921e
+    Boot consistency: State only • Attestation reported Unverified; AOSP allows an all-zero verifiedBootKey and runtime vbmeta comparison was skipped.
+    Device IDs: Not included in attestation
+    Key properties: EC 256 • P-256 • Generated
+    User auth: No user auth required
+    Application: 1 package(s) • 1 signer digest(s)
+  Checks:
+    Indicators: 0 policy hard • 0 policy review • 1 local
+    Key pair: Signature matched certificate • 3686us
+    AES-GCM: Round-trip ok • TEE • 8280us enc
+    Lifecycle: Delete ok • fresh material
+    KeyMint crypto: HMAC-SHA256 ok • Single-use EC ok • ECDH P-256 ok • RSA-PSS SHA-256 ok • AES-CBC/CTR auth ok • AES-CBC padding auth ok • EC SHA-512 auth ok • RSA-PSS SHA-512 auth ok • RSA-PSS PKCS#1 auth ok • RSA OAEP/PKCS#1 auth ok • RSA PKCS#1/OAEP auth ok • RSA-OAEP MGF1 ok • RSA-OAEP MGF1 auth ok • RSA-OAEP SHA-256 ok • RSA-OAEP SHA-1 auth ok • EC NONE auth ok • RSA PKCS#1 SHA-1 auth ok • RSA PKCS#1/PSS auth ok
+    Timing: Median 3468us
+    Timing side-channel: Register timer • bound_cpu0 • attested 0.560ms • non-attested 0.555ms • diff 0.005ms • ratio 1.009x • threshold > 1.1x • failedPairs=0/500 • outlierFiltered=79/500 • samples=421 • Not positive
+    Oversized challenge: Rejected 256B • 512B • 4096B
+    TEE Simulator generate-mode fingerprint: No TEE Simulator generate-mode fingerprint observed.
+    Keybox: Marker preserved
+    ImportKey narrative: Clean • kind=NONE, origin=IMPORTED, imported marker leaf returned without retained prior narrative.
+    KeyMint VINTF: VINTF declaration matched attested KeyMint version. kind=NONE keymasterVersion=400 attestationVersion=400 vintf=android.hardware.security.keymint/IKeyMintDevice/default@4 -> keymaster=400,attestation=400
+    Cert post-processing: The RKP and ATTEST_KEY paths agreed, showing no sign of certificate post-processing. kind=NONE, medianRkpPath=28.071ms, medianAttestKeyPath=9.860ms, ratio=2.847, delta=18.210ms, threshold=delta >= 120ms && delta >= 3.0xMAD, pairs=12
+    RKP manufacturer: Skipped because the chain carried no RKP provisioning manufacturer to cross-check.
+    Module hash: MODULE_HASH matched supplementary attestation info. getSupplementaryAttestationInfo(MODULE_HASH) returned 1542 DER bytes. kind=NONE expected=e71f57de0f1bf849 attested=e71f57de0f1bf849
+    Grant isolated-domain: Clean kind=NONE length=5 uid=99026 • Public: readback failed (public isolated readback failed: IllegalStateException: Could not connect to Keystore service. Keystore may have crashed or not been initialized). | Hidden: readback failed (hidden isolated readback failed: IllegalStateException: Could not connect to Keystore service. Keystore may have crashed or not been initialized). | Private: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.)
+    Grant caller binding: Clean kind=NONE uid=99027 ownerReplay=KEY_NOT_FOUND • Private: owner replay rejected with KEY_NOT_FOUND.
+    Grant access vector: Clean kind=NONE uid=99028 accessVector=256 granteeRead=PERMISSION_DENIED • Private: grantee getKeyEntry(GRANT) rejected with PERMISSION_DENIED.
+    Grant self-domain: Clean kind=NONE length=0 grantId=true • Public: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.) | Hidden: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.) | Private: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.); Grant-attest: Private grant-attest: clean APP getKeyEntry after GRANT custom attestation; baseline APP readback ok.
+    Keystore2: Unexpected reply
+    Legacy keystore: Legacy path not observed
+    listEntries: containsAlias and aliases aligned
+    listEntriesBatched: Cursor semantics aligned
+    Metadata key: KEY_ID normalized
+    Metadata shape: System fields present
+    Pure cert: Null key as expected
+    Pure cert level: No security level exposed
+    Pure cert metadata: Metadata security level exposed
+    Operation path: updateAad mismatch • updateAadServiceSpecific=false, oversizedUpdateRejected=true, abortInvalidatedHandle=true, compatFallback=false
+    Biometric TEE: User-auth key path available
+    Binder hook: Hook installed
+    Patch mode: generateKey/getKeyEntry aligned
+    Binder chain: Java and binder chains aligned • cycle1=keystoreVsGetKeyEntry=true, generateVsGetKeyEntryLeaf=true, generateVsGetKeyEntryChain=true, keystoreChainLength=5, getKeyEntryChainLength=5, cycle2=keystoreVsGetKeyEntry=true, generateVsGetKeyEntryLeaf=true, generateVsGetKeyEntryChain=true, keystoreChainLength=5, getKeyEntryChainLength=5, suspiciousLeafIssuerSpki=false, deleteEntryRemovedAlias=true
+    Update path: No anomaly • Grant ok
+    Update persistence: Clean kind=NONE prior=5 post=1 leafMatchesMarker=true • kind=NONE, marker leaf returned without retained prior narrative.
+    Pruning: 2/18 invalidated
+    Dual algorithm: RSA/EC chains aligned
+    ID attestation: No comparable IDs exposed
+    StrongBox: Available • StrongBox
+    Native: libbinder.so ioctl GOT entry matched libc. | ioctl prologue matched the on-disk image. | Keystore-style binder honeypot stayed within normal bounds across 3 runs. median_gap=80ns, gap_mad=0ns, noise_floor=10000ns, median_ratio=107%. Keystore-style binder honeypot timing stayed within normal bounds across redundant backends. asm=med1140ns/mad1ns/p951668ns, libc=med1220ns/mad40ns/p951465ns, syscall=med1180ns/mad0ns/p951221ns gap=80ns, noise_floor=10000ns, ratio=107% timer=arm64_cntvct, affinity=bound_cpu0.
+0/3 suspicious runs • median gap 80ns • noise floor 10.0us • median ratio 1.07x
+arm64_cntvct • bound_cpu0
+    Soter: Soter check skipped because the Treble service was not reachable.
+  Network: Built-in revocation snapshot is active; online refresh is awaiting startup consent. This certificate chain is not present in the revocation feed.
+  Certificate count: 5
+
+  --- TEE detailed export ---
+Attestation aligned; local probes need review
+Keystore2 operation error handling diverged from native-style semantics. Attestation and trust-path checks still aligned.
+
+Verdict: CONSISTENT
+Tier: STRONGBOX
+Trust root: GOOGLE
+Trust summary: Local trust path: Google root, chain verified, RKP observed
+Tamper score: 10
+Evidence count: 56
+Network: Built-in revocation snapshot is active; online refresh is awaiting startup consent. This certificate chain is not present in the revocation feed.
+Soter: Soter check skipped because the Treble service was not reachable.
+
+Trust
+- Local chain: Verified
+- Trust root: Google root
+- Chain layout: len 5 • ext 1 • trusted #1
+- RKP: Provisioned • 365d leaf
+- CRL: Built-in snapshot • clean
+- Root fingerprint: 3ee44512a1af...
+
+Attestation
+- Tier: StrongBox • attest TEE • keymaster TEE
+- Versions: attest 400 • keymaster 400 • Android 17.0.0
+- Challenge: Matched • len=32, sha256=06d52a2409bb, b64=B3R0UMb++u2t+7aFmB
+- Verified boot: Unverified • unlocked • 62980a3e921e
+- Boot consistency: State only • Attestation reported Unverified; AOSP allows an all-zero verifiedBootKey and runtime vbmeta comparison was skipped.
+- Device IDs: Not included in attestation
+- Key properties: EC 256 • P-256 • Generated
+- User auth: No user auth required
+- Application: 1 package(s) • 1 signer digest(s)
+
+Checks
+- Indicators: 0 policy hard • 0 policy review • 1 local
+- Key pair: Signature matched certificate • 3686us
+- AES-GCM: Round-trip ok • TEE • 8280us enc
+- Lifecycle: Delete ok • fresh material
+- KeyMint crypto: HMAC-SHA256 ok • Single-use EC ok • ECDH P-256 ok • RSA-PSS SHA-256 ok • AES-CBC/CTR auth ok • AES-CBC padding auth ok • EC SHA-512 auth ok • RSA-PSS SHA-512 auth ok • RSA-PSS PKCS#1 auth ok • RSA OAEP/PKCS#1 auth ok • RSA PKCS#1/OAEP auth ok • RSA-OAEP MGF1 ok • RSA-OAEP MGF1 auth ok • RSA-OAEP SHA-256 ok • RSA-OAEP SHA-1 auth ok • EC NONE auth ok • RSA PKCS#1 SHA-1 auth ok • RSA PKCS#1/PSS auth ok
+- Timing: Median 3468us
+- Timing side-channel: Register timer • bound_cpu0 • attested 0.560ms • non-attested 0.555ms • diff 0.005ms • ratio 1.009x • threshold > 1.1x • failedPairs=0/500 • outlierFiltered=79/500 • samples=421 • Not positive
+- Oversized challenge: Rejected 256B • 512B • 4096B
+- TEE Simulator generate-mode fingerprint: No TEE Simulator generate-mode fingerprint observed.
+- Keybox: Marker preserved
+- ImportKey narrative: Clean • kind=NONE, origin=IMPORTED, imported marker leaf returned without retained prior narrative.
+- KeyMint VINTF: VINTF declaration matched attested KeyMint version. kind=NONE keymasterVersion=400 attestationVersion=400 vintf=android.hardware.security.keymint/IKeyMintDevice/default@4 -> keymaster=400,attestation=400
+- Cert post-processing: The RKP and ATTEST_KEY paths agreed, showing no sign of certificate post-processing. kind=NONE, medianRkpPath=28.071ms, medianAttestKeyPath=9.860ms, ratio=2.847, delta=18.210ms, threshold=delta >= 120ms && delta >= 3.0xMAD, pairs=12
+- RKP manufacturer: Skipped because the chain carried no RKP provisioning manufacturer to cross-check.
+- Module hash: MODULE_HASH matched supplementary attestation info. getSupplementaryAttestationInfo(MODULE_HASH) returned 1542 DER bytes. kind=NONE expected=e71f57de0f1bf849 attested=e71f57de0f1bf849
+- Grant isolated-domain: Clean kind=NONE length=5 uid=99026 • Public: readback failed (public isolated readback failed: IllegalStateException: Could not connect to Keystore service. Keystore may have crashed or not been initialized). | Hidden: readback failed (hidden isolated readback failed: IllegalStateException: Could not connect to Keystore service. Keystore may have crashed or not been initialized). | Private: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.)
+- Grant caller binding: Clean kind=NONE uid=99027 ownerReplay=KEY_NOT_FOUND • Private: owner replay rejected with KEY_NOT_FOUND.
+- Grant access vector: Clean kind=NONE uid=99028 accessVector=256 granteeRead=PERMISSION_DENIED • Private: grantee getKeyEntry(GRANT) rejected with PERMISSION_DENIED.
+- Grant self-domain: Clean kind=NONE length=0 grantId=true • Public: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.) | Hidden: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.) | Private: clean (Owner alias and grantee Domain.GRANT ordered full-chain fingerprints matched.); Grant-attest: Private grant-attest: clean APP getKeyEntry after GRANT custom attestation; baseline APP readback ok.
+- Keystore2: Unexpected reply
+- Legacy keystore: Legacy path not observed
+- listEntries: containsAlias and aliases aligned
+- listEntriesBatched: Cursor semantics aligned
+- Metadata key: KEY_ID normalized
+- Metadata shape: System fields present
+- Pure cert: Null key as expected
+- Pure cert level: No security level exposed
+- Pure cert metadata: Metadata security level exposed
+- Operation path: updateAad mismatch • updateAadServiceSpecific=false, oversizedUpdateRejected=true, abortInvalidatedHandle=true, compatFallback=false
+- Biometric TEE: User-auth key path available
+- Binder hook: Hook installed
+- Patch mode: generateKey/getKeyEntry aligned
+- Binder chain: Java and binder chains aligned • cycle1=keystoreVsGetKeyEntry=true, generateVsGetKeyEntryLeaf=true, generateVsGetKeyEntryChain=true, keystoreChainLength=5, getKeyEntryChainLength=5, cycle2=keystoreVsGetKeyEntry=true, generateVsGetKeyEntryLeaf=true, generateVsGetKeyEntryChain=true, keystoreChainLength=5, getKeyEntryChainLength=5, suspiciousLeafIssuerSpki=false, deleteEntryRemovedAlias=true
+- Update path: No anomaly • Grant ok
+- Update persistence: Clean kind=NONE prior=5 post=1 leafMatchesMarker=true • kind=NONE, marker leaf returned without retained prior narrative.
+- Pruning: 2/18 invalidated
+- Dual algorithm: RSA/EC chains aligned
+- ID attestation: No comparable IDs exposed
+- StrongBox: Available • StrongBox
+- Native: libbinder.so ioctl GOT entry matched libc. | ioctl prologue matched the on-disk image. | Keystore-style binder honeypot stayed within normal bounds across 3 runs. median_gap=80ns, gap_mad=0ns, noise_floor=10000ns, median_ratio=107%. Keystore-style binder honeypot timing stayed within normal bounds across redundant backends. asm=med1140ns/mad1ns/p951668ns, libc=med1220ns/mad40ns/p951465ns, syscall=med1180ns/mad0ns/p951221ns gap=80ns, noise_floor=10000ns, ratio=107% timer=arm64_cntvct, affinity=bound_cpu0.
+0/3 suspicious runs • median gap 80ns • noise floor 10.0us • median ratio 1.07x
+arm64_cntvct • bound_cpu0
+- Soter: Soter check skipped because the Treble service was not reachable.
+
+Certificates
+- Attestation certificate: DuckDetector Tee -> 228114100d57de850b48dd3e13246787
+- Intermediate 1: 228114100d57de850b48dd3e13246787 -> Droid CA3
+- Intermediate 2: Droid CA3 -> Droid CA2
+- Intermediate 3: Droid CA2 -> Key Attestation CA1
+- Root certificate: Key Attestation CA1 -> Key Attestation CA1
+
+  [WARNING] Dangerous Apps
+  Verdict: 1 risky package(s) surfaced
+  Header facts:
+    Targets: 121
+    PM: Full · 382
+    Hits: 1
+    Hidden: 0
+  Packages:
+    MT Manager (bin.mt.termex) methods: /sdcard/MT2
+  Context:
+    Inventory: 121 legacy packages
+    PackageManager: Full inventory access
+    Visible packages: 382
+    Categories: Cracking / mod
+    Probe families: PackageManager, createPackageContext + ZipFile, Open APK FD, Android/data Directory Listing +10
+  Target apps:
+    LSPosed Manager (org.lsposed.manager) [Hook framework]
+    LSPatch (org.lsposed.lspatch) [Hook framework]
+    Xposed Installer (de.robv.android.xposed.installer) [Hook framework]
+    Magisk alpha (io.github.vvb2060.magisk) [Hook framework]
+    Magisk (com.topjohnwu.magisk) [Hook framework]
+    TaiChi (me.weishu.exp) [Hook framework]
+    SimpleHook (me.simpleHook) [Hook framework]
+    HookVip Pro (top.hookvip.pro) [Hook framework]
+    JiuWu Hook (Hook.JiuWu.Xp) [Hook framework]
+    HookVip (com.bug.hookvip) [Hook framework]
+    Lin Xposed (lin.xposed) [Hook framework]
+    Hide My Applist (com.tsng.hidemyapplist) [App hiding]
+    HMA (com.tsng.pzyhrx.hma) [App hiding]
+    Hide Blacklist (com.topmiaohan.hidebllist) [App hiding]
+    Zako Hide (zako.zako.zako) [App hiding]
+    SuperSU (eu.chainfire.supersu) [Root tool]
+    Superuser (com.noshufou.android.su) [Root tool]
+    Superuser (com.koushikdutta.superuser) [Root tool]
+    Superuser (com.thirdparty.superuser) [Root tool]
+    SU (com.yellowes.su) [Root tool]
+    KingRoot (com.kingroot.kinguser) [Root tool]
+    KingoRoot (com.kingo.root) [Root tool]
+    OneClickRoot (com.smedialink.oneclickroot) [Root tool]
+    KSU Next (com.rifsxd.ksunext) [Root tool]
+    KSU WebUI (io.github.a13e300.ksuwebui) [Root tool]
+    SuKiSu Ultra (com.sukisu.ultra) [Root tool]
+    ReSukisu (com.resukisu.resukisu) [Root tool]
+    SKRoot (com.linux.permissionmanager) [Root tool]
+    Root My Nothing (com.rootmynothing.app) [Root tool]
+    S25U Root (dev.busung.s25uroot) [Root tool]
+    Root My Pixel (com.alex193a.rootmypixel) [Root tool]
+    Fake Location (com.lerist.fakelocation) [Fake location]
+    Motion Emulator (com.zhufucyd.motion_emulator) [Fake location]
+    VIP Kill (com.cshlolss.vipkill) [Cracking / mod]
+    Modify Installer (com.modify.installer) [Cracking / mod]
+    Lucky Patcher (lucky.patcher) [Cracking / mod]
+    Lucky Patcher (com.chelpus.lackypatch) [Cracking / mod]
+    Lucky Patcher (com.android.vending.billing.InAppBillingService.LUCK) [Cracking / mod]
+    APKTool (ru.maximoff.apktool) [Cracking / mod]
+    MT Manager (bin.mt.termex) [Cracking / mod]
+    QAuxiliary (io.github.qauxv) [QQ / WeChat hook]
+    WeChat Xposed (com.fkzhang.wechatxposed) [QQ / WeChat hook]
+    BiliRoaming (me.iacn.biliroaming) [QQ / WeChat hook]
+    HookQQ (com.padi.hook.hookqq) [QQ / WeChat hook]
+    TIM Tool (top.sacz.timtool) [QQ / WeChat hook]
+    HyperCeiler (com.sevtinge.hyperceiler) [System modification]
+    Thanox (github.tornaco.android.thanos) [System modification]
+    ShortX (tornaco.apps.shortx) [System modification]
+    Scene (com.omarea.vtools) [System modification]
+    Customiuizer (name.monwf.customiuizer) [System modification]
+    Codestore Toolkit (com.coderstory.toolkit) [System modification]
+    Device ID Changer (com.silverlab.app.deviceidchanger.free) [Device ID modification]
+    Guise (com.houvven.guise) [Device ID modification]
+    IMPad (com.houvven.impad) [Device ID modification]
+    Privacy Space (cn.geektang.privacyspace) [Privacy bypass]
+    Shizuku (moe.shizuku.privileged.api) [Privacy bypass]
+    Storage Isolation (me.gm.cleaner) [Privacy bypass]
+    Storage Redirect (moe.shizuku.redirectstorage) [Privacy bypass]
+    Freezer (nep.timeline.freezer) [Freezer / background]
+    NoActive (cn.myflv.noactive) [Freezer / background]
+    StopApp (web1n.stopapp) [Freezer / background]
+    Termux (com.termux) [Terminal / dev]
+    ADB Helper (com.didjdk.adbhelper) [Terminal / dev]
+    IceCore (me.bingyue.IceCore) [Misc]
+    Dyoo (o.dyoo) [Misc]
+    Serendipity (com.demo.serendipity) [Misc]
+    AutoDaily (me.teble.xposed.autodaily) [Misc]
+    Portal (moe.fuqiuluo.portal) [Misc]
+    XposedSmsCode (com.github.tianma8023.xposed.smscode) [Misc]
+    HKF (xzr.hkf) [Misc]
+    Konabess (xzr.konabess) [Misc]
+    DataBackup (com.xayah.databackup.foss) [Misc]
+    ByYoung Setting (com.byyoung.setting) [Misc]
+    Algorithm Aide Pro (com.junge.algorithmAidePro) [Misc]
+    Atlas Toolbox (tmgp.atlas.toolbox) [Misc]
+    NP App (com.wn.app.np) [Misc]
+    Saas i18n (top.bienvenido.saas.i18n) [Misc]
+    QuickPay (com.syyf.quickpay) [Misc]
+    ShortX Ext (tornaco.apps.shortx.ext) [Misc]
+    Mio Kitchen (com.mio.kitchen) [Misc]
+    XLua (eu.faircode.xlua) [Misc]
+    DNA Tools (com.dna.tools) [Misc]
+    NoActive Monitor (cn.myflv.monitor.noactive) [Misc]
+    Card Emulator Pro (com.yuanwofei.cardemulator.pro) [Misc]
+    Oshin (com.suqi8.oshin) [Misc]
+    Wauxv (me.hd.wauxv) [Misc]
+    Have Fun (have.fun) [Misc]
+    Miko Client (miko.client) [Misc]
+    FCM Fix (com.kooritea.fcmfix) [Misc]
+    Twifucker (com.twifucker.hachidori) [Misc]
+    LuckyTool (com.luckyzyx.luckytool) [Misc]
+    Lyric Getter (cn.lyric.getter) [Misc]
+    MICTS (com.parallelc.micts) [Misc]
+    Plusne (me.plusne) [Misc]
+    App Retention (com.hchen.appretention) [Misc]
+    Switch Freeform (com.hchen.switchfreeform) [Misc]
+    XiaoWine Lyric (cn.aodlyric.xiaowine) [Misc]
+    RE Telegram (nep.timeline.re_telegram) [Misc]
+    Fuck Rimet (com.fuck.android.rimet) [Misc]
+    Kwai Hook (cn.kwaiching.hook) [Misc]
+    Android X (cn.android.x) [Misc]
+    IAmNotDisabled (cc.aoeiuv020.iamnotdisabled.hook) [Misc]
+    Kwai Tao (vn.kwaiching.tao) [Misc]
+    Plusne (com.nnnen.plusne) [Misc]
+    HMS Push (one.yufz.hmspush) [Misc]
+    XiaoWine (cn.fuckhome.xiaowine) [Misc]
+    TSBattery (com.fankes.tsbattery) [Misc]
+    IAMRKG (com.rkg.IAMRKG) [Misc]
+    Qute (com.ddm.qute) [Misc]
+    Anqu (kk.dk.anqu) [Misc]
+    QQ Module (com.qq.qcxm) [Misc]
+    Wei VIP (com.wei.vip) [Misc]
+    DKNB (dknb.con) [Misc]
+    DKNB (dknb.coo8) [Misc]
+    Jingshi (com.tencent.jingshi) [Misc]
+    JYNB (com.tencent.JYNB) [Misc]
+    Apocalua Run (com.apocalua.run) [Misc]
+    Oppo Theme (io.github.Retmon403.oppotheme) [Misc]
+    High Refresh Rate (com.fankes.enforcehighrefreshrate) [Misc]
+    Bootloader Spoofer (es.chiteroman.bootloaderspoofer) [Misc]
+    Rescue Plan (com.hchai.rescueplan) [Misc]
+
+  [WARNING] LSPosed
+  Verdict: Dirty SELinux policy signal(s)
+  Header facts:
+    Critical: N/A
+    Review: 2
+    Bridge: Clean
+    Packages: Clean
+  Runtime:
+    Runtime probes: Clean (No signal surfaced in this LSPosed evidence slice.)
+  Binder:
+    Binder probes: Clean (No signal surfaced in this LSPosed evidence slice.)
+  Package:
+    Packages: Clean (No signal surfaced in this LSPosed evidence slice.)
+  SELinux policy:
+    system_server execmem: Allowed (The native + java app_zygote SELinux access oracle reported system_server -> system_server:process execmem as allowed.)
+    KernelSU file read: Allowed (The native + java app_zygote SELinux access oracle reported untrusted_app -> ksu_file:file read as allowed. This is supporting dirty-policy evidence, not an LSPosed-specific rule.)
+  Native:
+    Native traces: Unavailable (This LSPosed evidence slice was unavailable or scoped, so it is not treated as clean.)
+  Methods:
+    Class load: Clean (Resolve known Xposed, libXposed, and LSPosed runtime classes through boot and app-facing class loaders.)
+    ClassLoader chain: Clean (Walks app-facing ClassLoader parent chains and flags loader names or chain depth that resemble LSPosed/Xposed injection.)
+    XposedBridge fields: Clean (Reflects XposedBridge.disableHooks and XposedBridge.sHookedMethodCallbacks to confirm live bridge state rather than class residue alone.)
+    Package catalog: Clean (Checks for LSPosed, LSPatch, EdXposed, Xposed installer, TaiChi, VirtualXposed, and common module-manager packages.)
+    Xposed meta-data: Clean (Scans installed app manifest meta-data such as xposedmodule, xposedminversion, and xposedscope.)
+    Stack trace: Clean (Analyzes current-thread and synthetic throwable stacks for XposedBridge, LSPosedBridge, LSPHooker_, and related hook callback tokens.)
+    Hook callbacks: Clean (Checks whether the default uncaught-exception handler class points back to Xposed or LSPosed runtime code.)
+    Binder bridge: Clean (Probes activity and serial Binder services for LSPosed bridge transaction behavior and descriptors.)
+    Zygote permissions: 1 grant(s) clean (Compares granted app permissions against the zygote-assigned supplemental GIDs exposed through /proc/self/status. Audited granted permissions against /proc/self/status Groups: INTERNET -> INET_GID (3003). Current groups: 3003 9997 20372 50372)
+    Runtime artifacts: Clean (Scans /proc/self/net/unix, /proc/self/fd, and environment variables for LSPosed/Xposed runtime residue that leaks into the current app process.)
+    Logcat leaks: Clean (Samples recent logcat buffers for LSPosed tags, control messages, bridge traces, and org.lsposed.daemon process leakage without requesting extra permissions.)
+    Dirty sepolicy: 2 dirty rule(s) (Runs DirtySepolicy-style access queries through the existing app_zygote SELinux carrier. The LSPosed-specific rule is untrusted_app -> lsposed_file:file read.
+Carrier=u:r:app_zygote:s0:c512,c768 | carrier state=ok | carrier match=yes | controls=passed | repeatability=stable | query=selinux_check_access + android.os.SELinux.checkSELinuxAccess
+access control=allowed | negative control rejected=yes | system_server execmem=allowed | Magisk binder=denied | KernelSU file read=allowed | LSPosed file read=denied
+selinux_check_access unavailable from the current carrier.
+Native dedicated=unavailable carrier=u:r:app_zygote:s0:c512,c768 controls=failed stable=no reason=selinux_check_access unavailable from the current carrier.
+Java dedicated=reportable carrier=u:r:app_zygote:s0:c512,c768 controls=passed stable=yes)
+    Native maps: Clean (Scans /proc/self/maps for LSPosed, XposedBridge, libXposed, LSPlant, EdXposed, and LSPatch runtime mappings.)
+    Native heap: Unavailable (Samples readable Dalvik heap regions through /proc/self/mem for LSPosed and Xposed keyword residuals.)
+    Native library: Loaded (JNI-backed maps and heap probes for LSPosed-specific runtime evidence.)
+    Signal summary: 2 weak (Direct runtime signals come from classes, stack traces, Binder bridges, and native traces; package-only signals are softer residue.)
+  Scan:
+    Danger signals: 0
+    Review signals: 2
+    Class hits: 0
+    ClassLoader hits: 0
+    Bridge field hits: 0
+    Stack hits: 0
+    Callback hits: 0
+    Binder hits: 0
+    Runtime artifact hits: 0
+    Runtime artifacts availability: Checked
+    Logcat hits: 0
+    Logcat availability: Checked
+    Dirty policy hits: 2
+    Dirty policy availability: Checked
+    Manager packages: 0
+    Module apps: 0
+    Native maps: 0
+    Native heap: N/A
+    Package visibility: Full
+  Impact:
+    • Manager packages, Xposed module meta-data, or dirty SELinux policy drift show framework or root-policy residue, but they do not prove the current process is hooked right now.
+    • Hardened setups can avoid exposing direct stack or class evidence in the current app, so yellow-only results still deserve correlation with other detector cards.
+
+  [WARNING] System Properties
+  Verdict: 1 property signal(s) need review
+  Header facts:
+    Critical: None
+    Review: 1
+    Boot: Clean
+    Build: Clean
+  Core:
+    persist.sys.usb.config: adb (USB debug configuration
+Source: Reflection
+Observed: adb
+USB debug configuration via reflection. Expected safe value: mtp. Cross-checked across 3 sources.)
+    ro.adb.secure: 1 (ADB authentication
+Source: Reflection
+Observed: 1
+ADB authentication via reflection. Expected safe value: 1. Cross-checked across 3 sources.)
+    ro.allow.mock.location: 0 (Mock location allowed
+Source: Reflection
+Observed: 0
+Mock location allowed via reflection. Expected safe value: 0. Cross-checked across 3 sources.)
+    ro.crypto.state: encrypted (Device encryption state
+Source: Reflection
+Observed: encrypted
+Device encryption state via reflection. Expected safe value: encrypted. Cross-checked across 3 sources.)
+  Boot:
+    ro.boot.avb_version: 1.4 (AVB version
+Source: Reflection
+Observed: 1.4
+AVB version via reflection. Cross-checked across 3 sources.)
+    ro.boot.flash.locked: 1 (Bootloader lock status
+Source: Reflection
+Observed: 1
+Bootloader lock status via reflection. Expected safe value: 1. Cross-checked across 3 sources.)
+    ro.boot.vbmeta.device_state: locked (VBMeta device state
+Source: Reflection
+Observed: locked
+VBMeta device state via reflection. Expected safe value: locked. Cross-checked across 3 sources.)
+    ro.boot.vbmeta.hash_alg: sha256 (VBMeta hash algorithm
+Source: Reflection
+Observed: sha256
+VBMeta hash algorithm via reflection. Expected safe value: sha256. Cross-checked across 3 sources.)
+    ro.boot.vbmeta.invalidate_on_error: yes (VBMeta invalidate on error
+Source: Reflection
+Observed: yes
+VBMeta invalidate on error via reflection. Expected safe value: yes. Cross-checked across 3 sources.)
+    ro.boot.verifiedbootstate: green (Verified boot state
+Source: Reflection
+Observed: green
+Verified boot state via reflection. Expected safe value: green. Cross-checked across 3 sources.)
+    ro.boot.veritymode: enforcing (dm-verity mode
+Source: Reflection
+Observed: enforcing
+dm-verity mode via reflection. Expected safe value: enforcing. Cross-checked across 3 sources.)
+    ro.boot.warranty_bit: 0 (Warranty status (Samsung)
+Source: Reflection
+Observed: 0
+Warranty status (Samsung) via reflection. Expected safe value: 0. Cross-checked across 3 sources.)
+  Build:
+    Build.FINGERPRINT: google/panther/pa… (Framework fingerprint constant
+Source: Build constant
+Observed: google/panther/panther:17/CP3A.261005.002.A1/16269273:user/release-keys
+Collected from android.os.Build.FINGERPRINT.)
+    Build.TAGS: release-keys (Build signature tags
+Source: Build constant
+Observed: release-keys
+Collected from android.os.Build.TAGS.)
+    Build.TYPE: user (Build type constant
+Source: Build constant
+Observed: user
+Collected from android.os.Build.TYPE.)
+    ro.build.flavor: panther-user (Build flavor
+Source: Reflection
+Observed: panther-user
+Build flavor via reflection. Cross-checked across 3 sources.)
+    ro.build.tags: release-keys (Build signature tags
+Source: Reflection
+Observed: release-keys
+Build signature tags via reflection. Expected safe value: release-keys. Cross-checked across 3 sources.)
+    ro.build.type: user (Build type
+Source: Reflection
+Observed: user
+Build type via reflection. Expected safe value: user. Cross-checked across 3 sources.)
+  Info:
+    VBMeta digest: 62980a3e921e5e953… (ro.boot.vbmeta.digest
+Source: Reflection
+62980a3e921e5e9534a5bde748a7a7615c2b0748dfe5237dfcaa16ba77e9d5b2)
+    VBMeta size: 21504 (ro.boot.vbmeta.size
+Source: Reflection
+21504)
+    Build display ID: CP3A.261005.002.A1 (ro.build.display.id
+Source: Reflection
+CP3A.261005.002.A1)
+    System fingerprint: google/panther/pa… (ro.build.fingerprint
+Source: Reflection
+google/panther/panther:17/CP3A.261005.002.A1/16269273:user/release-keys)
+    Android version: 17 (ro.build.version.release
+Source: Reflection
+17)
+    SDK level: 37 (ro.build.version.sdk
+Source: Reflection
+37)
+    Security patch: 2026-10-05 (ro.build.version.security_patch
+Source: Reflection
+2026-10-05)
+    Hardware: panther (ro.hardware
+Source: Reflection
+panther)
+    Brand: google (ro.product.brand
+Source: Reflection
+google)
+    Device codename: panther (ro.product.device
+Source: Reflection
+panther)
+    Manufacturer: Google (ro.product.manufacturer
+Source: Reflection
+Google)
+    Model: Pixel 7 (ro.product.model
+Source: Reflection
+Pixel 7)
+    System partition fingerprint: google/generic_sy… (ro.system.build.fingerprint
+Source: Reflection
+google/generic_system_google/generic:17/CP3A.261005.002.A1/16269273:user/release-keys)
+    Vendor fingerprint: google/panther/pa… (ro.vendor.build.fingerprint
+Source: Reflection
+google/panther/panther:17/CP3A.261005.002.A1/16269273:user/release-keys)
+  Methods:
+    Reflection API: 29 hit(s) (android.os.SystemProperties reflection reads.)
+    getprop snapshot: 29 hit(s) (Single getprop dump parsed once and reused for cross-checks.)
+    JVM property fallback: Not needed (System.getProperty fallback reads.)
+    Native libc: 29 hit(s) (Native libc property cross-checks using the callback-based system property API.)
+    Raw boot params: Unavailable (androidboot.* values from /proc/cmdline and /proc/bootconfig.)
+    Build constants: Clean (Build.TYPE, Build.TAGS, and Build.FINGERPRINT checks.)
+    Source consistency: Aligned (Cross-source comparison across reflection, getprop, JVM, and native libc reads.)
+    Cross-check rules: Aligned (Framework-vs-property, fingerprint-tail, raw-boot, and lock-state coherence checks.)
+    Prop area layout: Unavailable (Raw /dev/__properties__ layout scan unavailable.)
+    Property catalog: 15 / 42 observed (Security rule matches plus 14 info-only properties.)
+  Scan:
+    Rules checked: 42
+    Rules observed: 15
+    Reflection hits: 29
+    getprop hits: 29
+    JVM hits: 0
+    Native hits: 29
+    Boot raw: 0
+    Prop areas scanned: 0
+    Prop area holes: 0
+    Source mismatches: 0
+    Cross-checks: 0
+    Info props: 14
+  Impact:
+    • Observed properties matched conservative expectations, but raw property-area layout coverage was unavailable.
+    • System properties are still software-readable values, so even aligned results should be combined with kernel, SU, TEE, and package-level signals.
+
+  [INFO] Custom ROM
+  Verdict: Custom ROM scan has reduced coverage
+  Header facts:
+    ROMs: None
+    Build: Unavailable
+    Runtime: None
+    Native: None
+  Build:
+    System properties: Clean
+    Build fields: Clean
+    Modification: Unavailable (Native property-area coverage was unavailable on this build.)
+  Runtime:
+    Packages: Clean
+    Services: Clean (Listed 383 services.)
+    Reflection: Clean
+  Framework:
+    Resource maps: Clean
+    Platform files: Clean
+    Recovery scripts: Clean
+    SELinux policy: Clean
+    Native symbols: Clean
+    Product overlays: Clean
+  Methods:
+    propertyScan: Clean
+    buildFieldScan: Clean
+    modificationScan: Unavailable (Native property-area coverage was unavailable on this build.)
+    packageScan: Clean
+    serviceScan: Clean (Listed services: 383)
+    reflectionScan: Clean
+    mapsInjection: Clean
+    nativeFiles: Clean
+    nativePolicy: Clean
+    nativeSymbols: Clean
+    nativeLibrary: Loaded
+  Scan:
+    Properties checked: 10
+    Build fields checked: 3
+    Modification props checked: Unavailable (Native property-area coverage was unavailable on this build.)
+    Prop area contexts: Unavailable (Native property-area coverage was unavailable on this build.)
+    Prop area anomalies: Unavailable (Native property-area coverage was unavailable on this build.)
+    Prop item anomalies: Unavailable (Native property-area coverage was unavailable on this build.)
+    Packages checked: 22
+    Package visibility: Full
+    Named services checked: 11
+    Services listed: 383
+    Native library: Loaded
+  Impact:
+    • No custom ROM signature surfaced from available probes, but package visibility, property-area, or native symbol coverage was incomplete.
+    • A determined ROM can remove obvious signatures, so absence is not proof of stock firmware.
+
+  [INFO] Kernel Check
+  Verdict: CVE patch state is informational
+  Header facts:
+    Identity: Clean
+    Boot: Clean
+    Behavior: Unpatched
+    Native: Loaded
+  Identity:
+    uname -a: Captured (Linux localhost 6.1.162-android14-11-g9dd05ae3a1de-ab16261587 #1 SMP PREEMPT Thu Sep  3 03:59:00 UTC 2026 aarch64 Toybox)
+    /proc/version: Unavailable (No readable data surfaced for /proc/version.)
+    /proc/cmdline: Unavailable (No readable data surfaced for /proc/cmdline.)
+    Kernel release across sources: Consistent (3) (System.getProperty("os.version") = 6.1.162-android14-11-g9dd05ae3a1de-ab16261587
+uname() syscall = 6.1.162-android14-11-g9dd05ae3a1de-ab16261587
+uname -r = 6.1.162-android14-11-g9dd05ae3a1de-ab16261587)
+    Kernel build version across sources: Single source (uname() syscall = #1 SMP PREEMPT Thu Sep  3 03:59:00 UTC 2026)
+  Anomalies:
+    Anomalies: Clean (No hard kernel naming or boot-time anomaly surfaced.)
+  Behavior:
+    CVE-2024-43093: Unpatched (ZWC and Soft Hyphen (U+AD) still bypass the path filter.)
+    kptr_restrict: Protected (Kernel addresses remained hidden during the native probe.)
+  Methods:
+    emojiScan: Clean
+    chineseScan: Clean
+    scriptScan: Clean
+    telegramScan: Clean
+    mentionScan: Clean
+    customKernel: Clean
+    kernelVersionCheck: Clean
+    identityConsistency: 3 reads agree (Kernel release: System.getProperty("os.version"), uname() syscall, uname -r)
+    cmdlineCheck: Normal
+    cvePatchCheck: Unpatched (ZWC and Soft Hyphen (U+AD) still bypass the path filter.)
+    kptrRestrict: OK
+    nativeLibrary: Loaded
+  Scan:
+    Keyword families checked: 21
+    Cmdline rules checked: 14
+    Hard findings: 0
+    Info findings: 1
+    CVE patch state: Unpatched
+    Identity sources: 1
+    Native library: Loaded
+  Impact:
+    • The CVE-2024-43093 probe suggests the path-filter fix is missing or incomplete, but this remains informational context rather than a root or tamper verdict.
+    • This signal is useful for hardening posture, but it should not elevate the entire kernel card to warning on its own.
+
+  [INFO] Native Root
+  Verdict: Native root scan has reduced coverage
+  Header facts:
+    Flags: None
+    Direct: Limited
+    Kernel: Clean
+    Runtime: Limited
+  Native:
+    KSU supercall: Blocked by seccomp (The sacrificial reboot() helper died under app seccomp before it could install a temporary [ksu_driver] fd. Other KernelSU checks still ran.)
+  Methods:
+    ksuReadonlySupercall: Blocked (Uses a sacrificial child process to request a temporary [ksu_driver] fd through the KernelSU reboot-magic install path, then calls GET_INFO and CHECK_SAFEMODE without manager/root privileges.
+The device seccomp policy trapped reboot() for the helper process before a [ksu_driver] fd could be installed.)
+    __NR_supercall probe: Clean (Ping __NR_supercall to detect KernelPatch, in older version of KernelPatch, it will use "strncpy_from_user" WITHOUT permission authorize, 
+Therefore, it can repeatedly ping __NR_supercall using only \0 and 128 bytes of "A" and compare the time difference to detect KernelPatch. 
+This problem already fix in KernelPatch commit 84169d5d6be12e589ccac81d71dcebb80b22043a 
+Test Result: Full: 1.0282 us, Empty: 0.3239 us, Diff: 0.7042 us)
+    devpts permission check: Clean (Checks /dev/pts owner uid and SELinux labels from existing PTYs plus a freshly created PTY.
+In a normal system, the probe should not find uid 0 PTYs or a u:object_r:ksu_file:s0 label.
+Test Result: 
+Test: /dev/pts/0
+Owner: 10372
+SELinux: u:object_r:untrusted_app_all_devpts:s0:c116,c257,c512,c768
+
+)
+    prctlProbe: Clean (KernelSU magic prctl probe using option 0xDEADBEEF.)
+    susfsSideChannel: Normal (Fork child and attempt setresuid to a lower UID. Old SUSFS/KSU hooks can kill the child instead of returning EPERM.)
+    selfProcessIoc: Normal (Checks whether the current app process already runs in the KernelSU su SELinux domain or holds ambient [ksu_driver]/[ksu_fdwrapper] descriptors before escalation.
+Context: u:r:untrusted_app:s0:c116,c257,c512,c768
+Driver FDs: 0
+FD wrapper FDs: 0)
+    isolatedMountDrift: Clean (Compares the main app process against an isolated helper process using /proc/self/ns/mnt plus /apex, /system, and /vendor mount anchors. This is an ordinary-app-safe way to look for KSU profile mount namespace drift.
+mainNamespace=mnt:[4026536787]
+isolatedNamespace=mnt:[4026536790]
+Compared /apex, /system, and /vendor anchor mounts between the main app process and an isolated helper process.
+Semantic anchor mounts matched.)
+    ksuManagerFingerprint: Clean (Reads the public manager manifest for zygotePreloadName, isolatedProcess, and useAppZygote traits under the well-known KernelSU package name. This is auxiliary only because package visibility, repackaging, or renamed managers can change it.
+Known KernelSU manager packages were not visible.)
+    runtimeArtifacts: Clean (Scan /data/adb manager paths, curated tmp/system/storage residue paths, /data/local/tmp metadata, /proc process state, per-UID cgroup trees, isolated-process mount drift, and weak KernelSU manager manifest fingerprints for KernelSU, APatch, KernelPatch, Magisk, selective hiding, and unexpected root-process traces.
+Shell tmp: uid=2000, gid=2000, mode=0771, inode=111
+Process audit: Checked 2 process status/statm pair(s); denied=0.
+Cgroup audit: Checked 32 candidate uid path(s); native accessible=0, native pid entries=0, native proc denied=0, Java visible paths=0.
+Mount drift: mainNamespace=mnt:[4026536787]
+isolatedNamespace=mnt:[4026536790]
+Compared /apex, /system, and /vendor anchor mounts between the main app process and an isolated helper process.
+Semantic anchor mounts matched.
+Manager fingerprint: Known KernelSU manager packages were not visible.)
+    cgroupLeakage: Unavailable (Enumerate per-UID cgroup trees and compare native getdents visibility against Java File view, /proc/<pid>/status UID ownership, and PID liveness syscalls such as kill/getsid/getpgid/sched_getscheduler/pidfd_open. Checked 32 candidate uid path(s); native accessible=0, native pid entries=0, native proc denied=0, Java visible paths=0.)
+    kernelTraces: Clean (Check /proc/kallsyms, /proc/modules, and uname strings for KernelSU, APatch, KernelPatch, SuperCall, or Magisk tokens.)
+    propertyResidue: Clean (Read a small catalog of root-specific properties such as ro.kernel.ksu and APatch/KernelPatch variants.)
+    tempRootArtifacts: Clean (Scans /data/local/tmp for temp root exploit artifacts (ksud, temp_su, ksu-helper, ksu-payload, libcve43499root.so). Files matching CVE-2026-43499 pattern indicate an active temporary root escalation.)
+    nativeLibrary: Loaded (JNI-backed native root detection module.)
+    signalSummary: Clean (Direct probes are syscall and side-channel results; indirect probes are kernel strings, paths, processes, properties, and cgroup leakage.)
+  Scan:
+    Paths checked: 39
+    Path hits: 0
+    Proc checked: 4
+    Proc denied: 0
+    Proc hits: 0
+    Self context: u:r:untrusted_app:s0:c116,c257,c512,c768
+    Self driver FDs: 0
+    Self wrapper FDs: 0
+    Main mnt ns: mnt:[4026536787]
+    Isolated mnt ns: mnt:[4026536790]
+    Mount drift hits: 0
+    Mount anchor drifts: 0
+    Manager package: Clean
+    Manager traits: N/A
+    Cgroup paths: N/A
+    Cgroup visible: N/A
+    Cgroup proc: N/A
+    Cgroup denied: N/A
+    Cgroup hits: N/A
+    Kernel sources: 3
+    Kernel hits: 0
+    Properties checked: 5
+    Property hits: 0
+    Temp root checked: 22
+    Temp root hits: 0
+    Native library: Loaded
+  Impact:
+    • No native root indicator surfaced from available probes, but one or more support-only evidence paths were unavailable or scoped.
+    • Reduced coverage lowers confidence without implying a positive root detection.
+
+  [CLEAR] Memory
+  Verdict: No hook-like memory signals
+  Header facts:
+    Critical: Clean
+    Review: Clean
+    Hooks: Clean
+    Runtime: Clean
+  Hooks:
+    Function hooks: Clean (No suspicious evidence surfaced in this memory slice.)
+  Mapping:
+    Mappings: Clean (No suspicious evidence surfaced in this memory slice.)
+  Loader:
+    Loader visibility: Clean (No suspicious evidence surfaced in this memory slice.)
+  Methods:
+    GOT/PLT resolution: Clean (Checks whether critical libc and linker symbols still resolve into their expected native modules.)
+    Entry prologue: Clean (Looks for branch-heavy entry bytes and trampoline-style handoff patterns at sensitive function starts.)
+    maps + smaps: Clean (Scans non-ART executable mappings for writable code, unexpected swapped pages, and shared-dirty system code.)
+    FD-backed code: Clean (Cross-checks executable mappings and live file descriptors for deleted libraries, memfd loaders, ashmem, and /dev/zero execution.)
+    Signal handlers: Clean (Enumerates SIGTRAP/SIGBUS/SIGSEGV/SIGILL handlers and checks whether they point into anonymous or loader-suspicious memory.)
+    Loader visibility: Clean (Compares /proc/self/maps against dl_iterate_phdr and sanity-checks the current process [vdso] view.)
+  Scan:
+    Danger findings: 0
+    Review findings: 0
+    Modified functions: 0
+    Native library: Loaded
+  Impact:
+    • The current process did not expose branch-heavy function entries, suspicious executable memfd paths, or loader visibility mismatches.
+    • A clean memory slice reduces confidence in in-process runtime hooking only when the native probe ran successfully.
+
+  [CLEAR] Mount
+  Verdict: No suspicious mount-layer signal
+  Header facts:
+    Critical: None
+    Review: None
+    Coverage: 75%
+    Native: Loaded
+  Artifacts:
+    Status: Clean (No findings were produced for this section.)
+  Runtime:
+    Status: Clean (No findings were produced for this section.)
+  Filesystem:
+    Status: Clean (No findings were produced for this section.)
+  Consistency:
+    /data/adb access: Restricted (The app could not read /data/adb directly, which is normal without root.)
+    Init namespace access: Restricted (Reading /proc/1/ns/mnt is normally blocked for unprivileged apps, so namespace comparison coverage is partial.)
+    Path coverage: 75% (Accessible checks: 15/20. Permission-denied checks: 5.)
+  Methods:
+    Startup preload: Clean (Transparent NativeActivity launcher runs early namespace and mount checks before MainActivity starts.)
+    Path probes: Clean (Busybox, /data/adb, debug ramdisk payload markers, and hybrid framework path checks.)
+    Shell tmp view: Clean (Checks whether /data/local/tmp is selectively hidden or remapped compared with its parent and with /proc/self/mountinfo. parentAccessible=true, accessState=ACCESSIBLE, dedicatedMounts=0)
+    /proc/self/mounts: Clean (Runtime mount table scan for Magisk paths, writable system partitions, overlays, loop devices, and dm-verity bypass patterns.)
+    /proc/self/maps: Clean (Memory-map scan for Zygisk, Riru, and Magisk-hidden library paths.)
+    /proc/self/mountinfo: Clean (Mountinfo root-field, propagation, mount-ID, and namespace-consistency checks.)
+    Filesystem probes: Clean (Overlayfs support, system filesystem type, and suspicious tmpfs sizing checks.)
+    statx cross-check: Clean (Mount-ID and mount-root cross-checks using statx where the kernel exposes those fields.)
+  Scan:
+    Startup preload: Clean
+    Preload context: Stale
+    Preload findings: 0
+    Mount entries: 33
+    Mountinfo entries: 30
+    Map lines: 38
+    Permission denied: 5
+    Coverage: 75%
+    Mounts readable: Yes
+    Mountinfo readable: Yes
+    Maps readable: Yes
+    statx support: Yes
+  Impact:
+    • No suspicious mount, overlay, namespace, or root-managed filesystem artifact was visible from the current app context.
+    • Permission-restricted paths and namespace boundaries can hide part of the mount picture, so combine this card with SU, TEE, kernel, and package detectors.
+
+  [CLEAR] Play Integrity Fix
+  Verdict: No Play Integrity residue surfaced
+  Header facts:
+    Direct: None
+    Review: None
+    Props: Clean
+    Native: Clean
+  Methods:
+    Reflection API: Unavailable (android.os.SystemProperties reflection reads for PIF residue properties.)
+    getprop snapshot: Unavailable (Single getprop dump reused for all PIF property checks.)
+    JVM fallback: Not needed (System.getProperty fallback, mainly useful as a weak consistency source.)
+    Native libc props: Clean (__system_property_get checks for PIF-specific persist.sys residue.)
+    Native maps: Clean (Scans current-process memory maps for playintegrity/pihooks/pixelprops/keystore-related runtime traces.)
+    Property catalog: Clean (Checks PIF control, Pixel props, spoofed device identity, and security patch residue properties.)
+    Source consistency: Aligned (Flags cases where reflection, getprop, JVM, and native libc disagree for the same PIF residue property.)
+  Scan:
+    Properties checked: 19
+    Property hits: 0
+    Reflection hits: 0
+    getprop hits: 0
+    JVM hits: 0
+    Native prop hits: 0
+    Native traces: 0
+    Native library: Loaded
+  Impact:
+    • No common Play Integrity Fix residue surfaced from the current property catalog or runtime trace heuristics.
+    • Absence of residue is not proof of stock state. A determined bypass can clean properties and avoid obvious in-process traces.
+
+  [CLEAR] SU
+  Verdict: No root indicators
+  Header facts:
+    Artifacts: None
+    Daemons: None
+    Context: Normal
+    Processes: 0
+  Artifacts:
+    Root daemons: None
+    SU binaries: None
+  Context:
+    Self context: Normal (u:r:untrusted_app:s0:c116,c257,c512,c768)
+    Suspicious processes: None (No suspicious process contexts matched root-related tokens.)
+    Probe path: JNI syscall scan (Checked 2 process contexts; 0 /proc reads were denied. Denied reads are kept as supporting visibility evidence, not direct root-process proof.)
+  Methods:
+    daemonScan: Clean
+    fileScan: Clean
+    nativeSyscall: Normal (Self: u:r:untrusted_app:s0:c116,c257,c512,c768
+Checked: 2
+Denied: 0
+Denied reads are supporting visibility evidence only.)
+    nativeLibrary: Loaded
+  Scan:
+    SU paths checked: 20
+    Daemon paths checked: 6
+    Proc contexts checked: 2
+    Proc reads denied: 0
+  Impact:
+    • No common SU binaries or adb root daemons surfaced.
+    • Native SELinux context probes stayed within normal app boundaries.
+    • This remains heuristic evidence, not proof of an unmodified device.
+
+  [CLEAR] Virtualization
+  Verdict: No direct virtualization signal
+  Header facts:
+    Danger: 0
+    Review: 0
+    Host: 0
+    Native: Loaded
+  Environment:
+    Hypervisor capability: 1 (Capability-only signal. This does not mean the current app is running inside a guest.)
+    Hypervisor capability: 1 (Capability-only signal. It does not imply the current process is inside a guest.)
+  Runtime:
+    Status: Clean (No findings were produced for this section.)
+  Consistency:
+    Status: Clean (No findings were produced for this section.)
+  Honeypot:
+    Status: Clean (No findings were produced for this section.)
+  Host apps:
+    Status: Clean (No findings were produced for this section.)
+  Methods:
+    Properties and build: 1 info hit(s) (Checks system properties, Build fields, and ServiceManager guest services.
+Listed services: 383)
+    Dex and classpath: Clean (Class path entries: 1
+/data/app/~~0em7Os00uolKK0cwt-PBpQ==/com.eltavine.duckdetector-uFZ6VakIFedLDsqvluSMOQ==/base.apk)
+    UID identity: Clean (uid=10372 applicationUid=10372
+processName=com.eltavine.duckdetector
+uidName=com.eltavine.duckdetector
+packagesForUid=
+com.eltavine.duckdetector)
+    Runtime artifacts: Clean (Collects /proc/self/maps, /proc/self/fd, mountinfo, direct device nodes, and raw mount anchors from the current process.)
+    Graphics renderer: Clean (Builds an off-screen EGL context and inspects GL_VENDOR, GL_RENDERER, and GL_VERSION.)
+    Native bridge: Clean (Checks ART native bridge properties and translated runtime libraries such as libhoudini, libnb, and libndk_translation.)
+    Startup preload: Clean (Startup virtualization preload completed without anomalies.)
+    Cross-process consistency: Clean (Compares regular helper-process paths, mount anchors, and artifact sets against the main process and startup preload.)
+    Isolated-process consistency: Clean (Compares the isolated process against the main process for host residue, namespace drift, and anchor-mount divergence.)
+    Host apps: Clean (Checks known virtualization host packages via PackageManager, FUSE paths, native /data stats, and special paths.)
+    Native honeypots: Clean (Measures scheduling jitter across three native attempts.
+Attempt 1: mean=8895ns cv=5.09554 unique_us_buckets=3
+Attempt 2: mean=1566ns cv=3.30358 unique_us_buckets=3
+Attempt 3: mean=467ns cv=0.247968 unique_us_buckets=2
+
+Compares libc and raw openat error paths for a transient missing-path trap.
+Attempt 1: libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 libc_ns=30558 raw_ns=5208
+Attempt 2: libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 libc_ns=4517 raw_ns=3256
+Attempt 3: libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 libc_ns=3988 raw_ns=2849)
+    ASM honeypots: Clean (Correlates arm64 cntvct or cntfrq readings with wall-clock work windows.
+Attempt 1: freq=24576000 counter_delta=1411 counter_ns=57413 wall_ns=57495
+Attempt 2: freq=24576000 counter_delta=1138 counter_ns=46305 wall_ns=46387
+Attempt 3: freq=24576000 counter_delta=1142 counter_ns=46468 wall_ns=46549
+
+Compares libc getpid against an arm64 raw-svc syscall path.
+Attempt 1: libc_getpid=11473 asm_getpid=11473
+Attempt 2: libc_getpid=11473 asm_getpid=11473
+Attempt 3: libc_getpid=11473 asm_getpid=11473)
+    Sacrificial syscall pack: Partial (Executed the syscall pack in a sacrificial child process.
+
+openat2: 1/3 suspicious
+libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 asm_ret=-1 asm_errno=2 libc_ns=82479 raw_ns=13997 asm_ns=10579
+
+statx: 0/3 suspicious
+libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 asm_ret=-1 asm_errno=2 libc_ns=21729 raw_ns=9725 asm_ns=32837
+
+memfd_create: 0/3 suspicious
+libc_ret=84 libc_errno=0 raw_ret=84 raw_errno=0 asm_ret=84 asm_errno=0 libc_ns=31860 raw_ns=8505 asm_ns=9196
+
+pidfd_open: 0/3 suspicious
+libc_ret=84 libc_errno=0 raw_ret=84 raw_errno=0 asm_ret=84 asm_errno=0 libc_ns=5493 raw_ns=2401 asm_ns=2116
+
+renameat2: 0/3 suspicious
+libc_ret=-1 libc_errno=2 raw_ret=-1 raw_errno=2 asm_ret=-1 asm_errno=2 libc_ns=25472 raw_ns=13631 asm_ns=12776)
+  Scan:
+    Startup preload: Ready
+    Preload context: Yes
+    Cross-process helper: Ready
+    Isolated helper: Ready
+    Package visibility: Full
+    Maps scanned: 3290
+    FD entries: 268
+    Mountinfo lines: 170
+    EGL renderer: Ready
+    Dex paths: 1
+    Dex path hits: 0
+    UID identity hits: 0
+    Mount namespace: Ready
+    Mount anchor drift: 0
+    Environment hits: 0
+    Translation hits: 0
+    Runtime hits: 0
+    Consistency hits: 0
+    Isolated consistency: 0
+    Honeypot hits: 0
+    Syscall pack: Ready
+    Syscall pack hits: 0
+  Impact:
+    • Hypervisor capability: Capability-only signal. This does not mean the current app is running inside a guest.
+    • Hypervisor capability: Capability-only signal. It does not imply the current process is inside a guest.
+  References:
+    • Android Virtualization Framework: https://source.android.com/docs/core/virtualization
+    • Android Emulator: https://developer.android.com/studio/run/emulator
+    • AOSP property_contexts: https://android.googlesource.com/platform/system/sepolicy/+/refs/heads/main/private/property_contexts
+
+  [CLEAR] Zygisk
+  Verdict: No Zygisk runtime signal
+  Header facts:
+    State: All clear
+    Confidence: High
+    FD trap: Clean
+    Native: Ready
+  State:
+    State: All clear (Balanced policy: FD trap or any direct runtime strong hit is red, one heuristic-only family is yellow, converging heuristic families also escalate to red.)
+    Confidence: High (Both major paths completed without positive evidence.)
+    Strong signals: 0 (Direct strong signals include FD trap, NeoZygisk TMP_PATH leakage, namespace bypass, linker hook, TracerPid, and seccomp trap positives.)
+    Heuristic signals: 0 (Heuristic probes cover solist drift, maps and smaps anomalies, atexit routing, stack residue, suspicious threads or fds, and heap entropy.)
+  Signals:
+    Signals: Clean (No positive runtime signal surfaced in the current process.)
+  Methods:
+    Cross-process FD trap: Clean (Trap descriptor survived specialization and still resolves through /proc/self/fd to /data/data/com.eltavine.duckdetector/cache/#139916 (deleted).)
+    Native snapshot: Clean (Collects linker, namespace, maps, smaps, stack, thread, fd, seccomp, and heap traces from the current app process.)
+    Seccomp syscall trap: Unsupported (Runs a thread-local seccomp trap around pthread_attr_setstacksize to catch syscall-emitting libc hooks used by self-unloading Zygisk variants.)
+    Linker and namespace: Clean (Checks whether linker entry points still belong to the expected loader and whether restricted-path libraries appear in the current process.)
+    Maps and smaps: Clean (Looks for suspicious executable mappings, deleted loaders, JIT drift, and dirty system library pages.)
+    Threads and FDs: Clean (Correlates TracerPid, suspicious thread names, and open descriptor targets that frequently survive runtime tampering stacks.)
+    Solist, atexit, stack, heap: Clean (Uses weaker corroboration probes for module unload drift, atexit routing, residual stack strings, and jemalloc free-kept entropy.)
+  Impact:
+    • No direct runtime or converging heuristic signal surfaced in the current app process.
+    • A clean result reduces confidence in active Zygisk-style tampering for this process, but it does not prove the whole device is stock.
+  References:
+    • Cross-process FD trap looks for deleted-path descriptors that should survive clean specialization but may be silently closed by Zygisk-style FD sanitization.
+    • Native runtime probes correlate NeoZygisk TMP_PATH leakage, linker ownership, restricted-path loading, /proc maps and smaps drift, suspicious thread or fd residue, seccomp trap behavior, and heap entropy.
+    • Read this card together with Mount and Memory because those cards can still show corroborating Zygisk-facing traces even when this process keeps only partial residue.
+
+----- DEVICE INFO -----
+  Device Info
+  Header facts:
+    Brand: google
+    Model: Pixel 7
+    Android: 17
+    SDK: 37
+  Identity:
+    Brand: google
+    Manufacturer: Google
+    Model: Pixel 7
+    Device: panther
+    Product: panther
+    Board: panther
+  Build:
+    Hardware: panther
+    Bootloader: cloudripper-17.0-15902555
+    Fingerprint: google/panther/panther:17/CP3A.261005.002.A1/16269273:user/release-keys
+    Build ID: CP3A.261005.002.A1
+    Incremental: 16269273
+    Build type: user
+  Android:
+    Tags: release-keys
+    Build user: android-build
+    Build host: 32f0889dcf1c
+    SDK: 37
+    Release: 17
+    Codename: REL
+  Runtime:
+    Security patch: 2026-10-05
+    Preview SDK: 0
+    Primary ABI: arm64-v8a
+    ABI list: arm64-v8a
+    32-bit ABIs: Unavailable
+    64-bit ABIs: arm64-v8a
+  Context:
+    Kernel: 6.1.162-android14-11-g9dd05ae3a1de-ab16261587
+    Locale: zh-Hant-TW
+    Time zone: Asia/Taipei
+    Resolution: 1080 x 2400
+    Density: 420 dpi (2.6x)
+    Refresh rate: 90 Hz
+
+========================================
+  End of report
+========================================
