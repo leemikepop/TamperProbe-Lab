@@ -1,0 +1,25 @@
+Google 硬體認證的根憑證
+相容 GMS 的裝置可以使用由 Google 簽章的認證金鑰。
+開機載入器已上鎖
+憑證鏈
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Tue Oct 20 21:47:24 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Tue Oct 20 21:47:24 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Tue Oct 20 21:47:24 GMT+08:00 2026
+使用者：SERIALNUMBER=HIDDEN, T=TEE
+不早於：Thu Jan 01 08:00:00 GMT+08:00 1970
+不晚於：Tue Oct 20 21:47:24 GMT+08:00 2026
+撤銷清單發布時間
+2026年10月16日 下午11:38:00 UTC
+✅ CRL 為最新狀態
+認證
+版本：KeyMint 4.0
+安全等級：受信任執行環境
+Key Attestation
+2.0.2
+更多選項

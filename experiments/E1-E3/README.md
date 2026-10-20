@@ -207,3 +207,20 @@ Made during P0, before any other cell.
   test and fixture packages) are not installed on the Pixel for the rest of the experiment. One of
   them is an Xposed module that Ruru 1.1.1 reported in the first P0 capture, which is kept in
   `raw/P0-superseded/` and not used.
+
+## Amendment 2026-10-20
+
+Made during T1.
+
+- **Certificate identifiers in Duck reports.** Duck 1023's report (and Duck 521's in T1) lists the
+  key-attestation chain with certificate serial numbers and subject/issuer serialNumber
+  (`2.5.4.5`) attributes. On the P cells these identify the Pixel's own RKP certificates; in T1
+  they identify the leaked keybox, which this experiment records by class only. In every Duck
+  report kept, certificate serial numbers, every `2.5.4.5` attribute value and the validity periods
+  of intermediate certificates are replaced with `<redacted>`; nothing else in the file changes.
+  The P0–P7 reports were redacted after capture; from T1 on, reports are redacted before they are
+  kept. The Lab's own exports record chain length and validity states only and need no redaction.
+- **Tricky Addon.** Tricky Addon (`TA_utl`) is a common companion of TrickyStore that also
+  rewrites boot and build properties. It is not part of any cell: T1 and R3 measure TrickyStore
+  alone, which is narrower than the usual TrickyStore installation. This is reported as a threat to
+  validity.
