@@ -255,3 +255,16 @@ Made before R0.
   stays OBSERVED from R2 on. The operator chose to keep it rather than uninstall it and capture R0–R2
   again: it is present in every Redmi cell, so the Redmi cells stay comparable with each other. It is
   reported as a difference from the Pixel, which does not carry it.
+
+## Amendment 2026-10-21 (after R4)
+
+Made after every cell was captured.
+
+- **Results section.** The results section named in §7 step 6 is `results.md`, so that this file
+  stays append-only. It holds the script outputs, the prediction checks and the per-unit
+  concealment results.
+- **Boot properties in R4.** On the Redmi, Play Integrity Fix's own `service.sh` sets
+  `ro.boot.verifiedbootstate`, `flash.locked` and `vbmeta.device_state` to green and locked (run by
+  Zygisk Next, because Magisk's Zygisk is off). On the Pixel these were already spoofed by
+  `susfs4ksu` from P2, so PIF changed no boot property in T2; in R4 it is the component that
+  spoofs them.
