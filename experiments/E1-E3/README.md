@@ -249,3 +249,9 @@ Made before R0.
   after every Duck install on the Redmi the operator puts all of Duck's processes on the DenyList
   again and the entry count is checked before Duck runs. R1's first Duck 521 run, made before this
   rule, is kept as `duck521-superseded-report.txt` and not used.
+- **MagiskKiller on the Redmi (added during R2).** MagiskKiller 1.3 (`top.canyie.magiskkiller`), a
+  detector app installed on the Redmi since 2025-10-27, was missed by the pre-R0 cleanup. It is in
+  the Lab's dangerous-package list and none of the HMA presets hides it, so `DANGEROUS_PACKAGES`
+  stays OBSERVED from R2 on. The operator chose to keep it rather than uninstall it and capture R0–R2
+  again: it is present in every Redmi cell, so the Redmi cells stay comparable with each other. It is
+  reported as a difference from the Pixel, which does not carry it.

@@ -1,0 +1,9 @@
+無法認證
+認證出現錯誤，在選單調整選項後再試。 總是無法認證的常見原因是無法使用出廠配置的認證金鑰， 可能因為裝置配置錯誤或 persist 分割區損壞。
+
+詳細資訊：
+java.security.ProviderException: Failed to generate key pair.
+android.security.KeyStoreException: Unknown error (internal Keystore code: -1000 message: In generate_key. Caused by: 0: While generating Key without explicit attestation key. 1: Error::Km(ErrorCode(-1000))) (public error code: 10 internal Keystore code: -1000)
+Key Attestation
+2.0.2
+更多選項
