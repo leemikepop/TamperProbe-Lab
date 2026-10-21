@@ -1,0 +1,29 @@
+Ruru V1.1.1 (15)
+未發現
+可疑
+被拒絕
+發現
+環境檢測
+未發現
+Expand
+PM 命令查詢
+被拒絕
+Expand
+PM 常規 API 查詢
+未發現
+Expand
+PM 混合 API 查詢
+未發現
+Expand
+PM 主介面查詢
+未發現
+Expand
+Libc 檔案檢查
+未發現
+Expand
+Syscall 檔案檢查
+未發現
+Expand
+Xposed 模組
+未發現
+關於
