@@ -224,3 +224,23 @@ Made during T1.
   rewrites boot and build properties. It is not part of any cell: T1 and R3 measure TrickyStore
   alone, which is narrower than the usual TrickyStore installation. This is reported as a threat to
   validity.
+
+## Amendment 2026-10-21
+
+Made before R0.
+
+- **Leftover Tricky Addon on the Redmi.** The Redmi's module list was empty, but a hidden
+  `/data/adb/modules/.TA_utl` directory left by Tricky Addon was still run by Magisk at boot and set
+  `ro.boot.verifiedbootstate=green`, `flash.locked=1` and `vbmeta.device_state=locked` (the kernel
+  command line says `orange` and `unlocked`). With the operator's agreement the directory was deleted
+  without running its `uninstall.sh`, which would replace the keybox; the keybox was checked
+  unchanged and the phone was rebooted before R0.
+- **Other apps on the Redmi.** As on the Pixel, the product repository's apps
+  (`io.leemikepop.tamperprobe`, `.test`, `.lib.test`, `.fixture.xposedcontrol`,
+  `.fixture.storageowner`) and the Lab's development `…lab.lib.test` are uninstalled for the whole
+  experiment. Two detector apps outside this experiment (RootBeer sample 0.9 and
+  `com.chunqiunativecheck` 2.8.2) are uninstalled too. The HMA-OSS app is uninstalled before R0 and
+  installed again at R2, so that R0 and R1 carry no concealment app.
+- **Redmi security patch.** The device table above gives the Redmi's SPL as 2026-09-05; the phone
+  reports `ro.build.version.security_patch=2024-09-01` (build `V14.0.11.0.TGPMIXM`). The table entry
+  is wrong; the build is the one listed.

@@ -1,0 +1,12 @@
+Info
+The Environment is abnormal
+Modifications to the environment are detected.
+Detected Suspicious Mount
+Bootloader Unlocked
+Bootloader Unlocked
+Detected Risky App (3)
+System :
+Device: Xiaomi Redmi 23106RN0DA
+Native Detector
+Home
+Settings

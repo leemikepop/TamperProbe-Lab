@@ -1,0 +1,1162 @@
+{
+    "exportSchemaVersion": 2,
+    "exportedAtUtc": "2026-10-21T03:10:25.282229Z",
+    "retrofit": {
+        "selection": "ruru",
+        "upstream": {
+            "name": "Ruru",
+            "repository": "https://github.com/byxiaorun/Ruru",
+            "revision": "30694c211c63e8bc48c4db84a1cb525868c2bc41"
+        },
+        "aggregate": {
+            "method": "max(Result) over the checks",
+            "verdict": "FOUND"
+        },
+        "checks": [
+            {
+                "detectorId": "RURU_ABNORMAL_ENVIRONMENT",
+                "upstreamMethod": "AbnormalEnvironment.run(null, detail)",
+                "upstreamVerdict": "NOT_FOUND",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "RURU_PM_COMMAND",
+                "upstreamMethod": "PMCommand.run(basicAppList, detail)",
+                "upstreamVerdict": "METHOD_UNAVAILABLE",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "INCONCLUSIVE"
+            },
+            {
+                "detectorId": "RURU_PM_CONVENTIONAL_APIS",
+                "upstreamMethod": "PMConventionalAPIs.run(basicAppList, detail)",
+                "upstreamVerdict": "FOUND",
+                "upstreamPositive": true,
+                "upstreamFailed": false,
+                "outcome": "OBSERVED"
+            },
+            {
+                "detectorId": "RURU_PM_SUNDRY_APIS",
+                "upstreamMethod": "PMSundryAPIs.run(basicAppList, detail)",
+                "upstreamVerdict": "FOUND",
+                "upstreamPositive": true,
+                "upstreamFailed": false,
+                "outcome": "OBSERVED"
+            },
+            {
+                "detectorId": "RURU_PM_INTENT_QUERIES",
+                "upstreamMethod": "PMQueryIntentActivities.run(basicAppList, detail)",
+                "upstreamVerdict": "FOUND",
+                "upstreamPositive": true,
+                "upstreamFailed": false,
+                "outcome": "OBSERVED"
+            },
+            {
+                "detectorId": "RURU_FILE_LIBC",
+                "upstreamMethod": "FileDetection(useSyscall = false).run(basicAppList, detail)",
+                "upstreamVerdict": "FOUND",
+                "upstreamPositive": true,
+                "upstreamFailed": false,
+                "outcome": "OBSERVED"
+            },
+            {
+                "detectorId": "RURU_FILE_SYSCALL",
+                "upstreamMethod": "FileDetection(useSyscall = true).run(basicAppList, detail)",
+                "upstreamVerdict": "FOUND",
+                "upstreamPositive": true,
+                "upstreamFailed": false,
+                "outcome": "OBSERVED"
+            },
+            {
+                "detectorId": "RURU_XPOSED_MODULES",
+                "upstreamMethod": "XposedModules(lspatch = false).run(null, detail)",
+                "upstreamVerdict": "NOT_FOUND",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "RURU_LSPATCH",
+                "upstreamMethod": "XposedModules(lspatch = true).run(null, detail)",
+                "upstreamVerdict": "NOT_FOUND",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "RURU_MAGISK_APP",
+                "upstreamMethod": "MagiskApp.run(null, detail)",
+                "upstreamVerdict": "NOT_FOUND",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            }
+        ]
+    },
+    "scan": {
+        "startedAtUtc": "2026-10-21T03:10:21.183965Z",
+        "completedAtUtc": "2026-10-21T03:10:25.261741Z",
+        "requestedDetectorIds": [
+            "RURU_ABNORMAL_ENVIRONMENT",
+            "RURU_PM_COMMAND",
+            "RURU_PM_CONVENTIONAL_APIS",
+            "RURU_PM_SUNDRY_APIS",
+            "RURU_PM_INTENT_QUERIES",
+            "RURU_FILE_LIBC",
+            "RURU_FILE_SYSCALL",
+            "RURU_XPOSED_MODULES",
+            "RURU_LSPATCH",
+            "RURU_MAGISK_APP"
+        ],
+        "report": {
+            "wireSchemaVersion": 1,
+            "engineVersion": "retrofit-ruru",
+            "catalogVersion": "ruru-30694c211c63",
+            "completion": "COMPLETE",
+            "durationMillis": 4077,
+            "results": [
+                {
+                    "descriptor": {
+                        "id": "RURU_ABNORMAL_ENVIRONMENT",
+                        "name": "Ruru: abnormal environment",
+                        "description": "Ruru's AbnormalEnvironment: Xposed hooks in the process, a secondary user profile, marker files of hiding tools, and su, busybox and magisk in ten directories.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "filesystem-state",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-abnormal-environment.xposed-hooks",
+                                "title": "xposed-detector status",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Xposed hooks in the host process",
+                                "proposition": "An Xposed environment is present in the process",
+                                "observationChannel": "xposed-detector get_xposed_status() from Ruru's native library",
+                                "availability": "Always answers; the library inspects its own process",
+                                "trustBoundary": "The host process's runtime",
+                                "inferenceLimit": "Loading the library clears hooks it recognises; a negative is concealable"
+                            },
+                            {
+                                "id": "ruru-abnormal-environment.user-profile",
+                                "title": "Files directory owner",
+                                "domainId": "filesystem-state",
+                                "observedObject": "The user the host's files directory belongs to",
+                                "proposition": "The host runs in a secondary user or work profile",
+                                "observationChannel": "Context.getFilesDir() path prefix",
+                                "availability": "Always answers",
+                                "trustBoundary": "The host's own context",
+                                "inferenceLimit": "A secondary profile is not tampering; Ruru reports it as suspicious"
+                            },
+                            {
+                                "id": "ruru-abnormal-environment.marker-files",
+                                "title": "Hiding-tool marker files",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Seven files left by Hide My Applist (old), XPrivacyLua, TWRP, Xposed Edge, Riru Clipboard and PrivacySpace",
+                                "proposition": "A marker file exists",
+                                "observationChannel": "raw faccessat (libc access/stat/open(O_PATH) after SIGSYS), as detectFile",
+                                "availability": "Answers for a path on ENOENT or ENOTDIR, with /system/bin/sh visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Most markers lie under /data/system or /data/misc, which apps cannot search; a negative is concealable"
+                            },
+                            {
+                                "id": "ruru-abnormal-environment.root-binaries",
+                                "title": "su, busybox and magisk files",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Files named su, busybox or magisk in Ruru's ten directories",
+                                "proposition": "A root binary exists",
+                                "observationChannel": "raw faccessat (libc access/stat/open(O_PATH) after SIGSYS), as detectFile",
+                                "availability": "Answers for a path on ENOENT or ENOTDIR, with /system/bin/sh visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Ruru checks \"/cache\" + name (no slash); a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 24374,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-abnormal-environment.xposed-hooks",
+                                "title": "xposed-detector status",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Xposed hooks in the host process",
+                                "proposition": "An Xposed environment is present in the process",
+                                "observationChannel": "xposed-detector get_xposed_status() from Ruru's native library",
+                                "availability": "Always answers; the library inspects its own process",
+                                "trustBoundary": "The host process's runtime",
+                                "inferenceLimit": "Loading the library clears hooks it recognises; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.xposed-hooks.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "AbnormalEnvironment.run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.xposed-hooks.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "1",
+                                        "answeredCount": "1",
+                                        "attemptedCount": "1",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.xposed-hooks.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "1",
+                                        "check": "xposed-hooks",
+                                        "concealable": "true",
+                                        "reason": "An Xposed framework that renames or hides the classes xposed-detector looks up leaves a hooked process looking unhooked; the xposed-control ladder cell tests this declaration."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        },
+                        {
+                            "descriptor": {
+                                "id": "ruru-abnormal-environment.user-profile",
+                                "title": "Files directory owner",
+                                "domainId": "filesystem-state",
+                                "observedObject": "The user the host's files directory belongs to",
+                                "proposition": "The host runs in a secondary user or work profile",
+                                "observationChannel": "Context.getFilesDir() path prefix",
+                                "availability": "Always answers",
+                                "trustBoundary": "The host's own context",
+                                "inferenceLimit": "A secondary profile is not tampering; Ruru reports it as suspicious"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.user-profile.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "AbnormalEnvironment.run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.user-profile.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "1",
+                                        "answeredCount": "1",
+                                        "attemptedCount": "1",
+                                        "concealable": "false",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        },
+                        {
+                            "descriptor": {
+                                "id": "ruru-abnormal-environment.marker-files",
+                                "title": "Hiding-tool marker files",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Seven files left by Hide My Applist (old), XPrivacyLua, TWRP, Xposed Edge, Riru Clipboard and PrivacySpace",
+                                "proposition": "A marker file exists",
+                                "observationChannel": "raw faccessat (libc access/stat/open(O_PATH) after SIGSYS), as detectFile",
+                                "availability": "Answers for a path on ENOENT or ENOTDIR, with /system/bin/sh visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Most markers lie under /data/system or /data/misc, which apps cannot search; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.marker-files.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "AbnormalEnvironment.run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.marker-files.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "7",
+                                        "answeredCount": "7",
+                                        "attemptedCount": "7",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.marker-files.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "7",
+                                        "check": "marker-files",
+                                        "concealable": "true",
+                                        "reason": "Unmounting or hiding paths for this app (Magisk DenyList, Shamiko, KernelSU umount, SUSFS sus_path) returns ENOENT for a path that exists, which is the same answer an absent path gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        },
+                        {
+                            "descriptor": {
+                                "id": "ruru-abnormal-environment.root-binaries",
+                                "title": "su, busybox and magisk files",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Files named su, busybox or magisk in Ruru's ten directories",
+                                "proposition": "A root binary exists",
+                                "observationChannel": "raw faccessat (libc access/stat/open(O_PATH) after SIGSYS), as detectFile",
+                                "availability": "Answers for a path on ENOENT or ENOTDIR, with /system/bin/sh visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Ruru checks \"/cache\" + name (no slash); a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.root-binaries.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "AbnormalEnvironment.run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.root-binaries.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "27",
+                                        "answeredCount": "27",
+                                        "attemptedCount": "30",
+                                        "concealable": "true",
+                                        "noAnswerCount": "3",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_ABNORMAL_ENVIRONMENT.root-binaries.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "27",
+                                        "check": "root-binaries",
+                                        "concealable": "true",
+                                        "reason": "Unmounting or hiding paths for this app (Magisk DenyList, Shamiko, KernelSU umount, SUSFS sus_path) returns ENOENT for a path that exists, which is the same answer an absent path gives."
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "3 target(s) did not answer: EACCES",
+                                    "attributes": {
+                                        "count": "3",
+                                        "reason": "EACCES",
+                                        "targets": "/system/xbin/su,/system/xbin/busybox,/system/xbin/magisk",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_PM_COMMAND",
+                        "name": "Ruru: pm list packages",
+                        "description": "Ruru's PMCommand: whether any of its eleven basic packages is visible, and whether the listing holds only the host itself.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-pm-command.package-manager",
+                                "title": "pm list packages",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "Runtime.exec(\"pm list packages\") from the host process",
+                                "availability": "Answers only when the listing contains the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "INCONCLUSIVE",
+                    "strength": "NONE",
+                    "durationMicros": 165488,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-pm-command.package-manager",
+                                "title": "pm list packages",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "Runtime.exec(\"pm list packages\") from the host process",
+                                "availability": "Answers only when the listing contains the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "UNAVAILABLE",
+                            "records": [],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "11 target(s) did not answer: upstream_method_unavailable",
+                                    "attributes": {
+                                        "count": "11",
+                                        "reason": "upstream_method_unavailable",
+                                        "targets": "com.topjohnwu.magisk,io.github.vvb2060.magisk,io.github.vvb2060.magisk.lite,de.robv.android.xposed.installer,org.meowcat.edxposed.manager,org.lsposed.manager,top.canyie.dreamland.manager,me.weishu.exp,com.tsng.hidemyapplist,cn.geektang.privacyspace,moe.shizuku.redirectstorage",
+                                        "upstreamVerdict": "METHOD_UNAVAILABLE"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_PM_CONVENTIONAL_APIS",
+                        "name": "Ruru: installed packages and applications",
+                        "description": "Ruru's PMConventionalAPIs: whether any of its eleven basic packages is visible, and whether the listing holds only the host itself.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-pm-conventional-apis.package-manager",
+                                "title": "installed packages and applications",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getInstalledPackages(0) and getInstalledApplications(0)",
+                                "availability": "Answers only when the listing contains the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "OBSERVED",
+                    "strength": "WEAK",
+                    "durationMicros": 295276,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-pm-conventional-apis.package-manager",
+                                "title": "installed packages and applications",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getInstalledPackages(0) and getInstalledApplications(0)",
+                                "availability": "Answers only when the listing contains the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_PM_CONVENTIONAL_APIS.package-manager.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "PMConventionalAPIs.run(basicAppList, detail)",
+                                        "upstreamPositive": "true",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_CONVENTIONAL_APIS.package-manager.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "10",
+                                        "answeredCount": "11",
+                                        "attemptedCount": "11",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "1"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_CONVENTIONAL_APIS.package-manager.installed-package",
+                                    "kind": "SIGNAL",
+                                    "summary": "A package on Ruru's basic list is visible",
+                                    "signalStrength": "WEAK",
+                                    "attributes": {
+                                        "packageName": "com.topjohnwu.magisk"
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_PM_SUNDRY_APIS",
+                        "name": "Ruru: package lookups",
+                        "description": "Ruru's PMSundryAPIs: whether any of its eleven basic packages is visible, and whether the listing holds only the host itself.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-pm-sundry-apis.package-manager",
+                                "title": "package lookups",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageUid, getInstallSourceInfo and getLaunchIntentForPackage",
+                                "availability": "Answers only when getPackageUid resolves the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "OBSERVED",
+                    "strength": "WEAK",
+                    "durationMicros": 20221,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-pm-sundry-apis.package-manager",
+                                "title": "package lookups",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageUid, getInstallSourceInfo and getLaunchIntentForPackage",
+                                "availability": "Answers only when getPackageUid resolves the host and the android package",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_PM_SUNDRY_APIS.package-manager.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "PMSundryAPIs.run(basicAppList, detail)",
+                                        "upstreamPositive": "true",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_SUNDRY_APIS.package-manager.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "10",
+                                        "answeredCount": "11",
+                                        "attemptedCount": "11",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "1"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_SUNDRY_APIS.package-manager.installed-package",
+                                    "kind": "SIGNAL",
+                                    "summary": "A package on Ruru's basic list is visible",
+                                    "signalStrength": "WEAK",
+                                    "attributes": {
+                                        "packageName": "com.topjohnwu.magisk"
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_PM_INTENT_QUERIES",
+                        "name": "Ruru: launcher intent query",
+                        "description": "Ruru's PMQueryIntentActivities: whether any of its eleven basic packages is visible, and whether the listing holds only the host itself.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-pm-intent-queries.package-manager",
+                                "title": "launcher intent query",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.queryIntentActivities(ACTION_MAIN, MATCH_ALL)",
+                                "availability": "Answers only when the result contains the host's own MAIN activity",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A package without a MAIN activity is never listed, installed or not; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "OBSERVED",
+                    "strength": "WEAK",
+                    "durationMicros": 134975,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-pm-intent-queries.package-manager",
+                                "title": "launcher intent query",
+                                "domainId": "app-visibility",
+                                "observedObject": "Ruru's basic package list",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.queryIntentActivities(ACTION_MAIN, MATCH_ALL)",
+                                "availability": "Answers only when the result contains the host's own MAIN activity",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A package without a MAIN activity is never listed, installed or not; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_PM_INTENT_QUERIES.package-manager.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "PMQueryIntentActivities.run(basicAppList, detail)",
+                                        "upstreamPositive": "true",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_INTENT_QUERIES.package-manager.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "10",
+                                        "answeredCount": "11",
+                                        "attemptedCount": "11",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "1"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_PM_INTENT_QUERIES.package-manager.installed-package",
+                                    "kind": "SIGNAL",
+                                    "summary": "A package on Ruru's basic list is visible",
+                                    "signalStrength": "WEAK",
+                                    "attributes": {
+                                        "packageName": "com.topjohnwu.magisk"
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_FILE_LIBC",
+                        "name": "Ruru: libc file detection",
+                        "description": "Ruru's FileDetection(useSyscall = false): whether a data directory of any basic package is visible.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-file-libc.app-data-paths",
+                                "title": "App data paths",
+                                "domainId": "app-visibility",
+                                "observedObject": "/data/data, /data/user_de/0, /data/misc/profiles/ref and Android/{data,media,obb} directories of the basic packages",
+                                "proposition": "A data directory of a listed package exists",
+                                "observationChannel": "access(F_OK), stat and fstat(open(O_PATH)) on six data paths per package",
+                                "availability": "Answers for a path family only when com.android.settings' directory in that family is visible through the same call (app data isolation hides it otherwise)",
+                                "trustBoundary": "The host app's mount namespace, SELinux domain and storage view",
+                                "inferenceLimit": "A leftover directory does not show an installed app; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "OBSERVED",
+                    "strength": "WEAK",
+                    "durationMicros": 70825,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-file-libc.app-data-paths",
+                                "title": "App data paths",
+                                "domainId": "app-visibility",
+                                "observedObject": "/data/data, /data/user_de/0, /data/misc/profiles/ref and Android/{data,media,obb} directories of the basic packages",
+                                "proposition": "A data directory of a listed package exists",
+                                "observationChannel": "access(F_OK), stat and fstat(open(O_PATH)) on six data paths per package",
+                                "availability": "Answers for a path family only when com.android.settings' directory in that family is visible through the same call (app data isolation hides it otherwise)",
+                                "trustBoundary": "The host app's mount namespace, SELinux domain and storage view",
+                                "inferenceLimit": "A leftover directory does not show an installed app; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "RURU_FILE_LIBC.app-data-paths.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "FileDetection(useSyscall = false).run(basicAppList, detail)",
+                                        "upstreamPositive": "true",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_FILE_LIBC.app-data-paths.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "30",
+                                        "answeredCount": "33",
+                                        "attemptedCount": "66",
+                                        "concealable": "true",
+                                        "noAnswerCount": "33",
+                                        "presentCount": "3"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_FILE_LIBC.app-data-paths.app-data-path",
+                                    "kind": "SIGNAL",
+                                    "summary": "A data directory of a package on Ruru's basic list is visible",
+                                    "signalStrength": "WEAK",
+                                    "attributes": {
+                                        "packageName": "com.topjohnwu.magisk",
+                                        "paths": "/data/data/com.topjohnwu.magisk,/data/user_de/0/com.topjohnwu.magisk,/data/misc/profiles/ref/com.topjohnwu.magisk",
+                                        "upstreamResult": "FOUND"
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "33 target(s) did not answer: control_ENOENT",
+                                    "attributes": {
+                                        "count": "33",
+                                        "reason": "control_ENOENT",
+                                        "targets": "/storage/emulated/0/Android/data/com.topjohnwu.magisk,/storage/emulated/0/Android/media/com.topjohnwu.magisk,/storage/emulated/0/Android/obb/com.topjohnwu.magisk,/storage/emulated/0/Android/data/io.github.vvb2060.magisk,/storage/emulated/0/Android/media/io.github.vvb2060.magisk,/storage/emulated/0/Android/obb/io.github.vvb2060.magisk,/storage/emulated/0/Android/data/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/media/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/obb/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/data/de.robv.android.xposed.installer,/storage/emulated/0/Android/media/de.robv.android.xposed.installer,/storage/emulated/0/Android/obb/de.robv.android.xposed.installer,/storage/emulated/0/Android/data/org.meowcat.edxposed.manager,/storage/emulated/0/Android/media/org.meowcat.edxposed.manager,/storage/emulated/0/Android/obb/org.meowcat.edxposed.manager,/storage/emulated/0/Android/data/org.lsposed.manager,/storage/emulated/0/Android/media/org.lsposed.manager,/storage/emulated/0/Android/obb/org.lsposed.manager,/storage/emulated/0/Android/data/top.canyie.dreamland.manager,/storage/emulated/0/Android/media/top.canyie.dreamland.manager,/storage/emulated/0/Android/obb/top.canyie.dreamland.manager,/storage/emulated/0/Android/data/me.weishu.exp,/storage/emulated/0/Android/media/me.weishu.exp,/storage/emulated/0/Android/obb/me.weishu.exp,/storage/emulated/0/Android/data/com.tsng.hidemyapplist,/storage/emulated/0/Android/media/com.tsng.hidemyapplist,/storage/emulated/0/Android/obb/com.tsng.hidemyapplist,/storage/emulated/0/Android/data/cn.geektang.privacyspace,/storage/emulated/0/Android/media/cn.geektang.privacyspace,/storage/emulated/0/Android/obb/cn.geektang.privacyspace,/storage/emulated/0/Android/data/moe.shizuku.redirectstorage,/storage/emulated/0/Android/media/moe.shizuku.redirectstorage,/storage/emulated/0/Android/obb/moe.shizuku.redirectstorage",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_FILE_SYSCALL",
+                        "name": "Ruru: syscall file detection",
+                        "description": "Ruru's FileDetection(useSyscall = true): whether a data directory of any basic package is visible.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-file-syscall.app-data-paths",
+                                "title": "App data paths",
+                                "domainId": "app-visibility",
+                                "observedObject": "/data/data, /data/user_de/0, /data/misc/profiles/ref and Android/{data,media,obb} directories of the basic packages",
+                                "proposition": "A data directory of a listed package exists",
+                                "observationChannel": "raw faccessat(AT_FDCWD, path, F_OK) on six data paths per package",
+                                "availability": "Answers for a path family only when com.android.settings' directory in that family is visible through the same call (app data isolation hides it otherwise)",
+                                "trustBoundary": "The host app's mount namespace, SELinux domain and storage view",
+                                "inferenceLimit": "A leftover directory does not show an installed app; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "OBSERVED",
+                    "strength": "WEAK",
+                    "durationMicros": 35089,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-file-syscall.app-data-paths",
+                                "title": "App data paths",
+                                "domainId": "app-visibility",
+                                "observedObject": "/data/data, /data/user_de/0, /data/misc/profiles/ref and Android/{data,media,obb} directories of the basic packages",
+                                "proposition": "A data directory of a listed package exists",
+                                "observationChannel": "raw faccessat(AT_FDCWD, path, F_OK) on six data paths per package",
+                                "availability": "Answers for a path family only when com.android.settings' directory in that family is visible through the same call (app data isolation hides it otherwise)",
+                                "trustBoundary": "The host app's mount namespace, SELinux domain and storage view",
+                                "inferenceLimit": "A leftover directory does not show an installed app; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "RURU_FILE_SYSCALL.app-data-paths.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "FileDetection(useSyscall = true).run(basicAppList, detail)",
+                                        "upstreamPositive": "true",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_FILE_SYSCALL.app-data-paths.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "30",
+                                        "answeredCount": "33",
+                                        "attemptedCount": "66",
+                                        "concealable": "true",
+                                        "noAnswerCount": "33",
+                                        "presentCount": "3"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_FILE_SYSCALL.app-data-paths.app-data-path",
+                                    "kind": "SIGNAL",
+                                    "summary": "A data directory of a package on Ruru's basic list is visible",
+                                    "signalStrength": "WEAK",
+                                    "attributes": {
+                                        "packageName": "com.topjohnwu.magisk",
+                                        "paths": "/data/data/com.topjohnwu.magisk,/data/user_de/0/com.topjohnwu.magisk,/data/misc/profiles/ref/com.topjohnwu.magisk",
+                                        "upstreamResult": "FOUND"
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "33 target(s) did not answer: control_ENOENT",
+                                    "attributes": {
+                                        "count": "33",
+                                        "reason": "control_ENOENT",
+                                        "targets": "/storage/emulated/0/Android/data/com.topjohnwu.magisk,/storage/emulated/0/Android/media/com.topjohnwu.magisk,/storage/emulated/0/Android/obb/com.topjohnwu.magisk,/storage/emulated/0/Android/data/io.github.vvb2060.magisk,/storage/emulated/0/Android/media/io.github.vvb2060.magisk,/storage/emulated/0/Android/obb/io.github.vvb2060.magisk,/storage/emulated/0/Android/data/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/media/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/obb/io.github.vvb2060.magisk.lite,/storage/emulated/0/Android/data/de.robv.android.xposed.installer,/storage/emulated/0/Android/media/de.robv.android.xposed.installer,/storage/emulated/0/Android/obb/de.robv.android.xposed.installer,/storage/emulated/0/Android/data/org.meowcat.edxposed.manager,/storage/emulated/0/Android/media/org.meowcat.edxposed.manager,/storage/emulated/0/Android/obb/org.meowcat.edxposed.manager,/storage/emulated/0/Android/data/org.lsposed.manager,/storage/emulated/0/Android/media/org.lsposed.manager,/storage/emulated/0/Android/obb/org.lsposed.manager,/storage/emulated/0/Android/data/top.canyie.dreamland.manager,/storage/emulated/0/Android/media/top.canyie.dreamland.manager,/storage/emulated/0/Android/obb/top.canyie.dreamland.manager,/storage/emulated/0/Android/data/me.weishu.exp,/storage/emulated/0/Android/media/me.weishu.exp,/storage/emulated/0/Android/obb/me.weishu.exp,/storage/emulated/0/Android/data/com.tsng.hidemyapplist,/storage/emulated/0/Android/media/com.tsng.hidemyapplist,/storage/emulated/0/Android/obb/com.tsng.hidemyapplist,/storage/emulated/0/Android/data/cn.geektang.privacyspace,/storage/emulated/0/Android/media/cn.geektang.privacyspace,/storage/emulated/0/Android/obb/cn.geektang.privacyspace,/storage/emulated/0/Android/data/moe.shizuku.redirectstorage,/storage/emulated/0/Android/media/moe.shizuku.redirectstorage,/storage/emulated/0/Android/obb/moe.shizuku.redirectstorage",
+                                        "upstreamVerdict": "FOUND"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_XPOSED_MODULES",
+                        "name": "Ruru: Xposed modules",
+                        "description": "Ruru's XposedModules(lspatch = false) over every app with a MAIN activity.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-xposed-modules.launcher-apps",
+                                "title": "Launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "Xposed module metadata and META-INF/xposed/module.prop in launcher apps",
+                                "proposition": "A launcher app is an Xposed module",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN, GET_META_DATA), then each app's metadata and APK",
+                                "availability": "Answers for an app whose APK and metadata could be read, when the host itself is listed",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A module without a MAIN activity is never listed; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 1344936,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-xposed-modules.launcher-apps",
+                                "title": "Launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "Xposed module metadata and META-INF/xposed/module.prop in launcher apps",
+                                "proposition": "A launcher app is an Xposed module",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN, GET_META_DATA), then each app's metadata and APK",
+                                "availability": "Answers for an app whose APK and metadata could be read, when the host itself is listed",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A module without a MAIN activity is never listed; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_XPOSED_MODULES.launcher-apps.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "XposedModules(lspatch = false).run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_XPOSED_MODULES.launcher-apps.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "133",
+                                        "answeredCount": "133",
+                                        "attemptedCount": "133",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_XPOSED_MODULES.launcher-apps.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "133",
+                                        "check": "launcher-apps",
+                                        "concealable": "true",
+                                        "reason": "Per-app package-visibility concealment (Hide My Applist and similar) removes an installed package from every PackageManager answer to this app, which is the same answer an absent package gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_LSPATCH",
+                        "name": "Ruru: LSPatch apps",
+                        "description": "Ruru's XposedModules(lspatch = true) over every app with a MAIN activity.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-lspatch.launcher-apps",
+                                "title": "Launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "LSPatch, NPatch or JsHook metadata and an LSPosed component factory in launcher apps",
+                                "proposition": "A launcher app is patched with LSPatch or a derivative",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN, GET_META_DATA), then each app's metadata and APK",
+                                "availability": "Answers for an app whose APK and metadata could be read, when the host itself is listed",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A module without a MAIN activity is never listed; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 1100003,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-lspatch.launcher-apps",
+                                "title": "Launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "LSPatch, NPatch or JsHook metadata and an LSPosed component factory in launcher apps",
+                                "proposition": "A launcher app is patched with LSPatch or a derivative",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN, GET_META_DATA), then each app's metadata and APK",
+                                "availability": "Answers for an app whose APK and metadata could be read, when the host itself is listed",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A module without a MAIN activity is never listed; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "RURU_LSPATCH.launcher-apps.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "XposedModules(lspatch = true).run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_LSPATCH.launcher-apps.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "133",
+                                        "answeredCount": "133",
+                                        "attemptedCount": "133",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_LSPATCH.launcher-apps.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "133",
+                                        "check": "launcher-apps",
+                                        "concealable": "true",
+                                        "reason": "Per-app package-visibility concealment (Hide My Applist and similar) removes an installed package from every PackageManager answer to this app, which is the same answer an absent package gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "RURU_MAGISK_APP",
+                        "name": "Ruru: repackaged Magisk app",
+                        "description": "Ruru's MagiskApp compares every launcher app's size, components and permissions with the Magisk stub APK shipped in its assets.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "ruru-magisk-app.stub-shape",
+                                "title": "Stub-shaped launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "Non-system launcher apps whose size and components match the Magisk stub",
+                                "proposition": "A launcher app is a repackaged Magisk app",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN) and getPackageInfo per app, compared with getPackageArchiveInfo(assets/stub.apk)",
+                                "availability": "Answers only when the stub reference parses and the host is listed; an app whose comparison throws is not answered",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "Upstream swallows every per-app exception, including a missing stub; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 868925,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "ruru-magisk-app.stub-shape",
+                                "title": "Stub-shaped launcher apps",
+                                "domainId": "app-visibility",
+                                "observedObject": "Non-system launcher apps whose size and components match the Magisk stub",
+                                "proposition": "A launcher app is a repackaged Magisk app",
+                                "observationChannel": "queryIntentActivities(ACTION_MAIN) and getPackageInfo per app, compared with getPackageArchiveInfo(assets/stub.apk)",
+                                "availability": "Answers only when the stub reference parses and the host is listed; an app whose comparison throws is not answered",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "Upstream swallows every per-app exception, including a missing stub; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "RURU_MAGISK_APP.stub-shape.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "MagiskApp.run(null, detail)",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_MAGISK_APP.stub-shape.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "131",
+                                        "answeredCount": "131",
+                                        "attemptedCount": "133",
+                                        "concealable": "true",
+                                        "noAnswerCount": "2",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "RURU_MAGISK_APP.stub-shape.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "131",
+                                        "check": "stub-shape",
+                                        "concealable": "true",
+                                        "reason": "Per-app package-visibility concealment (Hide My Applist and similar) removes an installed package from every PackageManager answer to this app, which is the same answer an absent package gives."
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "2 target(s) did not answer: NullPointerException",
+                                    "attributes": {
+                                        "count": "2",
+                                        "reason": "NullPointerException",
+                                        "upstreamVerdict": "NOT_FOUND"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                }
+            ]
+        }
+    },
+    "provenance": {
+        "sampleApp": {
+            "applicationId": "io.leemikepop.tamperprobe.lab.retrofit.ruru",
+            "versionName": "1.0.5",
+            "versionCode": 5,
+            "gitCommit": "8c047f1693b5",
+            "gitDirty": false,
+            "buildType": "debug"
+        },
+        "host": {
+            "targetSdk": 29,
+            "packageVisibility": "target_sdk_below_30"
+        },
+        "device": {
+            "manufacturer": "Xiaomi",
+            "brand": "Redmi",
+            "model": "23106RN0DA",
+            "device": "gale",
+            "product": "gale_global",
+            "androidRelease": "13",
+            "apiLevel": 33,
+            "supportedAbis": [
+                "arm64-v8a",
+                "armeabi-v7a",
+                "armeabi"
+            ],
+            "buildFingerprint": "Redmi/gale_global/gale:13/TP1A.220624.014/V14.0.11.0.TGPMIXM:user/release-keys",
+            "buildType": "user",
+            "kernelVersion": "4.19.191-gf41c3bed52e9"
+        }
+    }
+}
