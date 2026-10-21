@@ -72,3 +72,6 @@ Properties, TEE. Warning: Custom ROM, Dangerous Apps (4), LSPosed.
 Certificate identifiers in both reports were redacted before the files were kept. Order as
 registered (1023, then 521, then 1023 restored, sha256 checked after each install). The operator
 drove Duck's UI and exported the reports; this session pulled and deleted them.
+
+Note (2026-10-21, during R1): the NRD row above omits one line of `nrd-1.txt`; NRD also showed
+"Detected Risky App (3)".

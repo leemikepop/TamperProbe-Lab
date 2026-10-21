@@ -244,3 +244,8 @@ Made before R0.
 - **Redmi security patch.** The device table above gives the Redmi's SPL as 2026-09-05; the phone
   reports `ro.build.version.security_patch=2024-09-01` (build `V14.0.11.0.TGPMIXM`). The table entry
   is wrong; the build is the one listed.
+- **DenyList after a Duck reinstall (Redmi; added during R1).** Magisk removes a package's DenyList entries when the
+  package is uninstalled, so swapping Duck builds also removes Duck from the DenyList. From R1 on,
+  after every Duck install on the Redmi the operator puts all of Duck's processes on the DenyList
+  again and the entry count is checked before Duck runs. R1's first Duck 521 run, made before this
+  rule, is kept as `duck521-superseded-report.txt` and not used.
