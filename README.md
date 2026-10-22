@@ -6,9 +6,11 @@ preparation (IEEE journal first), and contains only what that paper needs: the n
 the Evidence Contract they report through, a minimal SDK, a probe app that exports raw reports, and
 a research-mode RASP adapter with a command-line injector.
 
-> **Status:** skeleton. The repository was created from the TamperProbe product code on
-> 2026-10-14 with a fresh history. The experiments it supports have not been re-run on this
-> code yet, and which detectors are kept, changed or removed will be decided after they are.
+> **Status:** E1–E3 evaluated. The repository was created from the TamperProbe product code on
+> 2026-10-14 with a fresh history. Experiments E1–E3 were captured on tag `eval-2026-10-v1`
+> (2026-10-17 to 10-21); results are in [`experiments/E1-E3/results.md`](experiments/E1-E3/results.md).
+> Three detectors whose concealment declarations the ladders falsified are reported as found and
+> are not changed on this tag; any fix gets a new tag and its own experiment.
 
 ## Relation to the thesis and the product
 
@@ -25,10 +27,11 @@ a research-mode RASP adapter with a command-line injector.
 
 | Experiment | What it needs from this repository |
 | --- | --- |
-| A: ablation findings | the probe app (every detector, JSON export) and `experiments/tools/compare_cells.py` |
-| B (E2): RootBeer contract retrofit | `retrofit/rootbeer`: RootBeer's nine checks reported through the Evidence Contract |
-| E3′: Ruru contract retrofit | `retrofit/ruru`: ten of Ruru's checks reported through the Evidence Contract |
-| D: RASP deployability on open-source F-Droid apps | `tamperprobe-rasp` (research mode) and `injector/` |
+| E1: concealment ladders (done) | the probe app (every detector, JSON export) and `experiments/tools/compare_cells.py` |
+| E2: RootBeer contract retrofit (done) | `retrofit/rootbeer`: RootBeer's nine checks reported through the Evidence Contract |
+| E3′: Ruru contract retrofit (done) | `retrofit/ruru`: ten of Ruru's checks reported through the Evidence Contract |
+| E3: black-box detectors on the same cells (done) | nothing; screens and exported reports are recorded in each `cell.md` |
+| E5: RASP deployability on open-source F-Droid apps (deferred) | `tamperprobe-rasp` (research mode) and `injector/` |
 
 No result in this repository is a detection rate or a false-positive rate. A handful of phones in
 fixed configurations shows how detectors behave in those configurations; it does not estimate how
@@ -54,8 +57,8 @@ probe completed, not that tampering was observed.
 
 The catalog is generated from one `*.evidence.json` sidecar per detector (next to its `.cpp`) and
 `tamperprobe/evidence_domains.json`. Counts quoted anywhere should be read from the generated
-`tamperprobe/scripts/generated/detections_manifest.json`; at creation it held 8 evidence domains,
-38 detectors and 53 evidence units.
+`tamperprobe/scripts/generated/detections_manifest.json`; on tag `eval-2026-10-v1` it holds 8
+evidence domains, 38 detectors and 54 evidence units.
 
 ## Layout
 
@@ -165,7 +168,7 @@ injector configures an app-zygote preload, and it refuses targets that already d
 | RASP auto-block dialog, process kill, fixed-weight RASP scorer, threshold metadata | The paper separates detection from policy; the research RASP only records what it observed. |
 | Reference scorer in the core path | The probe app shows the raw report only. `ReferenceTamperScorer` remains in the SDK as an optional, documented example (with its tests) and nothing calls it. |
 | Maven publishing, the SDK consumer sample | No artifact is published from this repository. |
-| `web/portal` and the Flask/Celery/Redis injection service | Product delivery; the command-line injector is enough for experiment D. |
+| `web/portal` and the Flask/Celery/Redis injection service | Product delivery; the command-line injector is enough for experiment E5. |
 | Product documentation, ADRs and agent instructions, IDE settings | They describe the product, its history and its licensing. |
 | Raw evaluation data, device notes, third-party app captures | New experiments produce fresh data; nothing personal or device-identifying is published. |
 | Pinned catalog counts (8/38/53) in code | The catalog will change after the experiments; consumers check against counts derived from the generated manifest instead. |

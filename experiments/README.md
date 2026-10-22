@@ -58,14 +58,18 @@ experiments/
 ```
 
 `tools/compare_cells.py` reads the probe app's export documents. It was written for the thesis,
-where exports came from a full and a default selection; the Lab has only the full selection
-(`--selection full`).
+where exports came from a full and a default selection; in the Lab the probe app exports the full
+selection (`--selection full`) and the retrofit hosts export `rootbeer` and `ruru`.
 
-## Planned
+## Experiments
 
 | ID | Experiment | Status |
 | --- | --- | --- |
-| A | Re-run of the module ablation on this code | not registered |
-| B (E2) | RootBeer contract retrofit (see `../retrofit/`) | implemented; not registered |
-| E3′ | Ruru contract retrofit (see `../retrofit/`) | implemented; not registered |
-| D | RASP deployability on open-source F-Droid apps | not registered; optional |
+| E1 | Concealment ladders on this code (Pixel P0–P7, P3b, T1, T2; Redmi R0–R4) | done, [`E1-E3/`](E1-E3/), tag `eval-2026-10-v1` |
+| E2 | RootBeer contract retrofit (see `../retrofit/`) | done, same cells |
+| E3 | Black-box detectors (Duck-Detector 521 and 1023, Native Root Detector, Key Attestation, Ruru) | done, same cells |
+| E3′ | Ruru contract retrofit (see `../retrofit/`) | done, same cells |
+| E7 | Adaptive attacker: the `xposed-control` positive control | done, cell P7 |
+| E4 | Clean-device baseline | deferred until devices are available |
+| E5 | RASP deployability on open-source F-Droid apps | deferred |
+| E6 | Full-catalog scan cost | deferred; E1 exports already record scan durations |

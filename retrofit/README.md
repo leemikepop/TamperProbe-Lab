@@ -8,7 +8,8 @@ change to how they detect:
 | E2 | [RootBeer](https://github.com/scottyab/rootbeer) `de7bc7b` (release 0.1.2, the revision the thesis examined) | `:retrofit:rootbeer` | `io.leemikepop.tamperprobe.lab.retrofit.rootbeer` |
 | E3′ | [Ruru](https://github.com/byxiaorun/Ruru) `30694c2`, the maintained fork of ApplistDetector | `:retrofit:ruru` | `io.leemikepop.tamperprobe.lab.retrofit.ruru` |
 
-E2 is experiment B in [`../experiments/README.md`](../experiments/README.md); E3′ extends it to a
+Both were run on the E1 ladder cells ([`../experiments/E1-E3/`](../experiments/E1-E3/), results in
+`results.md`). E2 retrofits a Boolean detector; E3′ extends it to a
 detector that already has a coverage state. They show that the contract is an abstraction that
 can be applied to code we did not write, and they measure how many of a detector's "clean" results
 rest on a channel that did not answer or on an absence concealment can manufacture. Neither is a
@@ -131,9 +132,10 @@ Launching a host app shows the same run as text. Exports use the probe app's doc
 `summarize_retrofit.py` classifies, for every check whose upstream verdict was clean, what that
 verdict rests on: `no_answer` (no unit answered), `concealable` (every answered unit declares a
 concealment), `trusted`, or `mixed`, with the per-unit answered/attempted counts and the reasons
-targets did not answer. The preregistration fixes the cells (the device and component ladders of
-experiment A, plus clean devices), the build tag, and which declaration each ladder cell tests.
-Development captures are not results (see `../experiments/README.md`).
+targets did not answer. The E1–E3 preregistration (`../experiments/E1-E3/README.md`) fixes the
+cells (the Pixel and Redmi ladders of E1; no clean device), the build tag `eval-2026-10-v1`, and
+which declaration each ladder cell tests. Development captures are not results (see
+`../experiments/README.md`).
 
 ## Limits
 
@@ -143,8 +145,8 @@ Development captures are not results (see `../experiments/README.md`).
   activity, so an installed package without one is reported as an answered (concealable) negative
   even when another Ruru channel sees it; the unit's inference limit states this, and the
   retrofit does not use one channel to overrule another.
-- Concealment declarations come from the threat model. Until a ladder cell has switched each
-  mechanism on, they are declarations, not observations.
+- Concealment declarations come from the threat model. A ladder cell tests only the mechanisms
+  switched on in it; a declaration no cell has tested remains a declaration, not an observation.
 - The Ruru host's target SDK and `QUERY_ALL_PACKAGES` reproduce Ruru's release, not a Play-store
   app; the RootBeer host's `<queries>` reproduce a careful integrator. An integrator without them
   gets package checks that never answer, which the retrofit reports as `INCONCLUSIVE`.
