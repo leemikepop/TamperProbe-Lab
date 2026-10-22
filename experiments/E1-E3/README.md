@@ -268,3 +268,21 @@ Made after every cell was captured.
   Zygisk Next, because Magisk's Zygisk is off). On the Pixel these were already spoofed by
   `susfs4ksu` from P2, so PIF changed no boot property in T2; in R4 it is the component that
   spoofs them.
+
+## Amendment 2026-10-22
+
+Made after every cell was captured and `results.md` was written. No cell, raw record or result
+changes.
+
+- **Key Attestation build.** The archived `Key Attestation_2.0.2.apk` (§2; full hash in
+  `cells/apks.sha256`) is not a build by the original author, vvb2060. Its SHA-256 equals that of
+  the APK attached to release `v2.0.2(247)-Fork` of the fork `VisionR1/KeyAttestation`
+  (<https://github.com/VisionR1/KeyAttestation/releases>), and it is signed by `CN=Vision, C=GR`,
+  where vvb2060's GitHub releases are signed by `CN=Key Attestation`. The fork keeps the original
+  package name, so the identity in §2 is unchanged. Every Key Attestation record in `raw/` comes
+  from this fork build, and the paper cites the fork.
+- **Revocation status.** The fork's release notes for this version describe a reworked online
+  fetch of Google's attestation revocation list. The revocation status that §4 (T1) takes from Key
+  Attestation is therefore this fork's online check. In every P and T cell the record gives the
+  list's publication time and states that the list is current; the Redmi records give no
+  revocation status (R0–R2 because attestation failed, R3 and R4 because the app showed none).
