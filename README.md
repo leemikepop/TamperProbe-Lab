@@ -26,6 +26,8 @@ section with the details.
    interpreter (it runs the catalog generator during the build).
 3. **Build.** Run `./gradlew assembleDebug` (`gradlew.bat assembleDebug` on Windows). The probe app
    is written to `app/build/outputs/apk/debug/app-debug.apk`; the two retrofit hosts are built too.
+   On Windows, keep the repository in a short path such as `C:\src\TamperProbe-Lab`: from a deeply
+   nested folder the Ruru retrofit's CMake build exceeds the 260-character path limit and fails.
    See [Build](#build).
 4. **Scan a phone.** Install the APK with `adb install app/build/outputs/apk/debug/app-debug.apk`
    and open **TamperProbe Lab**. It scans every detector on launch and shows each detector's
