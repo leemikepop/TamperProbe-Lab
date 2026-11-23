@@ -70,6 +70,6 @@ selection (`--selection full`) and the retrofit hosts export `rootbeer` and `rur
 | E3 | Black-box detectors (Duck-Detector 521 and 1023, Native Root Detector, Key Attestation, Ruru) | done, same cells |
 | E3′ | Ruru contract retrofit (see `../retrofit/`) | done, same cells |
 | E7 | Adaptive attacker: the `xposed-control` positive control | done, cell P7 |
-| E4 | Clean-device baseline | deferred until devices are available |
+| E4 | Clean-device baseline (Xiaomi 12, cell X0) | registered, [`E4/`](E4/), tag `eval-2026-10-v1` |
 | E5 | RASP deployability on open-source F-Droid apps | deferred |
 | E6 | Full-catalog scan cost | deferred; E1 exports already record scan durations |
