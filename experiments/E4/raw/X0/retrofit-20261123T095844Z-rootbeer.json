@@ -1,0 +1,916 @@
+{
+    "exportSchemaVersion": 2,
+    "exportedAtUtc": "2026-11-23T09:58:44.818370Z",
+    "retrofit": {
+        "selection": "rootbeer",
+        "upstream": {
+            "name": "RootBeer",
+            "repository": "https://github.com/scottyab/rootbeer",
+            "revision": "de7bc7b4b09c9db148b62b331b4a44076b2eb480"
+        },
+        "aggregate": {
+            "method": "isRooted()",
+            "verdict": "false"
+        },
+        "checks": [
+            {
+                "detectorId": "ROOTBEER_ROOT_MANAGEMENT_APPS",
+                "upstreamMethod": "detectRootManagementApps()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_DANGEROUS_APPS",
+                "upstreamMethod": "detectPotentiallyDangerousApps()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_SU_BINARY",
+                "upstreamMethod": "checkForBinary(\"su\")",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_DANGEROUS_PROPS",
+                "upstreamMethod": "checkForDangerousProps()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_RW_PATHS",
+                "upstreamMethod": "checkForRWPaths()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_TEST_KEYS",
+                "upstreamMethod": "detectTestKeys()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_WHICH_SU",
+                "upstreamMethod": "checkSuExists()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_NATIVE_SU",
+                "upstreamMethod": "checkForRootNative()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            },
+            {
+                "detectorId": "ROOTBEER_MAGISK_BINARY",
+                "upstreamMethod": "checkForMagiskBinary()",
+                "upstreamVerdict": "false",
+                "upstreamPositive": false,
+                "upstreamFailed": false,
+                "outcome": "NOT_OBSERVED"
+            }
+        ]
+    },
+    "scan": {
+        "startedAtUtc": "2026-11-23T09:58:44.098036Z",
+        "completedAtUtc": "2026-11-23T09:58:44.809508Z",
+        "requestedDetectorIds": [
+            "ROOTBEER_ROOT_MANAGEMENT_APPS",
+            "ROOTBEER_DANGEROUS_APPS",
+            "ROOTBEER_SU_BINARY",
+            "ROOTBEER_DANGEROUS_PROPS",
+            "ROOTBEER_RW_PATHS",
+            "ROOTBEER_TEST_KEYS",
+            "ROOTBEER_WHICH_SU",
+            "ROOTBEER_NATIVE_SU",
+            "ROOTBEER_MAGISK_BINARY"
+        ],
+        "report": {
+            "wireSchemaVersion": 1,
+            "engineVersion": "retrofit-rootbeer",
+            "catalogVersion": "rootbeer-de7bc7b4b09c",
+            "completion": "COMPLETE",
+            "durationMillis": 711,
+            "results": [
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_ROOT_MANAGEMENT_APPS",
+                        "name": "RootBeer: root management apps",
+                        "description": "RootBeer calls getPackageInfo for every package in Const.knownRootAppsPackages.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-root-management-apps.package-manager",
+                                "title": "PackageManager.getPackageInfo",
+                                "domainId": "app-visibility",
+                                "observedObject": "Installed packages named in Const.knownRootAppsPackages",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageInfo(name, 0) from the host process",
+                                "availability": "Answers for a package only inside the host's package-visibility scope, with the host and the android package anchoring the channel",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 4625,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-root-management-apps.package-manager",
+                                "title": "PackageManager.getPackageInfo",
+                                "domainId": "app-visibility",
+                                "observedObject": "Installed packages named in Const.knownRootAppsPackages",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageInfo(name, 0) from the host process",
+                                "availability": "Answers for a package only inside the host's package-visibility scope, with the host and the android package anchoring the channel",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_ROOT_MANAGEMENT_APPS.package-manager.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "detectRootManagementApps()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_ROOT_MANAGEMENT_APPS.package-manager.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "12",
+                                        "answeredCount": "12",
+                                        "attemptedCount": "12",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_ROOT_MANAGEMENT_APPS.package-manager.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "12",
+                                        "check": "package-manager",
+                                        "concealable": "true",
+                                        "reason": "Per-app package-visibility concealment (Hide My Applist and similar) reports an installed package as not installed, which is the same answer an absent package gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_DANGEROUS_APPS",
+                        "name": "RootBeer: potentially dangerous apps",
+                        "description": "RootBeer calls getPackageInfo for every package in Const.knownDangerousAppsPackages.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "app-visibility",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-dangerous-apps.package-manager",
+                                "title": "PackageManager.getPackageInfo",
+                                "domainId": "app-visibility",
+                                "observedObject": "Installed packages named in Const.knownDangerousAppsPackages",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageInfo(name, 0) from the host process",
+                                "availability": "Answers for a package only inside the host's package-visibility scope, with the host and the android package anchoring the channel",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 7632,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-dangerous-apps.package-manager",
+                                "title": "PackageManager.getPackageInfo",
+                                "domainId": "app-visibility",
+                                "observedObject": "Installed packages named in Const.knownDangerousAppsPackages",
+                                "proposition": "A listed package is installed",
+                                "observationChannel": "PackageManager.getPackageInfo(name, 0) from the host process",
+                                "availability": "Answers for a package only inside the host's package-visibility scope, with the host and the android package anchoring the channel",
+                                "trustBoundary": "system_server's package filtering for the host app",
+                                "inferenceLimit": "A renamed or repackaged app is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_APPS.package-manager.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "detectPotentiallyDangerousApps()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_APPS.package-manager.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "27",
+                                        "answeredCount": "27",
+                                        "attemptedCount": "27",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_APPS.package-manager.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "27",
+                                        "check": "package-manager",
+                                        "concealable": "true",
+                                        "reason": "Per-app package-visibility concealment (Hide My Applist and similar) reports an installed package as not installed, which is the same answer an absent package gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_SU_BINARY",
+                        "name": "RootBeer: su binary",
+                        "description": "RootBeer calls File.exists() on su in its fixed directories and every PATH entry.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "binary-artifact",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-su-binary.file-exists",
+                                "title": "File.exists() of su paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A filesystem object named su in RootBeer's binary directories",
+                                "proposition": "su exists in a binary directory",
+                                "observationChannel": "java.io.File.exists(), which is stat(2); the shadow repeats the stat",
+                                "availability": "Answers for a path when stat returns success, ENOENT or ENOTDIR and /system/bin/sh is visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Existence alone does not show an executable; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 2391,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-su-binary.file-exists",
+                                "title": "File.exists() of su paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A filesystem object named su in RootBeer's binary directories",
+                                "proposition": "su exists in a binary directory",
+                                "observationChannel": "java.io.File.exists(), which is stat(2); the shadow repeats the stat",
+                                "availability": "Answers for a path when stat returns success, ENOENT or ENOTDIR and /system/bin/sh is visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Existence alone does not show an executable; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_SU_BINARY.file-exists.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkForBinary(\"su\")",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_SU_BINARY.file-exists.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "19",
+                                        "answeredCount": "19",
+                                        "attemptedCount": "21",
+                                        "concealable": "true",
+                                        "noAnswerCount": "2",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_SU_BINARY.file-exists.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "19",
+                                        "check": "file-exists",
+                                        "concealable": "true",
+                                        "reason": "Unmounting root files in this app's mount namespace (Magisk DenyList, Shamiko, KernelSU umount) and kernel path hiding (SUSFS sus_path) return ENOENT for a file that exists, which is the same answer an absent file gives."
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "2 target(s) did not answer: EACCES",
+                                    "attributes": {
+                                        "count": "2",
+                                        "reason": "EACCES",
+                                        "targets": "/system/xbin/su,/cache/su",
+                                        "upstreamVerdict": "false"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_DANGEROUS_PROPS",
+                        "name": "RootBeer: dangerous properties",
+                        "description": "RootBeer reads `getprop` output and flags ro.debuggable=1 or ro.secure=0.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "system-state",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-dangerous-props.getprop",
+                                "title": "getprop output",
+                                "domainId": "system-state",
+                                "observedObject": "ro.debuggable and ro.secure as listed by the getprop command",
+                                "proposition": "ro.debuggable is 1 or ro.secure is 0",
+                                "observationChannel": "Runtime.exec(\"getprop\") from the host process",
+                                "availability": "Answers for a property only when getprop lists it; ro.build.version.sdk anchors the listing",
+                                "trustBoundary": "Property service as seen by a command the app spawns",
+                                "inferenceLimit": "Development builds and emulators set these values without root; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 226420,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-dangerous-props.getprop",
+                                "title": "getprop output",
+                                "domainId": "system-state",
+                                "observedObject": "ro.debuggable and ro.secure as listed by the getprop command",
+                                "proposition": "ro.debuggable is 1 or ro.secure is 0",
+                                "observationChannel": "Runtime.exec(\"getprop\") from the host process",
+                                "availability": "Answers for a property only when getprop lists it; ro.build.version.sdk anchors the listing",
+                                "trustBoundary": "Property service as seen by a command the app spawns",
+                                "inferenceLimit": "Development builds and emulators set these values without root; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_PROPS.getprop.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkForDangerousProps()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_PROPS.getprop.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "2",
+                                        "answeredCount": "2",
+                                        "attemptedCount": "2",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_DANGEROUS_PROPS.getprop.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "2",
+                                        "check": "getprop",
+                                        "concealable": "true",
+                                        "reason": "Rewriting the property before Zygote starts (resetprop) gives this app the value an unmodified device has."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_RW_PATHS",
+                        "name": "RootBeer: system paths mounted read-write",
+                        "description": "RootBeer reads `mount` output and flags a system mount point with the rw option.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "filesystem-state",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-rw-paths.mount-table",
+                                "title": "mount output",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Mount options of seven system mount points",
+                                "proposition": "A system mount point is mounted rw",
+                                "observationChannel": "Runtime.exec(\"mount\") from the host process, parsed as RootBeer parses it",
+                                "availability": "Answers only when the mount table was read and lists the root mount point",
+                                "trustBoundary": "The host app's mount namespace",
+                                "inferenceLimit": "A path that is not a mount point inherits its parent's options, which RootBeer does not check; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 135734,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-rw-paths.mount-table",
+                                "title": "mount output",
+                                "domainId": "filesystem-state",
+                                "observedObject": "Mount options of seven system mount points",
+                                "proposition": "A system mount point is mounted rw",
+                                "observationChannel": "Runtime.exec(\"mount\") from the host process, parsed as RootBeer parses it",
+                                "availability": "Answers only when the mount table was read and lists the root mount point",
+                                "trustBoundary": "The host app's mount namespace",
+                                "inferenceLimit": "A path that is not a mount point inherits its parent's options, which RootBeer does not check; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_RW_PATHS.mount-table.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkForRWPaths()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_RW_PATHS.mount-table.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "7",
+                                        "answeredCount": "7",
+                                        "attemptedCount": "7",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_RW_PATHS.mount-table.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "7",
+                                        "check": "mount-table",
+                                        "concealable": "true",
+                                        "reason": "A remount made in another mount namespace is not in this app's mount table; root hiding gives the app the original namespace."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_TEST_KEYS",
+                        "name": "RootBeer: test-keys build",
+                        "description": "RootBeer flags a Build.TAGS value that contains test-keys.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "system-state",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-test-keys.build-tags",
+                                "title": "Build.TAGS",
+                                "domainId": "system-state",
+                                "observedObject": "android.os.Build.TAGS (ro.build.tags)",
+                                "proposition": "The build is signed with test keys",
+                                "observationChannel": "android.os.Build.TAGS, read by Zygote before the app starts",
+                                "availability": "Answers whenever Build.TAGS is not null",
+                                "trustBoundary": "Property values captured by Zygote",
+                                "inferenceLimit": "Custom ROMs and engineering builds use test keys without root; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 622,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-test-keys.build-tags",
+                                "title": "Build.TAGS",
+                                "domainId": "system-state",
+                                "observedObject": "android.os.Build.TAGS (ro.build.tags)",
+                                "proposition": "The build is signed with test keys",
+                                "observationChannel": "android.os.Build.TAGS, read by Zygote before the app starts",
+                                "availability": "Answers whenever Build.TAGS is not null",
+                                "trustBoundary": "Property values captured by Zygote",
+                                "inferenceLimit": "Custom ROMs and engineering builds use test keys without root; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_TEST_KEYS.build-tags.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "detectTestKeys()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_TEST_KEYS.build-tags.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "1",
+                                        "answeredCount": "1",
+                                        "attemptedCount": "1",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_TEST_KEYS.build-tags.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "1",
+                                        "check": "build-tags",
+                                        "concealable": "true",
+                                        "reason": "Rewriting the property before Zygote starts (resetprop) gives this app the value an unmodified device has."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_WHICH_SU",
+                        "name": "RootBeer: su on PATH",
+                        "description": "RootBeer runs `which su` and flags any output.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "binary-artifact",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-which-su.which",
+                                "title": "which su",
+                                "domainId": "binary-artifact",
+                                "observedObject": "An executable named su on the spawned shell's PATH",
+                                "proposition": "su resolves on PATH",
+                                "observationChannel": "Runtime.exec(\"which\", \"su\") from the host process",
+                                "availability": "Answers only when `which sh` resolves through the same command",
+                                "trustBoundary": "The PATH and mount namespace a command spawned by the app sees",
+                                "inferenceLimit": "A su outside PATH is not seen; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 220326,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-which-su.which",
+                                "title": "which su",
+                                "domainId": "binary-artifact",
+                                "observedObject": "An executable named su on the spawned shell's PATH",
+                                "proposition": "su resolves on PATH",
+                                "observationChannel": "Runtime.exec(\"which\", \"su\") from the host process",
+                                "availability": "Answers only when `which sh` resolves through the same command",
+                                "trustBoundary": "The PATH and mount namespace a command spawned by the app sees",
+                                "inferenceLimit": "A su outside PATH is not seen; a negative is concealable"
+                            },
+                            "collectionStatus": "COMPLETE",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_WHICH_SU.which.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkSuExists()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_WHICH_SU.which.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "1",
+                                        "answeredCount": "1",
+                                        "attemptedCount": "1",
+                                        "concealable": "true",
+                                        "noAnswerCount": "0",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_WHICH_SU.which.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "1",
+                                        "check": "which",
+                                        "concealable": "true",
+                                        "reason": "Unmounting root files in this app's mount namespace (Magisk DenyList, Shamiko, KernelSU umount) and kernel path hiding (SUSFS sus_path) return ENOENT for a file that exists, which is the same answer an absent file gives."
+                                    }
+                                }
+                            ],
+                            "issues": []
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_NATIVE_SU",
+                        "name": "RootBeer: native su check",
+                        "description": "RootBeer's libtoolChecker.so calls fopen(path, \"r\") on su in every binary directory.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "binary-artifact",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-native-su.fopen",
+                                "title": "fopen(\"r\") of su paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A readable file named su in RootBeer's binary directories",
+                                "proposition": "su can be opened for reading",
+                                "observationChannel": "open(path, O_RDONLY) from native code; requires libtoolChecker.so to load",
+                                "availability": "Answers only when the native library loaded and /system/bin/sh opens through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "A su that exists but is not readable by the app is not answered; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 9349,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-native-su.fopen",
+                                "title": "fopen(\"r\") of su paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A readable file named su in RootBeer's binary directories",
+                                "proposition": "su can be opened for reading",
+                                "observationChannel": "open(path, O_RDONLY) from native code; requires libtoolChecker.so to load",
+                                "availability": "Answers only when the native library loaded and /system/bin/sh opens through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "A su that exists but is not readable by the app is not answered; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_NATIVE_SU.fopen.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkForRootNative()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_NATIVE_SU.fopen.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "19",
+                                        "answeredCount": "19",
+                                        "attemptedCount": "21",
+                                        "concealable": "true",
+                                        "noAnswerCount": "2",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_NATIVE_SU.fopen.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "19",
+                                        "check": "fopen",
+                                        "concealable": "true",
+                                        "reason": "Unmounting root files in this app's mount namespace (Magisk DenyList, Shamiko, KernelSU umount) and kernel path hiding (SUSFS sus_path) return ENOENT for a file that exists, which is the same answer an absent file gives."
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "2 target(s) did not answer: EACCES",
+                                    "attributes": {
+                                        "count": "2",
+                                        "reason": "EACCES",
+                                        "targets": "/system/xbin/su,/cache/su",
+                                        "upstreamVerdict": "false"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                },
+                {
+                    "descriptor": {
+                        "id": "ROOTBEER_MAGISK_BINARY",
+                        "name": "RootBeer: magisk binary",
+                        "description": "RootBeer calls File.exists() on magisk in its fixed directories and every PATH entry.",
+                        "payloadSchemaVersion": 1,
+                        "primaryEvidenceDomainId": "binary-artifact",
+                        "evidenceUnits": [
+                            {
+                                "id": "rootbeer-magisk-binary.file-exists",
+                                "title": "File.exists() of magisk paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A filesystem object named magisk in RootBeer's binary directories",
+                                "proposition": "magisk exists in a binary directory",
+                                "observationChannel": "java.io.File.exists(), which is stat(2); the shadow repeats the stat",
+                                "availability": "Answers for a path when stat returns success, ENOENT or ENOTDIR and /system/bin/sh is visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Existence alone does not show an executable; a negative is concealable"
+                            }
+                        ]
+                    },
+                    "outcome": "NOT_OBSERVED",
+                    "strength": "NONE",
+                    "durationMicros": 1919,
+                    "unitResults": [
+                        {
+                            "descriptor": {
+                                "id": "rootbeer-magisk-binary.file-exists",
+                                "title": "File.exists() of magisk paths",
+                                "domainId": "binary-artifact",
+                                "observedObject": "A filesystem object named magisk in RootBeer's binary directories",
+                                "proposition": "magisk exists in a binary directory",
+                                "observationChannel": "java.io.File.exists(), which is stat(2); the shadow repeats the stat",
+                                "availability": "Answers for a path when stat returns success, ENOENT or ENOTDIR and /system/bin/sh is visible through the same call",
+                                "trustBoundary": "The host app's mount namespace and SELinux domain",
+                                "inferenceLimit": "Existence alone does not show an executable; a negative is concealable"
+                            },
+                            "collectionStatus": "PARTIAL",
+                            "records": [
+                                {
+                                    "code": "ROOTBEER_MAGISK_BINARY.file-exists.upstream-verdict",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Verdict of the unmodified upstream code for this channel",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "upstreamMethod": "checkForMagiskBinary()",
+                                        "upstreamPositive": "false",
+                                        "upstreamVerdict": "false"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_MAGISK_BINARY.file-exists.coverage",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Targets the channel was asked about and how many it answered",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "absentCount": "19",
+                                        "answeredCount": "19",
+                                        "attemptedCount": "21",
+                                        "concealable": "true",
+                                        "noAnswerCount": "2",
+                                        "presentCount": "0"
+                                    }
+                                },
+                                {
+                                    "code": "ROOTBEER_MAGISK_BINARY.file-exists.concealable-negative",
+                                    "kind": "OBSERVATION",
+                                    "summary": "Negative rests on an absence that concealment can produce",
+                                    "signalStrength": null,
+                                    "attributes": {
+                                        "answeredCount": "19",
+                                        "check": "file-exists",
+                                        "concealable": "true",
+                                        "reason": "Unmounting root files in this app's mount namespace (Magisk DenyList, Shamiko, KernelSU umount) and kernel path hiding (SUSFS sus_path) return ENOENT for a file that exists, which is the same answer an absent file gives."
+                                    }
+                                }
+                            ],
+                            "issues": [
+                                {
+                                    "code": "channel-no-answer",
+                                    "message": "2 target(s) did not answer: EACCES",
+                                    "attributes": {
+                                        "count": "2",
+                                        "reason": "EACCES",
+                                        "targets": "/system/xbin/magisk,/cache/magisk",
+                                        "upstreamVerdict": "false"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "collectionError": null
+                }
+            ]
+        }
+    },
+    "provenance": {
+        "sampleApp": {
+            "applicationId": "io.leemikepop.tamperprobe.lab.retrofit.rootbeer",
+            "versionName": "1.0.5",
+            "versionCode": 5,
+            "gitCommit": "8c047f1693b5",
+            "gitDirty": false,
+            "buildType": "debug"
+        },
+        "host": {
+            "targetSdk": 36,
+            "packageVisibility": "manifest_queries:39"
+        },
+        "device": {
+            "manufacturer": "Xiaomi",
+            "brand": "Xiaomi",
+            "model": "2201123G",
+            "device": "cupid",
+            "product": "cupid_global",
+            "androidRelease": "15",
+            "apiLevel": 35,
+            "supportedAbis": [
+                "arm64-v8a",
+                "armeabi-v7a",
+                "armeabi"
+            ],
+            "buildFingerprint": "Xiaomi/cupid_global/cupid:15/AQ3A.250226.002/OS3.0.3.0.VLCTWXM:user/release-keys",
+            "buildType": "user",
+            "kernelVersion": "5.10.236-android12-9-00003-gfb24cf99ad97-ab14313284"
+        }
+    }
+}

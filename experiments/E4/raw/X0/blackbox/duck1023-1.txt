@@ -1,0 +1,29 @@
+Warning
+Review ADB Runtime and System Properties next.
+2026.10.14-9fcc940074ed (1023)
+Build (UTC) · 2026-10-14 13:01:26
+Tap to export full report
+Scanned at 2026-11-23 18:08:44 · Total time 15s
+0
+Danger
+2
+Warning
+18
+Ready
+0
+Pending
+ADB Runtime
+Medium
+ADB enabled
+ADB is enabled or runtime activity was observed; no persistent hard runtime contradiction was confirmed.
+System Properties
+Medium
+1 property signal(s) need review
+Cross-source drift, cross-property drift, or raw property-area residue suggests a review-worthy build or boot context, even if not every warning means active compromise.
+Telegram
+Duck Detector
+首頁
+首頁
+設定
+設定
+ALPHA

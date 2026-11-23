@@ -1,0 +1,20 @@
+Duck Detector
+2026.​08.​28-​c1c8e0c17577​(521)
+Build Time (UTC)
+2026-​08-​28 13:​50:​27
+Export Report
+Scanned at 2026-​11-​23 18:​12:​52
+Total time 16s
+Warning
+Review System Properties and Custom ROM next.​
+Danger
+0
+Warning
+1
+Ready
+15
+Pending
+0
+MAIN
+SETTINGS
+ALPHA

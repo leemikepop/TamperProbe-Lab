@@ -1,0 +1,31 @@
+Ruru V1.1.1 (15)
+PM 混合 API 查詢
+未發現
+Expand
+PM 主介面查詢
+未發現
+Expand
+Libc 檔案檢查
+未發現
+Expand
+Syscall 檔案檢查
+未發現
+Expand
+Xposed 模組
+未發現
+Expand
+LSPatch 應用程式
+未發現
+Expand
+Magisk 應用程式
+未發現
+Expand
+無障礙服務
+未發現
+Expand
+設置屬性
+可疑
+Expand
+帳戶
+未發現
+關於

@@ -148,3 +148,22 @@ Screenshots must not show notifications or other apps; one that does is deleted 
 ---
 
 <!-- Below this line: append only. -->
+
+## Amendment 2026-11-23
+
+Made after X0 was captured. No prediction or decision rule changes.
+
+- **Correction to §5, prediction 6.** `DRM_CREDENTIAL_COHERENCE` is the only finding left on the
+  Pixel in T1 and T2, not in P6, where `TEE_ATTESTATION` is OBSERVED too (E1–E3 results). The
+  prediction itself is unchanged.
+- **Capture command (§7 step 3).** The export tests were run with `adb shell am instrument -w`
+  against the installed tag APKs instead of Gradle, which reinstalls them and on HyperOS needs a
+  confirmation on the phone for every install. Same APKs, same test classes.
+- **Recapture.** The first capture of X0 was lost before it was checked (`raw/X0/cell.md`); all
+  three rounds were captured again, and only the second capture is kept.
+- **Black-box settings.** Native Root Detector was installed fresh with its two optional detection
+  sets off; they were switched on to match the E1 records, and both screens are kept. Ruru 1.1.1
+  is recorded below its first screen as well, which the E1 records are not. Duck's start-up
+  choices (notifications skipped, GitHub acceleration off, CRL online refresh not granted) leave
+  both builds on the built-in revocation snapshot, as in E1.
+- **Results** are in `results.md`, as for E1–E3.
