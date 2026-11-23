@@ -6,11 +6,41 @@ preparation (IEEE journal first), and contains only what that paper needs: the n
 the Evidence Contract they report through, a minimal SDK, a probe app that exports raw reports, and
 a research-mode RASP adapter with a command-line injector.
 
-> **Status:** E1–E3 evaluated. The repository was created from the TamperProbe product code on
+> **Status:** E1–E4 evaluated. The repository was created from the TamperProbe product code on
 > 2026-10-14 with a fresh history. Experiments E1–E3 were captured on tag `eval-2026-10-v1`
 > (2026-10-17 to 10-21); results are in [`experiments/E1-E3/results.md`](experiments/E1-E3/results.md).
+> E4, the clean-phone baseline, was captured with the same build on 2026-11-23
+> ([`experiments/E4/results.md`](experiments/E4/results.md)).
 > Three detectors whose concealment declarations the ladders falsified are reported as found and
 > are not changed on this tag; any fix gets a new tag and its own experiment.
+
+## Quick start
+
+Five steps from a fresh checkout to a scan report and the paper's tables. Each step links to the
+section with the details.
+
+1. **Install the tools.** JDK 17, Android Studio (or the Android SDK) with NDK `27.0.12077973` and
+   CMake `3.22.1`, and Python 3. Nothing outside the Python standard library is needed.
+2. **Point the build at them.** Create `local.properties` in the repository root with
+   `sdk.dir=<path to the Android SDK>`, and set `TAMPERPROBE_LAB_PYTHON` to your Python 3
+   interpreter (it runs the catalog generator during the build).
+3. **Build.** Run `./gradlew assembleDebug` (`gradlew.bat assembleDebug` on Windows). The probe app
+   is written to `app/build/outputs/apk/debug/app-debug.apk`; the two retrofit hosts are built too.
+   See [Build](#build).
+4. **Scan a phone.** Install the APK with `adb install app/build/outputs/apk/debug/app-debug.apk`
+   and open **TamperProbe Lab**. It scans every detector on launch and shows each detector's
+   evidence units; **Export JSON** saves the raw report. To capture without touching the phone,
+   use the instrumented export test in [Run a scan and export JSON](#run-a-scan-and-export-json).
+5. **Reproduce the paper's tables.** The raw exports of every cell are committed, so no phone is
+   needed:
+
+   ```bash
+   python3 experiments/tools/compare_cells.py experiments/E1-E3/raw/P0 experiments/E1-E3/raw/P1   # outcome matrix
+   python3 retrofit/tools/summarize_retrofit.py experiments/E1-E3/raw/T2                           # RootBeer and Ruru
+   python3 experiments/E4/declared_units.py experiments/E4/raw/X0                                  # clean phone
+   ```
+
+   Each experiment's `results.md` lists the exact commands behind every table, with their output.
 
 ## Relation to the thesis and the product
 
@@ -31,6 +61,7 @@ a research-mode RASP adapter with a command-line injector.
 | E2: RootBeer contract retrofit (done) | `retrofit/rootbeer`: RootBeer's nine checks reported through the Evidence Contract |
 | E3′: Ruru contract retrofit (done) | `retrofit/ruru`: ten of Ruru's checks reported through the Evidence Contract |
 | E3: black-box detectors on the same cells (done) | nothing; screens and exported reports are recorded in each `cell.md` |
+| E4: clean-phone baseline (done) | the probe app and both retrofit hosts on a stock, locked Xiaomi 12; [`experiments/E4/`](experiments/E4/) |
 | E5: RASP deployability on open-source F-Droid apps (deferred) | `tamperprobe-rasp` (research mode) and `injector/` |
 
 No result in this repository is a detection rate or a false-positive rate. A handful of phones in
